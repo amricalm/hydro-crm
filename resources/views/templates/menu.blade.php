@@ -16,24 +16,15 @@
                 </svg>
                 <span class="side-menu__label">Dashboard</span></a>
         </li>
-        {{-- <li class="slide">
-            <a class="side-menu__item data-bs-toggle=" href="{{ url('mproject') }}">
-                <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" width="24" height="24" viewBox="0 0 24 24">
-                    <path d="M10 3H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zM9 9H5V5h4v4zm11-6h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zm-1 6h-4V5h4v4zm-9 4H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1zm-1 6H5v-4h4v4zm8-6c-2.206 0-4 1.794-4 4s1.794 4 4 4 4-1.794 4-4-1.794-4-4-4zm0 6c-1.103 0-2-.897-2-2s.897-2 2-2 2 .897 2 2-.897 2-2 2z" />
-                </svg>
-                <span class="side-menu__label">Master Project</span><i class="angle fe fe-chevron-right"></i>
-            </a>
-        </li> --}}
 
         <!-- Menu dengan sub-sub menu -->
-        
+
         <li class="slide">
             <a class="side-menu__item" data-bs-toggle="slide" href="javascript:void(0);">
                 <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" width="24" height="24" viewBox="0 0 24 24"><path d="M22 7.999a1 1 0 0 0-.516-.874l-9.022-5a1.003 1.003 0 0 0-.968 0l-8.978 4.96a1 1 0 0 0-.003 1.748l9.022 5.04a.995.995 0 0 0 .973.001l8.978-5A1 1 0 0 0 22 7.999zm-9.977 3.855L5.06 7.965l6.917-3.822 6.964 3.859-6.918 3.852z"></path><path d="M20.515 11.126 12 15.856l-8.515-4.73-.971 1.748 9 5a1 1 0 0 0 .971 0l9-5-.97-1.748z"></path><path d="M20.515 15.126 12 19.856l-8.515-4.73-.971 1.748 9 5a1 1 0 0 0 .971 0l9-5-.97-1.748z"></path></svg>
             <span class="side-menu__label">Data Induk</span><i class="angle fe fe-chevron-right"></i></a>
             <ul class="slide-menu" style="display: none;">
-                <li><a href="{{ url('makun') }}" class="slide-item">Akun</a></li>
-                <li><a href="{{ url('saw') }}" class="slide-item">Saldo Awal</a></li>
+                {{-- <li><a href="" class="slide-item"></a></li> --}}
             </ul>
         </li>
 
@@ -42,11 +33,6 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" width="24" height="24" viewBox="0 0 24 24"><path d="M5 22h14c1.103 0 2-.897 2-2V9a1 1 0 0 0-1-1h-3V7c0-2.757-2.243-5-5-5S7 4.243 7 7v1H4a1 1 0 0 0-1 1v11c0 1.103.897 2 2 2zM9 7c0-1.654 1.346-3 3-3s3 1.346 3 3v1H9V7zm-4 3h2v2h2v-2h6v2h2v-2h2l.002 10H5V10z"></path></svg>
             <span class="side-menu__label">Transaksi</span><i class="angle fe fe-chevron-right"></i></a>
             <ul class="slide-menu" style="display: none;">
-                <li><a href="{{ url('tkm') }}" class="slide-item">Kas Masuk</a></li>
-                <li><a href="{{ url('tkk') }}" class="slide-item">Kas Keluar</a></li>
-                <li><a href="{{ url('tju') }}" class="slide-item">Jurnal Umum</a></li>
-                <li><a class="slide-item">------------------------</a></li>
-                <li><a href="{{ url('posting') }}" class="slide-item">Batch Posting</a></li>
             </ul>
         </li>
 
@@ -55,12 +41,6 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" width="24" height="24" viewBox="0 0 24 24"><path d="M19.937 8.68c-.011-.032-.02-.063-.033-.094a.997.997 0 0 0-.196-.293l-6-6a.997.997 0 0 0-.293-.196c-.03-.014-.062-.022-.094-.033a.991.991 0 0 0-.259-.051C13.04 2.011 13.021 2 13 2H6c-1.103 0-2 .897-2 2v16c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2V9c0-.021-.011-.04-.013-.062a.99.99 0 0 0-.05-.258zM16.586 8H14V5.414L16.586 8zM6 20V4h6v5a1 1 0 0 0 1 1h5l.002 10H6z"></path></svg>
             <span class="side-menu__label">Laporan</span><i class="angle fe fe-chevron-right"></i></a>
             <ul class="slide-menu" style="display: none;">
-                <li><a href="{{ url('lap/jurnal') }}" class="slide-item">Daftar Transaksi (Jurnal)</a></li>
-                <li><a href="{{ url('lap/bb') }}" class="slide-item">Buku Besar</a></li>
-                <li><a href="{{ url('lap/neracasaldo') }}" class="slide-item">Neraca Saldo</a></li>
-                {{-- <li><a href="{{ url('lap/neraca_percobaan') }}" class="slide-item">Neraca Percobaan</a></li>
-                <li><a href="{{ url('lap/neraca') }}" class="slide-item">Laporan Posisi Keuangan</a></li>
-                <li><a href="{{ url('lap/lr') }}" class="slide-item">Laporan Penghasilan Komprehensif</a></li> --}}
             </ul>
         </li>
         <li class="slide">

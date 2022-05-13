@@ -41,7 +41,7 @@
                                         <div class="text-center mb-3">
                                             <h1 class="mb-2">Log In</h1>
                                         </div>
-                                        <form class="mt-5" method="POST" id="frm" action="{{ url('aman/validasi') }}" role="form" onsubmit="return submited()">
+                                        <form class="mt-5" method="POST" id="frm" action="{{ url('beranda') }}" role="form" onsubmit="return submited()">
                                             @csrf
                                             <div class="input-group mb-4{{ $errors->has('username') ? ' has-error' : '' }}">
                                                 <div class="input-group-text">

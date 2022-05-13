@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AmanController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,6 +21,9 @@ Route::get('/keluar', [AmanController::class, 'logout'])->name('aman.keluar');
 //===================== ROUTE END INDEX ===========================//
 
 //===================== ROUTE LOGIN ===========================//
-Route::get('aman/validasi', [AmanController::class, 'validasi']);
 Route::post('aman/validasi', [AmanController::class, 'validasi']);
 //===================== ROUTE END LOGIN ===========================//
+
+//===================== ROUTE DASHBOARD ===========================//
+Route::post('beranda',  [DashboardController::class, 'index'])->name("beranda");
+//===================== ROUTE END DASHBOARD ===========================//

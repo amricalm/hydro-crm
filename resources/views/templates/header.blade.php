@@ -7,7 +7,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <!-- Title -->
-        <title>EDM {{ (!empty($judul) ? ' - '.$judul : '') }}</title>
+        <title>Hydro CRM {{ (!empty($judul) ? ' - '.$judul : '') }}</title>
 
         <!--Favicon -->
         <link rel="icon" href="{{ asset('assets/images/brand/favicon.ico')}}" type="image/x-icon" />
@@ -41,15 +41,15 @@
         <!-- INTERNAL Select2 css -->
         <link href="{{ asset('assets/plugins/bootstrap-datepicker/bootstrap-datepicker.css')}}" rel="stylesheet" />
         <link href="{{ asset('assets/plugins/select2/select2.min.css')}}" rel="stylesheet" />
-        
+
         <!-- Data table css -->
         {{-- <link href="{{ asset('assets/plugins/datatables/DataTables/css/dataTables.bootstrap4.min.css')}}" rel="stylesheet" />
         <link href="{{ asset('assets/plugins/datatables/Responsive/css/responsive.bootstrap4.min.css')}}" rel="stylesheet" /> --}}
 
         <!-- Color Skin css -->
         <link id="theme" href="{{ asset('assets/colors/color1.css')}}" rel="stylesheet" type="text/css" />
-        
-        
+
+
         <link href="../css/bootstrap-combobox.css" rel="stylesheet">
         <link href="../css/jquery.autocomplete.css" rel="stylesheet">
         <link href="{{ asset('css/app.css')}}" rel="stylesheet" type="text/css" />

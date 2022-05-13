@@ -30,14 +30,6 @@ class AmanController extends Controller
         session()->flush();
         return redirect()->route('aman');
     }
-    public function xvalidasi()
-    {
-        $sess['UserID'] = '01';
-        $sess['UserLogin'] = 'adn';
-        $sess['tglSaw'] = '2021-01-01';
-        $sess['tampilBarisTabel'] = 50;
-        session($sess);
-    }
     public function validasi(Request $request)
     {
         $username = $request->username;
@@ -111,20 +103,6 @@ class AmanController extends Controller
                 $sess['TampilBarisTabel'] = Adn::getSysVar('TampilBarisTabel');
                 $sess['PeriodeMulai'] = Adn::getSysVar('periode_mulai');
                 $sess['ServerPosting'] = Adn::getSysVar('ServerPosting');
-                // $sess['UserName'] = $user[0]->Name;
-                // $sess['UserEmployeeName'] = $user[0]->EmployeeName;
-                // $sess['UserEmail'] = $user[0]->Email;
-                // $sess['UserGroupID'] = $user[0]->GroupID;
-                // $sess['UserUnitID'] = $user[0]->UnitID;
-                // $sess['UserPositionID'] = $user[0]->PositionID;
-                // $sess['UserHP'] = $user[0]->Hp;
-                // $sess['UserFile'] = $user[0]->File;
-                // $sess['UserParaf'] = $user[0]->Paraf;
-                // $sess['UserSignature'] = $user[0]->Signature;
-                // $sess['UserActive'] = $user[0]->Active;
-                // $sess['UserReportTo'] = $user[0]->ReportTo;
-                // $sess['UserDeleted'] = $user[0]->Deleted;
-                // $sess['UserLevel'] = $user[0]->Level;
                 // $sess['UserMenu'] = $semuamenu;
                 session($sess);
                 return redirect()->route('modules');
@@ -136,7 +114,6 @@ class AmanController extends Controller
         }
     }
 
-
     function getMenu($groupID, $parentID)
     {
         return DB::table('role')
@@ -146,46 +123,5 @@ class AmanController extends Controller
             ->where('Type', '=', 'Menu')
             ->where('ParentID', '=', $parentID)
             ->get();
-    }
-    function KonversiNoSurat()
-    {
-        //try
-        //{
-        $surat = DB::table('mail')
-            ->selectRaw('mail.ID,MailNo,unit.UnitCode, MailCode, MONTH(MailDate) BlnMail,YEAR(MailDate) ThnMail')
-            ->join('unit', 'unit.ID', '=', "mail.MailFromID")
-            ->join('mailtype', 'mailtype.ID', '=', 'mail.MailTypeID')
-            ->get()->toArray();
-
-
-        $g = new VarGlobal();
-        foreach ($surat as $item) {
-            $No = $item->UnitCode . '/' . $item->MailCode . '/' . $item->MailNo . '/' . $g->romawi($item->BlnMail) . '/' . $item->ThnMail;
-            $simpan = DB::table('mail')
-                ->whereRaw('ID = ' . $item->ID)
-                ->update(array('MailNo' => $No));
-        }
-        echo 'sukses';
-        // }
-        // catch(Exception $e)
-        // {
-        //     $pesan = $e->getMessage();
-        // }
-
-        //$arr = array('status' => '$hasil', 'msg' => $pesan);
-        //return Response()->json($arr);
-    }
-
-
-    function compareSesionUserID($reportto, $unitid, $positionid)
-    {
-        $compareSesionUserID = DB::table('user')
-            ->select('ID')
-            ->whereRaw('ID =' . $reportto)
-            ->whereRaw('UnitID =' . $unitid)
-            ->whereRaw('PositionID =' . $positionid)
-            ->get();
-
-        return $compareSesionUserID;
     }
 }
