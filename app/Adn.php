@@ -21,11 +21,16 @@ class Adn{
         return $result;
     }
 
+    public static function SetDMY($aDate) {
+        $result = Date("Y-m-d",$aDate);
+        return $result;
+    }
+
     public static function setTglSd($aStrDate){
         $result =Date('Y-m-d', strtotime($aStrDate. ' + 1 days'));
         return $result;
     }
-    
+
     public static function getSysVar($col){
         $result = DB::table('sys_var')
                 ->where('sys_col','=',$col)
@@ -37,10 +42,10 @@ class Adn{
         $affected = DB::table('sys_var')
                     ->where('sys_col','=',$col)
                     ->update(['sys_val' => $val]);
-        
+
         //DB::enableQueryLog();
         //Log::info(DB::getQueryLog());
-        
+
         return $affected;
     }
 
