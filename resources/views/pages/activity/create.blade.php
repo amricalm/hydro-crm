@@ -387,7 +387,7 @@
 
 function loadData(page,status){
     $.ajax({
-        url:"/aktivitas/getTabel",
+        url:"{{ route('aktivitas.getTabel') }}",
         method:"POST",
         data:{page:page, status:status},
         success:function(data){

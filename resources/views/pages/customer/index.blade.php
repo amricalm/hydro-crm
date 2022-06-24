@@ -313,7 +313,7 @@
 
 function loadData(page,status){
     $.ajax({
-        url:"/pelanggan/getTabel",
+        url:"{{ route('pelanggan.getTabel') }}",
         method:"POST",
         data:{page:page, status:status},
         success:function(data){

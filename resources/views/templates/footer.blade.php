@@ -3,7 +3,7 @@
     <div class="container">
         <div class="row align-items-center flex-row-reverse">
             <div class="col-md-12 col-sm-12 text-center">
-                Copyright © 2021 <a href="javascript:void(0);">BWA</a>. Designed with <span class="fa fa-heart text-danger"></span> by <a href="javascript:void(0);"> andhana </a> All rights reserved
+                Copyright © 2022 <a href="javascript:void(0);">Hydro</a>. Designed with <span class="fa fa-heart text-danger"></span> by <a href="javascript:void(0);"> andhana </a> All rights reserved
             </div>
         </div>
     </div>
@@ -77,15 +77,15 @@
 <!-- Custom js-->
 <script src="{{asset('assets/js/custom.js')}}"></script>
 
-<script src="../js/NumberFormat.js"></script>
-<script src="../js/autoNumeric-min.js"></script>
-<script src="../js/bootstrap-combobox.js"></script>
-<script src="../js/adn.js"></script>
-<script src="../js/app.js"></script>
+<script src="{{asset('js/NumberFormat.js')}}"></script>
+<script src="{{asset('js/autoNumeric-min.js')}}"></script>
+<script src="{{asset('js/bootstrap-combobox.js')}}"></script>
+<script src="{{asset('js/adn.js')}}"></script>
+<script src="{{asset('js/app.js')}}"></script>
 
-<script src="../js/jquery.autocomplete.js"></script>
-<script src="../js/imask.min.js"></script>
-<script src="../js/moment.min.js"></script>
+<script src="{{asset('js/jquery.autocomplete.js')}}"></script>
+<script src="{{asset('js/imask.min.js')}}"></script>
+<script src="{{asset('js/moment.min.js')}}"></script>
 
 @stack('footer')
 <script>

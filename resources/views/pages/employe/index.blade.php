@@ -319,7 +319,7 @@
 
 function loadData(page,status){
     $.ajax({
-        url:"/karyawan/getTabel",
+        url:"{{ route('karyawan.getTabel') }}",
         method:"POST",
         data:{page:page, status:status},
         success:function(data){

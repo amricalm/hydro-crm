@@ -252,7 +252,7 @@
 
 function loadData(page,status){
     $.ajax({
-        url:"/aksi/getTabel",
+        url:"{{ route('aksi.getTabel') }}",
         method:"POST",
         data:{page:page, status:status},
         success:function(data){

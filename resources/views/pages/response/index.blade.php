@@ -252,7 +252,7 @@
 
 function loadData(page,status){
     $.ajax({
-        url:"/respon/getTabel",
+        url:"{{route('respon.getTabel') }}",
         method:"POST",
         data:{page:page, status:status},
         success:function(data){

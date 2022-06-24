@@ -41,19 +41,6 @@
                 <li><a href="{{ url('aktivitas') }}" class="slide-item">Aktivitas Sales</a></li>
             </ul>
         </li>
-
-        <li class="slide">
-            <a class="side-menu__item" data-bs-toggle="slide" href="javascript:void(0);">
-                <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" width="24" height="24" viewBox="0 0 24 24"><path d="M19.937 8.68c-.011-.032-.02-.063-.033-.094a.997.997 0 0 0-.196-.293l-6-6a.997.997 0 0 0-.293-.196c-.03-.014-.062-.022-.094-.033a.991.991 0 0 0-.259-.051C13.04 2.011 13.021 2 13 2H6c-1.103 0-2 .897-2 2v16c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2V9c0-.021-.011-.04-.013-.062a.99.99 0 0 0-.05-.258zM16.586 8H14V5.414L16.586 8zM6 20V4h6v5a1 1 0 0 0 1 1h5l.002 10H6z"></path></svg>
-            <span class="side-menu__label">Laporan</span><i class="angle fe fe-chevron-right"></i></a>
-            <ul class="slide-menu" style="display: none;">
-            </ul>
-        </li>
-        <li class="slide">
-            <a class="side-menu__item" href="{{ url('/setting')}}">
-                <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" width="24" height="24" viewBox="0 0 24 24"><path d="M3 11h8V3H3zm2-6h4v4H5zM3 21h8v-8H3zm2-6h4v4H5zm8-12v8h8V3zm6 6h-4V5h4zm-5.99 4h2v2h-2zm2 2h2v2h-2zm-2 2h2v2h-2zm4 0h2v2h-2zm2 2h2v2h-2zm-4 0h2v2h-2zm2-6h2v2h-2zm2 2h2v2h-2z"></path></svg>
-                <span class="side-menu__label">Pengaturan</span></a>
-        </li>
     </ul>
 </aside>
 <!--aside closed-->
