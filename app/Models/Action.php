@@ -13,6 +13,6 @@ class Action extends Model
     const CREATED_AT = 'con';
     const UPDATED_AT = 'uon';
 
-    protected $table = "aa_action";
-    protected $fillable = ['id','code','name','description','cby','uby'];
+    protected $table = "cr_action";
+    protected $fillable = ['id','code','name','desc','cby','uby'];
 }

@@ -13,6 +13,6 @@ class Activity extends Model
     const CREATED_AT = 'con';
     const UPDATED_AT = 'uon';
 
-    protected $table = "ep_activity";
+    protected $table = "cr_activity";
     protected $fillable = ['date','customer_id','action_id','action_desc','response_id','response_desc','cby','uby'];
 }

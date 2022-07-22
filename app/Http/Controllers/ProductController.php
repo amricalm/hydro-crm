@@ -18,6 +18,7 @@ class ProductController extends Controller
         if (!SESSION::has('UserID')) {
             // return redirect()->route('aman');
         }
+        $this->middleware('auth');
     }
 
     public function index(Request $req)
@@ -111,7 +112,7 @@ class ProductController extends Controller
         $q = Product::selectRaw("*")
         ->offset($limit_start)
         ->limit($limit)->get();
-        $jmh = DB::table('aa_product');
+        $jmh = DB::table('cr_product');
         $total_records =$jmh->count();
 
         $kelas_baris_akhir ='';

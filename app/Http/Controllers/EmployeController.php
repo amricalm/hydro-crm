@@ -16,6 +16,7 @@ class EmployeController extends Controller
         if (!SESSION::has('UserID')) {
             // return redirect()->route('aman');
         }
+        $this->middleware('auth');
     }
 
     public function index(Request $req)

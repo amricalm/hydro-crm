@@ -25,6 +25,9 @@ class AmanController extends Controller
             return view('pages/aman');
         }
     }
+
+    $this->middleware('auth');
+
     public function logout()
     {
         session()->flush();

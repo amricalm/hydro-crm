@@ -16,6 +16,7 @@ class ActionController extends Controller
         if (!SESSION::has('UserID')) {
             // return redirect()->route('aman');
         }
+        $this->middleware('auth');
     }
 
     public function index(Request $req)
@@ -106,7 +107,7 @@ class ActionController extends Controller
 
         $q = Action::selectRaw("*")
         ->limit($limit)->get();
-        $jmh = DB::table('aa_product_type');
+        $jmh = DB::table('cr_product_type');
         $total_records =$jmh->count();
 
         $kelas_baris_akhir ='';

@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
 use App\Models\Employe;
 use App\Models\Customer;
+use App\Models\MsUpload;
+use App\Exports\AllExport;
+use App\Imports\CustomerImport;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Adn;
 
 class CustomerController extends Controller
@@ -17,6 +21,7 @@ class CustomerController extends Controller
         if (!SESSION::has('UserID')) {
             // return redirect()->route('aman');
         }
+        $this->middleware('auth');
     }
 
     public function index(Request $req)
@@ -202,5 +207,41 @@ class CustomerController extends Controller
             $result = true;
         }
         return json_encode($result);
+    }
+
+    public function template(Request $request)
+    {
+        $array = array('type'=>'customer');
+        return Excel::download(new AllExport($array),'Pelanggan.xlsx');
+    }
+
+    public function upload(Request $request)
+    {
+        $ext = $request->file('file')->getClientOriginalExtension();
+        if($ext!='xls'&&$ext!='xlsx')
+        {
+            echo 'File harus file excel (xls/xlsx)!';
+            die();
+        }
+
+        $fileModel = new MsUpload;
+        $fileModel->eid = (auth()->user()->pid!='') ? auth()->user()->pid : auth()->user()->id;
+        $fileModel->desc = 'Import Pelanggan';
+        $fileModel->cby = auth()->user()->id;
+        $fileModel->uby = '0';
+
+        if($request->file())
+        {
+            $filename = time().'_'.$request->file->getClientOriginalName();
+            $filepath = $request->file('file')->storeAs('',$filename,'upload');
+
+            $fileModel->url = $filepath;
+            $fileModel->original_file = 'uploads/'.$filepath;
+            $fileModel->save();
+
+            $import = Excel::import(new CustomerImport, $fileModel->original_file);
+
+            // echo 'Berhasil|'.$request->file->extension().'|'.$fileModel->original_file;
+        }
     }
 }

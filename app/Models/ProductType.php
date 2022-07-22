@@ -13,6 +13,6 @@ class ProductType extends Model
     const CREATED_AT = 'con';
     const UPDATED_AT = 'uon';
 
-    protected $table = "aa_product_type";
+    protected $table = "cr_product_type";
     protected $fillable = ['id','code','name','cby','uby'];
 }

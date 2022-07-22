@@ -13,6 +13,6 @@ class Response extends Model
     const CREATED_AT = 'con';
     const UPDATED_AT = 'uon';
 
-    protected $table = "aa_response";
-    protected $fillable = ['id','code','name','description','cby','uby'];
+    protected $table = "cr_response";
+    protected $fillable = ['id','code','name','desc','cby','uby'];
 }

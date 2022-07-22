@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
 use App\Models\Activity;
+use App\Models\Address;
 use App\Adn;
 
 class ActivityController extends Controller
@@ -23,12 +24,12 @@ class ActivityController extends Controller
         $app['judul']   = "Aktivitas";
         $app['sales']   = DB::table('aa_employe')->get()->toArray();
         $app['customer']   = DB::table('aa_customer')->get()->toArray();
-        $app['action']   = DB::table('aa_action')->get()->toArray();
-        $app['response']   = DB::table('aa_response')->get()->toArray();
+        $app['action']   = DB::table('cr_action')->get()->toArray();
+        $app['response']   = DB::table('cr_response')->get()->toArray();
 
         $tampilBarisTabel  = Adn::getSysVar('TampilBarisTabel');
         Session::put('TampilBarisTabel', $tampilBarisTabel);
-        return view('pages.activity.create', $app);
+        return view('pages.activity.sales', $app);
     }
 
     public function get(Request $req)
@@ -46,23 +47,43 @@ class ActivityController extends Controller
             {
                 $obj = Activity::find($req->id);
             }
-            if($obj==null){
+            if($obj==null)
+            {
                 $response= Adn::Response(false,"Data Karyawan Tidak Ditemukan.");
                 return response()->json($response);
             }
 
-            $obj->nip=$req->nip;
-            $obj->name=$req->name;
-            $obj->address=$req->address;
-            $obj->hp=$req->hp;
-            $obj->email=$req->email;
-            $obj->facebook=$req->facebook;
-            $obj->instagram=$req->instagram;
-            $obj->status=!($req->aktif);
-            $obj->cby=1;
-            $obj->uby=1;
+            $activity = Activity::updateOrCreate(
+                [ 'id' => $req->id ],
+                [
+                    'date' => $req->date,
+                    'customer_id' => $req->customer_id,
+                    'sales_id' => $req->sales_id,
+                    'action_id' => $req->action_id,
+                    'action_desc' => $req->action_desc,
+                    'response_id' => $req->response_id,
+                    'response_desc' => $req->response_desc,
+                    'cby' => 1,
+                    'uby' => 1
+                ]
+            );
 
-            $obj->save();
+            $address = Address::updateOrCreate(
+                [ 'pid' => $req->customer_id ],
+                [
+                    'type' => $req->type,
+                    'address' => $req->address,
+                    'province' => 1, //$req->province,
+                    'city' => 1, //$req->city,
+                    'district' => 0,
+                    'village' => 0,
+                    'post_code' => $req->post_code,
+                    'latitude' => '',
+                    'longitude' => '',
+                    'cby' => 1,
+                    'uby' => 1
+                ]
+            );
 
             $response= Adn::Response(true,"Sukses");
         }
@@ -118,19 +139,19 @@ class ActivityController extends Controller
         $q = Activity::selectRaw("*")
         ->offset($limit_start)
         ->limit($limit)->get();
-        $jmh = DB::table('ep_activity');
+        $jmh = DB::table('cr_activity');
         $total_records =$jmh->count();
 
         $kelas_baris_akhir ='';
         $tr = '';
         $status = 'AKTIF';
         foreach ($q as $row) {
-            $history = Activity::select('aa_employe.name as name','aa_action.name as action','aa_response.name as response','response_desc')
-                        ->join('aa_employe','ep_activity.sales_id','=','aa_employe.id')
-                        ->join('aa_action','ep_activity.action_id','=','aa_action.id')
-                        ->join('aa_response','ep_activity.response_id','=','aa_response.id')
-                        ->where('ep_activity.id',$row->id)
-                        ->first();
+            $history = Activity::select('aa_employe.name as name','cr_action.name as action','cr_response.name as response','response_desc')
+                        ->join('aa_employe','cr_activity.sales_id','=','aa_employe.id')
+                        ->join('cr_action','cr_activity.action_id','=','cr_action.id')
+                        ->join('cr_response','cr_activity.response_id','=','cr_response.id')
+                        ->where('cr_activity.id',$row->id)
+                        ->get();
             $tr .= '
             <tr ' . $kelas_baris_akhir .'>
               <input type="hidden" value="'. $row->id .'">

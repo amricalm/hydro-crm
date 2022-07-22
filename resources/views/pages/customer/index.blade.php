@@ -19,7 +19,8 @@
                     </div>
                     <div class="page-rightheader">
                         <div class="btn-list">
-                            <a href="javascript:void(0)" id="createNew" class="btn btn-outline-primary" ><i class="fe fe-plus-square"></i>Tambah</a>
+                            <a href="javascript:void(0)" id="import" class="btn btn-sm btn-secondary"><i class="fe fe-download"></i> Impor dari Excel</a>
+                            <a href="javascript:void(0)" id="createNew" class="btn btn-outline-primary" ><i class="fe fe-plus-square"></i> Tambah</a>
                         </div>
                     </div>
                 </div>
@@ -166,7 +167,71 @@
     </div>
   </div>
 <!--#endregion === Modal=== -->
+<!-- Modal -->
+<div class="modal" tabindex="-1" id="modalImport" data-bs-backdrop="static">
+    <div class="modal-dialog modal-fullscreen bwa-modal-fullscreen">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="page-title text-primary">Import Pelanggan</h4>
+            <div class="float-right">
+                <button type="button" class="btn btn-outline-primary position-relative" id="btnProses" tabindex="-1"><i class="fe fe-save"></i>
+                    Simpan</button>
+                <button type="button" class="btn btn-outline-danger position-relative" id="batalImport"><i class="fe fe-slash"></i>
+                        Batal</button>
+                <button type="button" id="btn-close-import" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
+            </div>
+        </div>
+        <div class="modal-body bwa-modal_body">
+            <div class="bwa-modal-container">
+                <!-- Row -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row row-sm">
+                                    <div class="col-lg-6 col-md-12">
+                                        <form id="frmImpor">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <ol>
+                                                        <li>
+                                                            <div class="row p-2">
+                                                                <div class="col-md-12">
+                                                                    <label for="files">Download Template Pelanggan</label>
+                                                                </div>
+                                                                <div class="col-md-12">
+                                                                    <a href="{{ url('pelanggan/export') }}" target="_blank" class="btn btn-sm btn-primary"><i class="fas fa-file-download"></i> Download</a>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="row p-2">
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <label for="files">Upload Filenya disini</label>
+                                                                        <input type="file" class="form-control-file" name="file" id="file">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    </ol>
+                                                </div>
+                                            </div>
+                                        </form><!-- END Form -->
+                                    </div>
+                                </div>
 
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Row -->
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
 @endsection
 @section('footer')
 <?php
@@ -224,6 +289,10 @@
             $('#add-modal').show();
         });
 
+        $('#import').click(function(){
+            $('#modalImport').show();
+        });
+
         $(document).on('click','.btn-edit',function(){
             mode = 'EDIT';
             var id = $(this).closest('tr').find('input').val();
@@ -265,9 +334,18 @@
             $('#add-modal').hide();
         });
 
+        $('#btn-close-import').click(function () {
+            $('#modalImport').hide();
+        });
+
         $('#batal').click(function () {
             mode = 'TAMBAH';
-            var frm = document.querySelector("#trn")
+            var frm = document.querySelector("#trn");
+            frm.reset();
+        });
+
+        $('#batalImport').click(function () {
+            var frm = document.querySelector("#frmImpor");
             frm.reset();
         });
 
@@ -305,6 +383,31 @@
                 el.html('Simpan');
                 el.removeAttr('disabled');
             });//$.ajax
+        });
+
+        $('#btnProses').on('click',function(){
+            var file_data = $('#file').prop('files')[0];
+            var form_data = new FormData();
+            form_data.append('file', file_data);
+            form_data.append("_token","{{ csrf_token() }}");
+
+            $.ajax({
+                url: '{{ route('customer.upload') }}',
+                dataType: 'text',
+                cache: false,
+                contentType: false,
+                processData: false,
+                data: form_data,
+                type: 'post',
+                    success: function(response){
+                        if(response=='Berhasil'){
+                            alert('Sukses.');
+                            window.location.reload();
+                        }else{
+                            alert('Gagal.');
+                        }
+                    },
+            });
         });
 
         $('.select2').select2();

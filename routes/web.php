@@ -1,8 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redirect;
 use App\Http\Controllers\AmanController;
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EmployeController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
@@ -23,7 +26,11 @@ use App\Http\Controllers\ActivityController;
 */
 
 //===================== ROUTE INDEX ===========================//
-Route::get('/', [AmanController::class, 'index'])->name('aman');
+Auth::routes();
+Route::get('/', function () {
+    return (!Auth::check()) ? Redirect::route('login') : Redirect::route('home');
+});
+// Route::get('/', [AmanController::class, 'index'])->name('aman');
 Route::get('/keluar', [AmanController::class, 'logout'])->name('aman.keluar');
 //===================== ROUTE END INDEX ===========================//
 
@@ -32,7 +39,7 @@ Route::post('aman/validasi', [AmanController::class, 'validasi']);
 //===================== ROUTE END LOGIN ===========================//
 
 //===================== ROUTE DASHBOARD ===========================//
-Route::get('beranda',  [DashboardController::class, 'index']);
+Route::get('/home', [HomeController::class, 'index'])->name('home');
 //===================== ROUTE END DASHBOARD ===========================//
 
 //============================= KARYAWAN ============================//
@@ -51,6 +58,8 @@ Route::post('/pelanggan/get', [CustomerController::class, 'get'])->name('custome
 Route::post('/pelanggan', [CustomerController::class, 'save'])->name('customer.save');
 Route::post('/pelanggan/delete', [CustomerController::class, 'delete'])->name('customer.delete');
 Route::post('/pelanggan/isExist', [CustomerController::class, 'isExist'])->name('customer.isExist');
+Route::get('/pelanggan/export',[CustomerController::class, 'template']);
+Route::post('/pelanggan/export',[CustomerController::class, 'upload'])->name('customer.upload');
 //===================== ROUTE END PELANGGAN ===========================//
 
 
@@ -93,10 +102,9 @@ Route::post('/respon/isExist', [ResponseController::class, 'isExist'])->name('re
 
 //============================= PELANGGAN ============================//
 Route::get('/aktivitas', [ActivityController::class, 'index']);
-Route::post('/aktivitas/getTabel', [ActivityController::class, 'getTabel'])->name('aktivitas.getTabel');
-Route::post('/aktivitas/get', [ActivityController::class, 'get'])->name('aktivitas.get');
-Route::post('/aktivitas', [ActivityController::class, 'save'])->name('aktivitas.save');
-Route::post('/aktivitas/delete', [ActivityController::class, 'delete'])->name('aktivitas.delete');
-Route::post('/aktivitas/isExist', [ActivityController::class, 'isExist'])->name('aktivitas.isExist');
+Route::post('/aktivitas/getTabel', [ActivityController::class, 'getTabel'])->name('activity.getTabel');
+Route::post('/aktivitas/get', [ActivityController::class, 'get'])->name('activity.get');
+Route::post('/aktivitas', [ActivityController::class, 'save'])->name('activity.save');
+Route::post('/aktivitas/delete', [ActivityController::class, 'delete'])->name('activity.delete');
+Route::post('/aktivitas/isExist', [ActivityController::class, 'isExist'])->name('activity.isExist');
 //===================== ROUTE END PELANGGAN ===========================//
-
