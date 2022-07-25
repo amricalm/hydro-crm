@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Log;
 use App\Models\Activity;
 use App\Models\Address;
@@ -14,6 +15,7 @@ class ActivityController extends Controller
 {
     public function __construct()
     {
+        $this->middleware('auth');
         if (!SESSION::has('UserID')) {
             // return redirect()->route('aman');
         }
@@ -35,8 +37,59 @@ class ActivityController extends Controller
     public function get(Request $req)
     {
         $data = Activity::where('id',$req->id)->get()->toArray();
-
         return response()->json($data);
+    }
+
+    public function createx(Request $req)
+    {
+        $app['judul']       = "Aktivitas";
+        $app['sales']       = DB::table('aa_employe')->get()->toArray();
+        $app['customer']    = DB::table('aa_customer')->get()->toArray();
+        $app['action']      = DB::table('cr_action')->get()->toArray();
+        $app['response']    = DB::table('cr_response')->get()->toArray();
+
+        return view('pages.activity.create', $app);
+    }
+
+    public function create()
+    {
+        $app['judul']       = "Aktivitas";
+        $app['sales']       = DB::table('aa_employe')->get()->toArray();
+        $app['customer']    = DB::table('aa_customer')->get()->toArray();
+        $app['category']    = DB::table('rf_category_action')->get()->toArray();
+        $app['action']      = DB::table('cr_action')->get()->toArray();
+        $app['response']    = DB::table('cr_response')->get()->toArray();
+
+        $app['ModeEdit'] = "Edit";
+        return view('pages.activity.create', $app);
+    }
+
+    public function getByCategoryAction(Request $req)
+    {
+        $action = DB::table('cr_action')->where('category_id',$req->id)->get()->toArray();
+        $response = DB::table('cr_response')->where('category_id',$req->id)->get()->toArray();
+        return Response::json(array('success' => true,'action'=>$action,'response'=>$response));
+    }
+
+    public static function getCustomer(Request $req)
+    {
+        $id = trim($req->id);
+        try {
+            $query = DB::table('aa_customer')->where('id', 'like',"%".$id."%")->first();
+            if(isset($query)) {
+                $qry = trim($query->id);
+                if($id == $qry) {
+                    $query = DB::table('aa_customer')->where('id', $query->id)->first();
+                    return response()->json(["IsSuccess"=>true,"ID"=>$query->id,"Obj"=>$query]);
+                } else {
+                    return response()->json(["IsSuccess"=>true,"ID"=>""]);
+                }
+            } else {
+                return response()->json(["IsSuccess"=>true,"ID"=>""]);
+            }
+        } catch(\Exception $e) {
+            return response()->json(['error'=>$e]);
+        }
     }
 
     public function save(Request $req)

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use App\Http\Controllers\AmanController;
@@ -103,8 +104,19 @@ Route::post('/respon/isExist', [ResponseController::class, 'isExist'])->name('re
 //============================= PELANGGAN ============================//
 Route::get('/aktivitas', [ActivityController::class, 'index']);
 Route::post('/aktivitas/getTabel', [ActivityController::class, 'getTabel'])->name('activity.getTabel');
+Route::post('/aktivitas/getByCategoryAction', [ActivityController::class, 'getByCategoryAction']);
+Route::post('/aktivitas/getCustomer', [ActivityController::class, 'getCustomer']);
 Route::post('/aktivitas/get', [ActivityController::class, 'get'])->name('activity.get');
 Route::post('/aktivitas', [ActivityController::class, 'save'])->name('activity.save');
 Route::post('/aktivitas/delete', [ActivityController::class, 'delete'])->name('activity.delete');
 Route::post('/aktivitas/isExist', [ActivityController::class, 'isExist'])->name('activity.isExist');
+Route::get('/aktivitas/create', [ActivityController::class, 'create'])->name('activity.create');
 //===================== ROUTE END PELANGGAN ===========================//
+
+Route::get('/clear-cache', function () {
+    $configCache = Artisan::call('config:cache');
+    $clearCache = Artisan::call('cache:clear');
+    $routeCache = Artisan::call('route:clear');
+    $viewCache = Artisan::call('view:clear');
+    echo 'Berhasil';
+});

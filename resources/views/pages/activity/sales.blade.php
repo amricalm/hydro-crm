@@ -19,7 +19,7 @@
                     </div>
                     <div class="page-rightheader">
                         <div class="btn-list">
-                            <a href="javascript:void(0)" id="createNew" class="btn btn-outline-primary" ><i class="fe fe-plus-square"></i>Tambah</a>
+                            <a href="{{ route('activity.create') }}" id="createNew" class="btn btn-outline-primary" ><i class="fe fe-plus-square"></i>Tambah</a>
                         </div>
                     </div>
                 </div>
@@ -27,8 +27,6 @@
                 <!-- Row -->
                 <div class="row">
                     <div class="col-md-12 col-lg-12">
-
-
                         <div class="card mb-4">
                             <div class="card-body py-4">
                                 <div class="form-group row row-sm mb-0">
