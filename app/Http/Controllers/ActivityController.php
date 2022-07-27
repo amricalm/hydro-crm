@@ -6,10 +6,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\Activity;
+use App\Models\ActivityDtl;
 use App\Models\Address;
+use Carbon\Carbon;
 use App\Adn;
+use Validator;
 
 class ActivityController extends Controller
 {
@@ -59,7 +63,7 @@ class ActivityController extends Controller
         $app['category']    = DB::table('rf_category_action')->get()->toArray();
         $app['action']      = DB::table('cr_action')->get()->toArray();
         $app['response']    = DB::table('cr_response')->get()->toArray();
-
+        $app['user']        = DB::table('users')->where('id', auth()->user()->id)->first();
         $app['ModeEdit'] = "Edit";
         return view('pages.activity.create', $app);
     }
@@ -92,7 +96,7 @@ class ActivityController extends Controller
         }
     }
 
-    public function save(Request $req)
+    public function save_old(Request $req)
     {
         try {
             $obj = new Activity;
@@ -280,5 +284,67 @@ class ActivityController extends Controller
             $result = true;
         }
         return json_encode($result);
+    }
+
+    public function search(Request $request)
+    {
+        $search = $request->search;
+        $qry = DB::table('aa_customer')
+            ->where('name', 'LIKE', '%'.$search.'%')
+            ->orWhere('hp', 'LIKE', '%'.$search.'%')
+            ->orWhere('address','LIKE', '%'.$search.'%')
+            ->orWhere('email','LIKE', '%'.$search.'%')
+            ->orWhere('facebook','LIKE', '%'.$search.'%')
+            ->orWhere('instagram','LIKE', '%'.$search.'%')
+            ->select('id','name')
+            ->get();
+        $array = array('resultSearch'=>$qry);
+        echo (count($qry)>0) ? json_encode($array) : '' ;
+    }
+
+    public static function validation(Request $req)
+    {
+        $validator = Validator::make($req->all(), [
+            'customer' => 'required',
+            'hp' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error'=>$validator->errors()->all()]);
+        }
+
+        return response()->json(["status"=>true,"Message"=>"Data Lengkap."]);
+    }
+
+    public static function save(Request $req)
+    {
+        $req = $req->all();
+        $activityId = 0;
+        foreach ($req as $k => $v) {
+            if($k == 0) {
+                $hdr = new Activity;
+                $hdr->date          = Carbon::now()->toDateTimeString();
+                $hdr->customer_id   = isset($v["customer"]) ? $v["customer"] : 0;
+                $hdr->sales_id      = auth()->user()->eid;
+                $hdr->cby           = auth()->user()->id;
+                $hdr->save();
+                $activityId = $hdr->id;
+            } else {
+                foreach ($v as $kdtl => $vdtl) {
+                    $getAction          = DB::table('cr_action')->where('name',$vdtl['action'])->first();
+                    $getResponse        = DB::table('cr_response')->where('name',$vdtl['response'])->first();
+                    
+                    $dtl = new ActivityDtl;
+                    $dtl->activity_id   = $activityId;
+                    $dtl->action_id     = $getAction->id;
+                    $dtl->action_desc   = $vdtl['actionDesc'];
+                    $dtl->response_id   = $getResponse->id;
+                    $dtl->response_desc = $vdtl['responseDesc'];
+                    $dtl->cby           = auth()->user()->id;
+                    $dtl->save();
+                }
+            }
+        }
+        return response()->json(["IsSuccess"=>true,"Message"=>"Berhasil disimpan"]);
     }
 }

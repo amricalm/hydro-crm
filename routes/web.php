@@ -107,10 +107,13 @@ Route::post('/aktivitas/getTabel', [ActivityController::class, 'getTabel'])->nam
 Route::post('/aktivitas/getByCategoryAction', [ActivityController::class, 'getByCategoryAction']);
 Route::post('/aktivitas/getCustomer', [ActivityController::class, 'getCustomer']);
 Route::post('/aktivitas/get', [ActivityController::class, 'get'])->name('activity.get');
-Route::post('/aktivitas', [ActivityController::class, 'save'])->name('activity.save');
+Route::post('/aktivitas', [ActivityController::class, 'save_old'])->name('activity.save');
 Route::post('/aktivitas/delete', [ActivityController::class, 'delete'])->name('activity.delete');
 Route::post('/aktivitas/isExist', [ActivityController::class, 'isExist'])->name('activity.isExist');
 Route::get('/aktivitas/create', [ActivityController::class, 'create'])->name('activity.create');
+Route::post('/aktivitas/search', [ActivityController::class, 'search']);
+Route::post('/aktivitas/validation', [ActivityController::class, 'validation']);
+Route::post('/aktivitas/save', [ActivityController::class, 'save']);
 //===================== ROUTE END PELANGGAN ===========================//
 
 Route::get('/clear-cache', function () {

@@ -37,14 +37,15 @@ class HomeController extends Controller
                             ->where('ca.id', $this->general->category_action_id('KPI'))
                             ->select('a.id','a.name')
                             ->get();
-        $app['capaian'] = DB::table('cr_action AS ac')
-                        ->leftJoin('cr_activity AS vit','ac.id', '=', 'vit.action_id')
-                        ->selectRaw('ac.id, COUNT(vit.id) AS result')
+        $app['capaian'] = DB::table('cr_action AS act')
+                        ->selectRaw('act.id, COUNT(dtl.action_id) AS result')
+                        ->leftJoin('cr_activity_dtl AS dtl','act.id', '=', 'dtl.action_id')
+                        ->leftJoin('cr_activity AS vit','dtl.activity_id', '=', 'vit.id')
                         ->leftJoin('rf_category_action as ca','category_id','=','ca.id')
-                        ->join('aa_employe AS em','vit.sales_id', '=', 'em.id')
+                        ->leftjoin('aa_employe AS em','vit.sales_id', '=', 'em.id')
                         ->where('ca.id', $this->general->category_action_id('KPI'))
-                        ->where('em.id', $app['salesId'])
-                        ->groupBy('ac.id')
+                        ->where('vit.sales_id', $app['salesId'])
+                        ->groupBy('act.id')
                         ->get();
 
         $countDate = Carbon::parse($app['startDate'])->diffInDays(Carbon::parse($app['endDate'])) + 1;
@@ -74,13 +75,14 @@ class HomeController extends Controller
                 $dtimefr = $app['startDate'].' '.$app['time'][$i]->name.':00';
                 $dtimeto = $app['endDate'].' '.substr($app['time'][$i]->name,0,2).':59:00';
 
-                $qry    = DB::table('cr_action AS ac')
-                        ->leftJoin('cr_activity AS vit','ac.id', '=', 'vit.action_id')
-                        ->join('aa_employe AS em','vit.sales_id', '=', 'em.id')
-                        ->selectRaw('ac.id, COUNT(vit.id) AS results')
+                $qry    = DB::table('cr_action AS act')
+                        ->leftJoin('cr_activity_dtl AS dtl','act.id', '=', 'dtl.action_id')
+                        ->leftJoin('cr_activity AS vit','dtl.activity_id', '=', 'vit.id')
+                        ->leftjoin('aa_employe AS em','vit.sales_id', '=', 'em.id')
+                        ->selectRaw('act.id, COUNT(vit.id) AS results')
                         ->whereBetween('date', [$dtimefr, $dtimeto])
                         ->where('em.id', $app['salesId'])
-                        ->groupBy('ac.id')
+                        ->groupBy('act.id')
                         ->get()->toArray();
 
                 if(count($qry) > 0) {

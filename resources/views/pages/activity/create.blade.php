@@ -8,7 +8,7 @@
             <div class="col-md-12">
                 <div class="card mb-0">
                     <div class="card-header">
-                        <h4 class="col-md-2 page-title text-primary">{{ $judul }} &nbsp;&nbsp;{{ date('d-m-Y') }}</h4>
+                        <h4 class="col-md-2 page-title text-primary"><a href="{{ url('aktivitas') }}">{{ $judul }}</a> &nbsp;&nbsp;{{ date('d-m-Y') }}</h4>
                         <div class="col-md-8 text-center">
                             <div id="jam" class="page-title text-primary">0</div>
                         </div>
@@ -22,39 +22,7 @@
                     <div class="card-body bg-light">
                         <div class="row row-sm">
                             <div class="col-lg-12 col-md-12">
-                                <form class="" id='trn'>
-                                    <div class="row">
-                                        <form>
-                                            <div class="col-md-4">
-                                                <div class="form-group row row-sm mb-0">
-                                                    <label class="col-md-3 form-label">Cari Nama</label>
-                                                    <div class="col-md-9">
-                                                        <input type="text" name="search_name" id="search_name" autocomplete="off" class="form-control  form-control-sm  mb-2" tabindex="13">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="form-group row row-sm mb-0">
-                                                    <label class="col-md-3 form-label">Cari HP</label>
-                                                    <div class="col-md-9">
-                                                        <input type="text" name="search_hp" id="search_hp" autocomplete="off" class="form-control  form-control-sm  mb-2" tabindex="13">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <div class="form-group row row-sm mb-0">
-                                                    <label class="col-md-3 form-label">Cari Alamat</label>
-                                                    <div class="col-md-9">
-                                                        <input type="text" name="search_email" id="search_email" autocomplete="off" class="form-control  form-control-sm  mb-2" tabindex="13">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-1 text-right">
-                                                <button class="btn btn-sm btn-primary" id="search"><i class="fe fe-search"></i>Tampil</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                    <hr class="border-info mt-4 mb-4">
+                                <form class="" id="trn">
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group row row-sm mb-0">
@@ -68,6 +36,19 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="col-md-6">
+                                            <form id="frmsearch">
+                                                <div class="form-group row row-sm mb-0">
+                                                    <label class="col-md-3 form-label">Cari</label>
+                                                    <div class="col-md-7">
+                                                        <input type="text" name="search" id="txtSearch" autocomplete="off" class="form-control  form-control-sm  mb-2" placeholder="Cari Nama, Hp, Alamat, Email, FB, IG" tabindex="13">
+                                                    </div>
+                                                    <div class="col-md-1 text-right">
+                                                        <button class="btn btn-sm btn-primary" id="btnSearch"><i class="fe fe-search"></i> Cari</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
                                     </div>
                                     <hr class="border-info mt-4 mb-4">
                                     <div class="row">
@@ -75,7 +56,7 @@
                                             <div class="form-group row row-sm mb-0">
                                                 <label class="col-md-3 form-label">Nama Pelanggan</label>
                                                 <div class="col-md-9">
-                                                    <select name="customer" id="customer" class="form-select form-control  form-control-sm  mb-2" tabindex="10">
+                                                    <select name="customer" id="customer" class="form-select form-control form-control-sm mb-2" tabindex="10">
                                                         <option value="">-- Pilih Pelanggan --</option>
                                                         @foreach($customer as $item)
                                                         <option value="{{$item->id}}">{{$item->name}}</option>
@@ -118,53 +99,6 @@
                                         </div>
                                     </div>
                                     <hr class="border-info mt-4 mb-4">
-                                    {{-- <div class="row" id="tbl-transaksi">
-                                        <div class="row" id="tbody">
-                                            <div class="row tr_clone" id="tr">
-                                                <div class="col-md-2">
-                                                    <div class="form-group row row-sm mb-0">
-                                                        <label class="form-label">Aksi</label>
-                                                        <div>
-                                                            <select name="action" id="action" class="form-select form-control  form-control-sm  mb-2" tabindex="10">
-                                                                <option value="" disabled>--- Pilih Aksi ---</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <div class="form-group row row-sm mb-0">
-                                                        <label class="form-label">Keterangan Aksi</label>
-                                                        <div>
-                                                            <textarea type="text" name="action_desc" id="action_desc" rows="1" autocomplete="off" class="form-control  form-control-sm  mb-2" tabindex="13"></textarea>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <div class="form-group row row-sm mb-0">
-                                                        <label class="form-label">Respon</label>
-                                                        <div>
-                                                            <select name="response" id="response" class="form-select form-control  form-control-sm  mb-2" tabindex="10">
-                                                                <option value="" disabled>--- Pilih Respon ---</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <div class="form-group row row-sm mb-0">
-                                                        <label class="form-label">Keterangan Respon</label>
-                                                        <div>
-                                                            <textarea type="text" name="response_desc" id="response_desc" rows="1" autocomplete="off" class="form-control  form-control-sm  mb-2" tabindex="13"></textarea>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-1 text-right ">
-                                                    <button class="btn btn-sm btn-primary" id="tambah-baris"><i class="fe fe-plus"></i> Tambah</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div> --}}
-
-
                                     <table class="table-sm table-condensed table-bordered small fw-bold" id="tbl-transaksi">
                                         <thead>
                                             <tr>
@@ -217,9 +151,6 @@
                                             </tr>
                                         </tbody>
                                     </table>
-
-
-
                                 </form><!-- END Form -->
                             </div>
                         </div>
@@ -274,10 +205,6 @@
             }
             currentTime();
 
-            $('#btn-close').click(function () {
-                $('#add-modal').hide();
-            });
-
             $('#batal').click(function () {
                 mode = 'TAMBAH';
                 var frm = document.querySelector("#trn")
@@ -288,42 +215,6 @@
                 getByCategoryAction($(this).val());
             });
             $('#category').trigger('change');
-
-            $('#save').click(function(e) {
-                e.preventDefault();
-                var el = $(this);
-                el.html('...');
-
-                var kirim = true;
-                const frm = new FormData(document.querySelector("#trn"));
-                const obj = Object.fromEntries(frm.entries());
-
-                obj.mode = mode;
-
-                $.ajax({
-                    data: obj,
-                    url:  "{{ route('activity.save') }}",
-                    type: "POST",
-                    success: function(msg) {
-                        console.log(msg);
-                        if (msg.IsSuccess){
-                            alert('Sukses.');
-                            $('#trn').trigger("reset");
-                            $('#add-modal').hide();
-                            window.location.reload();
-                        }else{
-                            alert(msg.Message)
-                        }
-
-                    },
-                    error: function(msg) {
-                        console.log('Error:', msg);
-                    }
-                }).done(function(msg){
-                    el.html('Simpan');
-                    el.removeAttr('disabled');
-                });
-            });
 
             $('#customer').on("change",function(){
                 getCustomer($(this).val());
@@ -659,64 +550,136 @@
             kolom.innerHTML = '<span>'+ resDesc + '</span><textarea class="kd-res-desc" name="response-id-desc[]" style="display:none;">' + resDesc + '</textarea>'; //resDesc;
         }
 
-        $('#search').on('click',function(){
+        $('#btnSearch').on('click',function(){
             search();
         });
 
         function search()
         {
-            searchName  = $('#search_name').val();
-            searchHp    = $('#search_hp').val();
-            searchEmail = $('#search_email').val();
-            if(searchName=='' || searchName==' ' || searchHp=='' || searchHp==' ' || searchEmail=='' || searchEmail==' ' || )
+            search  = $('#txtSearch').val();
+            if(search=='' || search==' ')
             {
                 alert('Pencarian tidak boleh kosong');
                 return;
             }
-            $('#btnCariSiswa').html('<i class="fa fa-circle-o-notch fa-spin"></i>&nbsp;&nbsp;Sedang mencari');
-            $('#btnCariSiswa').attr('disabled');
-            $('#daftarsiswa').html('');
-            $.post('{{ url('home/carisiswa') }}',{_token:'{{ csrf_token() }}',cari:cari},function(data){
-                $('#btnCariSiswa').html('<i class="fa fa-search"></i>&nbsp; Cari Siswa');
-                $('#btnCariSiswa').removeAttr('disabled');
+            
+            $("#ajax-loading").show();
+            $('#btnSearch').html('<i class="fa fa-circle-o-notch fa-spin"></i>&nbsp;&nbsp;Sedang mencari');
+            $('#btnSearch').attr('disabled',true);
+            $.post('{{ url('aktivitas/search') }}',{_token:'{{ csrf_token() }}',search:search},function(data){
+                $('#btnSearch').html('<i class="fe fe-search"></i>&nbsp; Cari');
+                $('#btnSearch').removeAttr('disabled');
+                $("#ajax-loading").hide();
                 if(data!='')
                 {
-                    $('#profilsiswa').hide();
+                    // $('#profilsiswa').hide();
                     datas = JSON.parse(data);
-                    siswahasilcari = datas.siswa;
-                    list = ''; no = 0;
-                    $('#tablesiswa').DataTable().clear();
-                    $('#tablesiswa').DataTable().destroy();
-                    $.each(siswahasilcari,function(index,value){
-                        {{-- list += '<li class="list-group-item d-flex justify-content-between align-items-center" style="padding:0px;"><span><input type="radio" name="siswa[]" id="siswa'+value.id+'" onchange="pilihsiswa('+value.id+')" ></span> <label for="siswa'+value.id+'" style="margin-bottom:0px;"><span class="d-inline-block text-truncate" style="max-width: 300px;" title="'+value.name+'">'+value.name+'</span></label></li>';
-                        no++;--}}
-                        list += '<tr><td><input type="radio" name="siswa[]" id="siswa'+value.id+'" onchange="pilihsiswa('+value.id+')" ></td><td><label for="siswa'+value.id+'" style="margin-bottom:0px;"><span class="d-inline-block text-truncate" style="max-width: 300px;" title="'+value.name+'">'+value.name+'</span></label></td></tr>';
-                        no++;
+                    resultSearch = datas.resultSearch;
+                    // list = '';
+                    // $('#tablesiswa').DataTable().clear();
+                    // $('#tablesiswa').DataTable().destroy();
+                    var $el = $("#customer");
+                    $el.empty();
+                    $el.append('<option value="">--- Pilih Pelanggan ---</option>');
+                    $.each(resultSearch,function(index,value){
+                        $el.append('<option value="'+value.id+'">'+value.name+'</option>');
                     })
-                    $('#daftarsiswa').html(list);
-                    $('#pjumlah').html('Jumlah siswa yang ditemukan : '+no.toString());
-                    $('#pjumlah').show();
-                    $('#tablesiswa').DataTable({
-                        'dom':'f<t>p',
-                        "paging" : true,
-                        'info' : false,
-                        "searching": true,
-                        "pageLength": 3,
-                        "language": {
-                            "paginate": {
-                                "previous": "&lt;",
-                                "next": "&gt;"
-                            },
-                            "search": "Temukan siswa :",
-                        },
-                        retrieve: true,
-                    });
                 }
                 else
                 {
-                    $('#daftarsiswa').html('<tr><td><i class="fa fa-times"></i> Siswa tidak ditemukan.</td></tr>')
+                    alert('Pencarian tidak ditemukan');
+                    return;
                 }
             })
         }
+
+        $('.btn-simpan').click(function (e) {
+            e.preventDefault();
+            var tbl = document.getElementById('tbl-transaksi');
+            var action = "", response="", actionDesc = "", responseDesc="", kolomPrj, kolomProgram,
+                dtlID = 0;
+
+            var modeEdit = 'Edit',
+                customer = parseInt($('#customer').val()),
+                hp = $('#hp').val(),
+                address = $('#address').val(),
+                email = $('#email').val(),
+                facebook = $('#facebook').val(),
+                instagram = $('#instagram').val();
+
+            //--------- Validasi ---------------------------------------------//
+            const frm = new FormData(document.querySelector("#trn"));
+            const obj = Object.fromEntries(frm.entries());
+            obj.mode = mode;
+
+            $.ajax({
+                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                url: "{{ url('aktivitas/validation') }}",
+                type: "POST",
+                data: {customer:customer, hp:hp},
+                dataType: "json",
+                success: function (respon) {
+                    if($.isEmptyObject(respon.error)) {
+                        const o = [{ModeEdit:modeEdit , customer:customer, hp:hp, address:address, email:email, facebook:facebook, instagram:instagram}];
+                        
+                        baris = tbl.tBodies[0].getElementsByTagName('tr');
+                        rowCount = 0;
+                        for (i = 0; i < baris.length - 1; i++)
+                        {
+                            actionColumn    = baris.item(i).cells.item(idxKolomAksi);
+                            action          = $(actionColumn).children(':input').val();
+                            responseColumn  = baris.item(i).cells.item(idxKolomRespon);
+                            response        = $(responseColumn).children(':input').val();
+                            actionDescColumn= baris.item(i).cells.item(idxKolomAksiDesc);
+                            actionDesc          = $(actionDescColumn).children(':input').val();
+                            responseDescColumn  = baris.item(i).cells.item(idxKolomResponDesc);
+                            responseDesc        = $(responseDescColumn).children(':input').val();
+                            
+
+                            var btn = baris.item(i).cells.item(idxKolomEdit).firstChild.getAttribute('data-btn');
+                            if(btn.toString().trim().toUpperCase()=="OK")
+                            {
+                                showAlert('warning','','Detail Aksi Belum Lengkap.');
+                                return false;
+                            }
+
+                            const dtl = [{dtlID:dtlID, action:action, response:response, actionDesc:actionDesc, responseDesc:responseDesc}];
+                            o.push(dtl);
+                        }
+
+                        if(action == '')
+                        {
+                            showAlert('warning','','Detail Aksi Tidak Ada.');
+                            return false;
+                        }
+
+                        // console.log(o);
+                        $.ajax({
+                            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                            url: "{{ url('aktivitas/save') }}",
+                            type: "POST",
+                            data: JSON.stringify(o),
+                            dataType: "json",
+                            contentType: "application/json; charset=utf-8",
+                            success: function (respon) {
+                                if (respon.IsSuccess)
+                                {
+                                    showAlert('success','',respon.Message);
+                                    window.location.reload();
+                                }
+                                else {
+                                    showAlert('error','',"Terjadi Kesalahan: " + respon.Message);
+                                }
+                            }, error: function(respon) {
+                                console.log('Error:', respon);
+                            }
+                        });
+                    } else {
+                        showAlert('warning','','Data Belum Lengkap.');
+                    }
+                }
+            });
+            //--------------------------------------------
+        });
     </script>
 @endsection

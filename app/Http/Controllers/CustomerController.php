@@ -54,7 +54,6 @@ class CustomerController extends Controller
                 return response()->json($response);
             }
 
-            $obj->nip=$req->nip;
             $obj->name=$req->name;
             $obj->address=$req->address;
             $obj->hp=$req->hp;
@@ -201,7 +200,7 @@ class CustomerController extends Controller
     public function isExist(Request $req)
     {
         $result =false;
-        $q = Customer::where('nip','=',$req->nip)->get();
+        $q = Customer::where('name','=',$req->name)->get();
         if($q->count()>0)
         {
             $result = true;
