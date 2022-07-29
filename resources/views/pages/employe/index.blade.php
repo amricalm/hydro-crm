@@ -35,8 +35,8 @@
                                     <label class="col-md-1 form-label">Status</label>
                                     <div class="col-md-3">
                                         <select name="status" id="pilih-status" class="form-select form-control  form-control-sm  mb-2" tabindex="1">
-                                            <option value="0">Tidak Aktif</option>
                                             <option value="1" selected>Aktif</option>
+                                            <option value="0">Tidak Aktif</option>
                                         </select>
                                     </div>
                                     <div class="col-md-1">
@@ -93,7 +93,7 @@
                                                 <div class="card-body">
                                                     <div class="form-group row row-sm mb-0">
                                                         <label class="col-md-3 form-label">NIP</label>
-                                                        <div class="col-md-9">
+                                                        <div class="col-md-9" id="div-id">
                                                             <input type="text" id="tx-nip" name="nip" autocomplete="off" class="form-control  form-control-sm  mb-2" tabindex="12">
                                                         </div>
                                                     </div>
@@ -198,15 +198,15 @@
         });
         loadData(1,$('#pilih-status').val());
 
-        $('#tx-nip').on('change', function(){
+        $('#tx-name').on('change', function(){
             var el = $(this);
             $.ajax({
                 url:"{{ route('employe.isExist') }}",
                 method:"POST",
-                data:{nip:el.val()},
+                data:{name:el.val()},
                 success:function(data){
                     if(data==='true'){
-                        alert('NIP telah ada.');
+                        alert('Karyawan telah ada.');
                         el.val('');
                         el.focus();
                     }
@@ -233,23 +233,25 @@
         $(document).on('click','.btn-edit',function(){
             mode = 'EDIT';
             var id = $(this).closest('tr').find('input').val();
-            console.log(id);
             $.ajax({
                 url:"{{ route('employe.get') }}",
                 method:"POST",
                 data:{id:id.trim()},
                 success:function(data){
-                    console.log(data);
                         var obj = data[0];
-
+                        var input = document.createElement("input");
+                        input.setAttribute("type", "hidden");
+                        input.setAttribute("name", "id");
+                        input.setAttribute("value", obj.id);
+                        document.getElementById("div-id").appendChild(input);
                         $('#tx-nip').val(obj.nip);
                         $('#tx-name').val(obj.name);
                         $('#tx-address').val(obj.address);
-                        $('#kd-hp').val(obj.hp);
+                        $('#tx-hp').val(obj.hp);
                         $('#tx-email').val(obj.email);
                         $('#tx-facebook').val(obj.facebook);
                         $('#tx-instagram').val(obj.instagram);
-                        $("#chk-aktif").prop('checked', !(Boolean(Number(obj.aktif))));
+                        $("#chk-aktif").prop('checked', !(Boolean(obj.status)));
                 }
             })
             $('#ajax-loading').show();
@@ -269,6 +271,10 @@
 
         $('#btn-close').click(function () {
             $('#add-modal').hide();
+            var frm = document.querySelector("#trn");
+            frm.reset();
+            var status = $('#pilih-status').val();
+            loadData(1,status);
         });
 
         $('#batal').click(function () {
@@ -285,32 +291,46 @@
             var kirim = true;
             const frm = new FormData(document.querySelector("#trn"));
             const obj = Object.fromEntries(frm.entries());
-
+            var name = $('#tx-name').val();
             obj.mode = mode;
-
             $.ajax({
-                data: obj,
-                url:  "{{ route('employe.save') }}",
+                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                url: "{{ url('karyawan/validation') }}",
                 type: "POST",
-                success: function(msg) {
-                    console.log(msg);
-                    if (msg.IsSuccess){
-                        alert('Sukses.');
-                        $('#trn').trigger("reset");
-                        $('#add-modal').hide();
-                        window.location.reload();
-                    }else{
-                        alert(msg.Message)
+                data: {name:name},
+                dataType: "json",
+                success: function (respon) {
+                    if($.isEmptyObject(respon.error)) {
+                        $.ajax({
+                            data: obj,
+                            url:  "{{ route('employe.save') }}",
+                            type: "POST",
+                            success: function(msg) {
+                                if (msg.IsSuccess){
+                                    alert('Sukses.');
+                                    $('#trn').trigger("reset");
+                                    if(msg.Obj == 'EDIT') {
+                                        $('#add-modal').hide();
+                                        window.location.reload();
+                                    }
+                                }else{
+                                    alert(msg.Message)
+                                }
+                            },
+                            error: function(msg) {
+                                console.log('Error:', msg);
+                            }
+                        }).done(function(msg){
+                            el.html('Simpan');
+                            el.removeAttr('disabled');
+                        });
+                    } else {
+                        alert('Data Belum Lengkap.');
+                        el.html('Simpan');
+                        el.removeAttr('disabled');
                     }
-
-                },
-                error: function(msg) {
-                    console.log('Error:', msg);
                 }
-            }).done(function(msg){
-                el.html('Simpan');
-                el.removeAttr('disabled');
-            });//$.ajax
+            });
         });
 
         $('.select2').select2();
@@ -344,7 +364,7 @@ function checkdelete(id,el)
             $.ajax({
                 url:"{{route('employe.delete') }}",
                 method:"POST",
-                data:{kdProgram:id},
+                data:{id:id},
                 success:function(data){
                     if(data.Message=='Sukses')
                     {

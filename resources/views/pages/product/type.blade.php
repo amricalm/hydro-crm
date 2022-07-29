@@ -70,14 +70,14 @@
                                             <div class="card">
                                                 <div class="card-body">
                                                     <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-3 form-label">Kode Produk</label>
-                                                        <div class="col-md-9">
-                                                            <input type="text" id="tx-nip" name="nip" autocomplete="off" class="form-control  form-control-sm  mb-2" tabindex="12">
+                                                        <label class="col-md-4 form-label">Kode</label>
+                                                        <div class="col-md-8" id="div-id">
+                                                            <input type="text" id="tx-code" name="code" autocomplete="off" class="form-control  form-control-sm  mb-2" tabindex="12">
                                                         </div>
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-3 form-label">Nama Produk</label>
-                                                        <div class="col-md-9">
+                                                        <label class="col-md-4 form-label">Nama Kategori Produk</label>
+                                                        <div class="col-md-8">
                                                             <input type="text" id="tx-name" name="name" autocomplete="off" class="form-control  form-control-sm  mb-2" tabindex="13">
                                                         </div>
                                                     </div>
@@ -95,16 +95,12 @@
                 <!-- End Row -->
             </div>
         </div>
-      </div>
     </div>
-  </div>
+</div>
 <!--#endregion === Modal=== -->
 
 @endsection
 @section('footer')
-<?php
-    use App\Http\Controllers\MProgramController;
-?>
 <script type="text/javascript">
 
     var mode = 'TAMBAH';
@@ -123,17 +119,17 @@
         $(document).ajaxStop(function() {
             $("#ajax-loading").hide();
         });
-        loadData(1,$('#pilih-status').val());
+        loadData(1);
 
-        $('#tx-nip').on('change', function(){
+        $('#tx-name').on('change', function(){
             var el = $(this);
             $.ajax({
                 url:"{{ route('product-type.isExist') }}",
                 method:"POST",
-                data:{nip:el.val()},
+                data:{name:el.val()},
                 success:function(data){
                     if(data==='true'){
-                        alert('NIP telah ada.');
+                        alert('Kategori Produk telah ada.');
                         el.val('');
                         el.focus();
                     }
@@ -143,13 +139,11 @@
 
         $(document).on('click', '.halaman', function(){
            var page = $(this).attr("id");
-           var status = $('#pilih-status').val();
-           loadData(page,status);
+           loadData(page);
         });
 
         $('#tampil').click(function () {
-           var status = $('#pilih-status').val();
-           loadData(1,status);
+           loadData(1);
         });
 
         $('#createNew').click(function(){
@@ -160,23 +154,19 @@
         $(document).on('click','.btn-edit',function(){
             mode = 'EDIT';
             var id = $(this).closest('tr').find('input').val();
-            console.log(id);
             $.ajax({
                 url:"{{ route('product-type.get') }}",
                 method:"POST",
                 data:{id:id.trim()},
                 success:function(data){
-                    console.log(data);
-                        var obj = data[0];
-
-                        $('#tx-nip').val(obj.nip);
-                        $('#tx-name').val(obj.name);
-                        $('#tx-address').val(obj.address);
-                        $('#kd-hp').val(obj.hp);
-                        $('#tx-email').val(obj.email);
-                        $('#tx-facebook').val(obj.facebook);
-                        $('#tx-instagram').val(obj.instagram);
-                        $("#chk-aktif").prop('checked', !(Boolean(Number(obj.aktif))));
+                    var obj = data[0];
+                    var input = document.createElement("input");
+                    input.setAttribute("type", "hidden");
+                    input.setAttribute("name", "id");
+                    input.setAttribute("value", obj.id);
+                    document.getElementById("div-id").appendChild(input);
+                    $('#tx-code').val(obj.code);
+                    $('#tx-name').val(obj.name);
                 }
             })
             $('#ajax-loading').show();
@@ -191,11 +181,14 @@
 
         $('#add-modal').on('shown.bs.modal', function (e) {
             //AktivasiTab();
-            $('#tx-nip').focus();
+            $('#tx-code').focus();
         });
 
         $('#btn-close').click(function () {
             $('#add-modal').hide();
+            var frm = document.querySelector("#trn");
+            frm.reset();
+            loadData(1);
         });
 
         $('#batal').click(function () {
@@ -212,43 +205,57 @@
             var kirim = true;
             const frm = new FormData(document.querySelector("#trn"));
             const obj = Object.fromEntries(frm.entries());
-
+            var name = $('#tx-name').val();
             obj.mode = mode;
-
             $.ajax({
-                data: obj,
-                url:  "{{ route('product-type.save') }}",
+                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                url: "{{ url('karyawan/validation') }}",
                 type: "POST",
-                success: function(msg) {
-                    console.log(msg);
-                    if (msg.IsSuccess){
-                        alert('Sukses.');
-                        $('#trn').trigger("reset");
-                        $('#add-modal').hide();
-                        window.location.reload();
-                    }else{
-                        alert(msg.Message)
+                data: {name:name},
+                dataType: "json",
+                success: function (respon) {
+                    if($.isEmptyObject(respon.error)) {
+                        $.ajax({
+                            data: obj,
+                            url:  "{{ route('product-type.save') }}",
+                            type: "POST",
+                            success: function(msg) {
+                                if (msg.IsSuccess){
+                                    alert('Sukses.');
+                                    $('#trn').trigger("reset");
+                                    if(msg.Obj == 'EDIT') {
+                                        $('#add-modal').hide();
+                                        window.location.reload();
+                                    }
+                                }else{
+                                    alert(msg.Message)
+                                }
+                            },
+                            error: function(msg) {
+                                console.log('Error:', msg);
+                            }
+                        }).done(function(msg){
+                            el.html('Simpan');
+                            el.removeAttr('disabled');
+                        });
+                    } else {
+                        alert('Data Belum Lengkap.');
+                        el.html('Simpan');
+                        el.removeAttr('disabled');
                     }
-
-                },
-                error: function(msg) {
-                    console.log('Error:', msg);
                 }
-            }).done(function(msg){
-                el.html('Simpan');
-                el.removeAttr('disabled');
-            });//$.ajax
+            });
         });
 
         $('.select2').select2();
     });
 
 
-function loadData(page,status){
+function loadData(page){
     $.ajax({
-        url:"{{ route('jenis-produk.getTabel') }}",
+        url:"{{ route('product-type.getTabel') }}",
         method:"POST",
-        data:{page:page, status:status},
+        data:{page:page},
         success:function(data){
             $('#tbl').html(data);
         }
@@ -271,7 +278,7 @@ function checkdelete(id,el)
             $.ajax({
                 url:"{{route('product-type.delete') }}",
                 method:"POST",
-                data:{kdProgram:id},
+                data:{id:id},
                 success:function(data){
                     if(data.Message=='Sukses')
                     {

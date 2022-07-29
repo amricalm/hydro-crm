@@ -8,10 +8,14 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
 use App\Models\Employe;
 use App\Models\Customer;
+use App\Models\SalesOwner;
 use App\Models\MsUpload;
 use App\Exports\AllExport;
 use App\Imports\CustomerImport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\SmartSystem\General;
+use Carbon\Carbon;
+use Validator;
 use App\Adn;
 
 class CustomerController extends Controller
@@ -19,81 +23,25 @@ class CustomerController extends Controller
     public function __construct()
     {
         if (!SESSION::has('UserID')) {
-            // return redirect()->route('aman');
         }
+        $vargeneral = new General();
+        $this->general = $vargeneral;
         $this->middleware('auth');
     }
 
     public function index(Request $req)
     {
         $app['judul']   = "Pelanggan";
-        $app['karyawan']   = Employe::all();
+        $app['roleName']= $this->general->role_name();
+        if ($app['roleName'] == 'ADMIN') {
+            $app['karyawan']   = Employe::all();
+        } elseif ($app['roleName'] == 'SALES') {
+            $app['karyawan']   = Employe::where('id', auth()->user()->eid)->get();
+        }
 
         $tampilBarisTabel  = Adn::getSysVar('TampilBarisTabel');
         Session::put('TampilBarisTabel', $tampilBarisTabel);
         return view('pages.customer.index', $app);
-    }
-
-    public function get(Request $req)
-    {
-        $data = Customer::where('id',$req->id)->get()->toArray();
-
-        return response()->json($data);
-    }
-
-    public function save(Request $req)
-    {
-        try {
-            $obj = new Customer;
-            if ($req->mode=='EDIT')
-            {
-                $obj = Customer::find($req->id);
-            }
-            if($obj==null){
-                $response= Adn::Response(false,"Data Karyawan Tidak Ditemukan.");
-                return response()->json($response);
-            }
-
-            $obj->name=$req->name;
-            $obj->address=$req->address;
-            $obj->hp=$req->hp;
-            $obj->email=$req->email;
-            $obj->facebook=$req->facebook;
-            $obj->instagram=$req->instagram;
-            $obj->status=!($req->aktif);
-            $obj->cby=1;
-            $obj->uby=1;
-
-            $obj->save();
-
-            $response= Adn::Response(true,"Sukses");
-        }
-        catch(\PDOException $e)
-        {
-            $response= Adn::Response(false,"Database > " .$e->getMessage());
-        }
-        catch (\Error $e) {
-            $response= Adn::Response(false,$e->getMessage());
-        }
-
-        return response()->json($response);
-    }
-
-    public function delete(Request $req)
-    {
-        try {
-            Customer::where('id',$req->id)->delete();
-            $response= Adn::Response(true,"Sukses");
-        }
-        catch(\PDOException $e)
-        {
-            $response= Adn::Response(false,"Database > " .$e->getMessage());
-        }
-        catch (\Error $e) {
-            $response= Adn::Response(false,$e->getMessage());
-        }
-
-        return response()->json($response);
     }
 
     public function getTabel(Request $req){
@@ -101,27 +49,55 @@ class CustomerController extends Controller
         <table class="table table-bordered card-table table-vcenter text-nowrap" width="100%">
         <thead>
           <tr class="border-top">
-            <th class="py-2" width="10%">#</th>
-            <th class="py-2">Nama Lengkap</th>
-            <th class="py-2">Status</th>
-            <th class="py-2" colspan="2" width="6%"></th>
+            <th class="py-2" width="5%">#</th>
+            <th class="py-2" width="20%">Nama Pelanggan</th>
+            <th class="py-2" width="15%">Hp</th>
+            <th class="py-2">Alamat</th>
+            <th class="py-2">Sales</th>
+            <th class="py-2" colspan="2" width="5%"></th>
           </tr>
         </thead>
         <tbody>';
 
         $status = (trim($req->status))!='1'?0:1;
-
+        $employe = $req->employe;
         $page = (isset($req->page))?$req->page:1;
         $limit = session('TampilBarisTabel');
         $limit_start = ($page - 1) * $limit;
         $no = $limit_start + 1;
 
-        $q = Customer::selectRaw("*")
-        ->where('status',$status)
-        ->offset($limit_start)
-        ->limit($limit)->get();
-        $jmh = Customer::where('status',$status);
-        $total_records =$jmh->count();
+        $q = DB::table('aa_customer AS cus')
+            ->selectRaw('cus.*, emp.name as sales_name')
+            ->leftJoin('cr_sales_owner AS so', function($join)
+                {
+                    $join->on('cus.id', '=', 'so.cid');
+                    $join->on('so.periode', '=', DB::raw((int)Carbon::now()->format('Ym')));
+                })
+            ->leftJoin('aa_employe AS emp','so.eid','=','emp.id')
+            ->where('cus.status', $status);
+            
+            if($employe == '') { //Jika sales tidak dipilih
+                $q =  $q->whereNotIn('cus.id',
+                    DB::table('cr_sales_owner AS so')
+                    ->select('cid')
+                    ->leftJoin('aa_employe AS emp','so.eid','=','emp.id')
+                    ->where('periode',DB::raw((int)Carbon::now()->format('Ym')))
+                );
+            } elseif ($employe == 999) { //Jika sales dipilh semua
+                $q =  $q->whereIn('cid',
+                    DB::table('cr_sales_owner AS so')
+                    ->select('cid')
+                    ->leftJoin('aa_employe AS emp','so.eid','=','emp.id')
+                    ->where('periode',DB::raw((int)Carbon::now()->format('Ym')))
+                );
+            } else {
+                $q = $q->where('emp.id',$employe); //Jika sales dipilih
+            }
+
+            $total_records = $q->count();
+
+            $q = $q->offset($limit_start)
+                    ->limit($limit)->get();
 
         $kelas_baris_akhir ='';
         $tr = '';
@@ -131,9 +107,11 @@ class CustomerController extends Controller
             $tr .= '
             <tr ' . $kelas_baris_akhir .'>
               <input type="hidden" value="'. $row->id .'">
-              <td class="py-1">'. $row->id .'</td>
+              <td class="py-1">'. $no .'</td>
               <td class="py-1">'. $row->name .'</td>
-              <td class="py-1">'. $status .'</td>
+              <td class="py-1">'. $row->hp .'</td>
+              <td class="py-1">'. $row->address .'</td>
+              <td class="py-1">'. $row->sales_name .'</td>
 
               <td class="py-1">
                     <button type="button" class="btn bg-info-transparent py-0 px-2 btn-edit" ><i class="fe fe-edit"></i></button>
@@ -197,6 +175,33 @@ class CustomerController extends Controller
         echo $output;
     }
 
+    public function get(Request $req)
+    {
+        $data = Customer::selectRaw('aa_customer.*, eid')
+                ->leftJoin('cr_sales_owner AS so', function($join)
+                {
+                    $join->on('aa_customer.id', '=', 'so.cid');
+                    $join->on('so.periode', '=', DB::raw((int)Carbon::now()->format('Ym')));
+                })
+                ->where('aa_customer.id',$req->id)
+                ->get()
+                ->toArray();
+        return response()->json($data);
+    }
+
+    public static function validation(Request $req)
+    {
+        $validator = Validator::make($req->all(), [
+            'name' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error'=>$validator->errors()->all()]);
+        }
+
+        return response()->json(["status"=>true,"Message"=>"Data Lengkap."]);
+    }
+
     public function isExist(Request $req)
     {
         $result =false;
@@ -206,6 +211,73 @@ class CustomerController extends Controller
             $result = true;
         }
         return json_encode($result);
+    }
+
+    public function save(Request $req)
+    {
+        try {
+            //Simpan Pelanggan
+            $obj = new Customer;
+            if ($req->mode=='EDIT')
+            {
+                $obj = Customer::find($req->id);
+            }
+            if($obj==null){
+                $response= Adn::Response(false,"Data Karyawan Tidak Ditemukan.");
+                return response()->json($response);
+            }
+
+            $obj->name=$req->name;
+            $obj->address=$req->address;
+            $obj->hp=$req->hp;
+            $obj->email=$req->email;
+            $obj->facebook=$req->facebook;
+            $obj->instagram=$req->instagram;
+            $obj->status=!($req->aktif);
+            if ($req->mode=='EDIT') {
+                $obj->uby=auth()->user()->id;
+            } else {
+                $obj->cby=auth()->user()->id;
+            }
+            $obj->save();
+
+            if($req->sales != '') {
+                //Simpan Sales Owner
+                $customer_id = $obj->id;
+                $salesOwner = SalesOwner::updateOrCreate(
+                    ['periode' => Carbon::now()->format('Ym'), 'cid' => $customer_id],
+                    ['eid' => $req->sales, 'cby' => auth()->user()->id, 'uby' => auth()->user()->id]
+                );
+            }
+            
+            $response= Adn::Response(true,"Sukses",$req->mode);
+        }
+        catch(\PDOException $e)
+        {
+            $response= Adn::Response(false,"Database > " .$e->getMessage());
+        }
+        catch (\Error $e) {
+            $response= Adn::Response(false,$e->getMessage());
+        }
+
+        return response()->json($response);
+    }
+
+    public function delete(Request $req)
+    {
+        try {
+            Customer::where('id',$req->id)->delete();
+            $response= Adn::Response(true,"Sukses");
+        }
+        catch(\PDOException $e)
+        {
+            $response= Adn::Response(false,"Database > " .$e->getMessage());
+        }
+        catch (\Error $e) {
+            $response= Adn::Response(false,$e->getMessage());
+        }
+
+        return response()->json($response);
     }
 
     public function template(Request $request)

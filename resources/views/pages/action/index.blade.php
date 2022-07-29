@@ -19,7 +19,7 @@
                     </div>
                     <div class="page-rightheader">
                         <div class="btn-list">
-                            <a href="javascript:void(0)" id="createNew" class="btn btn-outline-primary" ><i class="fe fe-plus-square"></i>Tambah</a>
+                            <a href="javascript:void(0)" id="createNew" class="btn btn-outline-primary" ><i class="fe fe-plus-square"></i> Tambah</a>
                         </div>
                     </div>
                 </div>
@@ -27,6 +27,25 @@
                 <!-- Row -->
                 <div class="row">
                     <div class="col-md-12 col-lg-12">
+                        <div class="card mb-4">
+                            <div class="card-body py-4">
+                                <div class="form-group row row-sm mb-0">
+                                    <label class="col-md-2 form-label">Kategori Aksi</label>
+                                    <div class="col-md-4">
+                                        <select name="category" id="cb-category" class="form-select form-control form-control-sm mb-2" tabindex="10">
+                                            <option value="">-- Pilih Kategori Aksi --</option>
+                                            <option value="999">-- Pilih Semua Kategori Aksi --</option>
+                                            @foreach($category as $item)
+                                                <option value="{{$item->id}}">{{$item->name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button type="button" id="tampil" class="btn btn-sm btn-primary"><i class="fe fe-search"></i>Tampil</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="card">
                             <div class="card-body">
                                 <div class="table-responsive" id="tbl">
@@ -48,7 +67,7 @@
     <div class="modal-dialog modal-fullscreen bwa-modal-fullscreen">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="page-title text-primary">Edit {{ $judul }}</h4>
+          <h4 class="page-title text-primary">{{ $judul }}</h4>
             <div class="float-right">
                 <button type="button" class="btn btn-outline-primary position-relative" id="save" tabindex="-1"><i class="fe fe-save"></i>
                     Simpan</button>
@@ -70,21 +89,32 @@
                                             <div class="card">
                                                 <div class="card-body">
                                                     <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-3 form-label">Kode</label>
+                                                        <label class="col-md-3 form-label">Kode Aksi</label>
                                                         <div class="col-md-9">
-                                                            <input type="text" id="tx-nip" name="nip" autocomplete="off" class="form-control  form-control-sm  mb-2" tabindex="12">
+                                                            <input type="text" id="tx-code" name="code" autocomplete="off" class="form-control form-control-sm mb-2">
                                                         </div>
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
                                                         <label class="col-md-3 form-label">Nama Aksi</label>
-                                                        <div class="col-md-9">
-                                                            <input type="text" id="tx-name" name="name" autocomplete="off" class="form-control  form-control-sm  mb-2" tabindex="13">
+                                                        <div class="col-md-9" id="div-id">
+                                                            <input type="text" id="tx-name" name="name" autocomplete="off" class="form-control form-control-sm mb-2">
                                                         </div>
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
                                                         <label class="col-md-3 form-label">Keterangan</label>
                                                         <div class="col-md-9">
-                                                            <textarea type="text" id="tx-name" name="name" rows="4" autocomplete="off" class="form-control  form-control-sm  mb-2" tabindex="13"></textarea>
+                                                            <textarea type="text" id="tx-desc" name="desc" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row row-sm mb-0">
+                                                        <label class="col-md-3 form-label">Kategori Aksi</label>
+                                                        <div class="col-md-9">
+                                                            <select name="category" id="cb-category" class="form-select form-control form-control-sm mb-2" tabindex="10">
+                                                                <option value="">-- Pilih Kategori Aksi --</option>
+                                                                @foreach($category as $item)
+                                                                <option value="{{$item->id}}">{{$item->name}}</option>
+                                                                @endforeach
+                                                            </select>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -105,12 +135,8 @@
     </div>
   </div>
 <!--#endregion === Modal=== -->
-
 @endsection
 @section('footer')
-<?php
-    use App\Http\Controllers\MProgramController;
-?>
 <script type="text/javascript">
 
     var mode = 'TAMBAH';
@@ -129,17 +155,17 @@
         $(document).ajaxStop(function() {
             $("#ajax-loading").hide();
         });
-        loadData(1,$('#pilih-status').val());
+        loadData(1, $('#cb-category').val());
 
-        $('#tx-nip').on('change', function(){
+        $('#tx-name').on('change', function(){
             var el = $(this);
             $.ajax({
                 url:"{{ route('action.isExist') }}",
                 method:"POST",
-                data:{nip:el.val()},
+                data:{name:el.val()},
                 success:function(data){
                     if(data==='true'){
-                        alert('NIP telah ada.');
+                        alert('Nama Aksi telah ada.');
                         el.val('');
                         el.focus();
                     }
@@ -149,13 +175,13 @@
 
         $(document).on('click', '.halaman', function(){
            var page = $(this).attr("id");
-           var status = $('#pilih-status').val();
-           loadData(page,status);
+           var category = $('#cb-category').val();
+           loadData(page,category);
         });
 
         $('#tampil').click(function () {
-           var status = $('#pilih-status').val();
-           loadData(1,status);
+           var category = $('#cb-category').val();
+           loadData(1,category);
         });
 
         $('#createNew').click(function(){
@@ -166,23 +192,21 @@
         $(document).on('click','.btn-edit',function(){
             mode = 'EDIT';
             var id = $(this).closest('tr').find('input').val();
-            console.log(id);
             $.ajax({
                 url:"{{ route('action.get') }}",
                 method:"POST",
                 data:{id:id.trim()},
                 success:function(data){
-                    console.log(data);
-                        var obj = data[0];
-
-                        $('#tx-nip').val(obj.nip);
-                        $('#tx-name').val(obj.name);
-                        $('#tx-address').val(obj.address);
-                        $('#kd-hp').val(obj.hp);
-                        $('#tx-email').val(obj.email);
-                        $('#tx-facebook').val(obj.facebook);
-                        $('#tx-instagram').val(obj.instagram);
-                        $("#chk-aktif").prop('checked', !(Boolean(Number(obj.aktif))));
+                    var obj = data[0];
+                    var input = document.createElement("input");
+                    input.setAttribute("type", "hidden");
+                    input.setAttribute("name", "id");
+                    input.setAttribute("value", obj.id);
+                    document.getElementById("div-id").appendChild(input);
+                    $('#tx-code').val(obj.code);
+                    $('#tx-name').val(obj.name);
+                    $('#tx-desc').val(obj.desc);
+                    $('#cb-category option[value="'+obj.category+'"]').attr("selected", "selected");
                 }
             })
             $('#ajax-loading').show();
@@ -197,17 +221,23 @@
 
         $('#add-modal').on('shown.bs.modal', function (e) {
             //AktivasiTab();
-            $('#tx-nip').focus();
+            $('#tx-name').focus();
         });
 
         $('#btn-close').click(function () {
             $('#add-modal').hide();
+            var frm = document.querySelector("#trn");
+            frm.reset();
+            $('#cb-category option').removeAttr("selected", "selected");
+            var category = $('#cb-category').val();
+            loadData(1,category);
         });
 
         $('#batal').click(function () {
             mode = 'TAMBAH';
-            var frm = document.querySelector("#trn")
+            var frm = document.querySelector("#trn");
             frm.reset();
+            $('#cb-category option').removeAttr("selected", "selected");
         });
 
         $('#save').click(function(e) {
@@ -218,43 +248,58 @@
             var kirim = true;
             const frm = new FormData(document.querySelector("#trn"));
             const obj = Object.fromEntries(frm.entries());
-
+            var name = $('#tx-name').val();
             obj.mode = mode;
 
             $.ajax({
-                data: obj,
-                url:  "{{ route('action.save') }}",
+                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                url: "{{ url('aksi/validation') }}",
                 type: "POST",
-                success: function(msg) {
-                    console.log(msg);
-                    if (msg.IsSuccess){
-                        alert('Sukses.');
-                        $('#trn').trigger("reset");
-                        $('#add-modal').hide();
-                        window.location.reload();
-                    }else{
-                        alert(msg.Message)
+                data: {name:name},
+                dataType: "json",
+                success: function (respon) {
+                    if($.isEmptyObject(respon.error)) {
+                        $.ajax({
+                            data: obj,
+                            url:  "{{ route('action.save') }}",
+                            type: "POST",
+                            success: function(msg) {
+                                if (msg.IsSuccess){
+                                    alert('Sukses.');
+                                    $('#trn').trigger("reset");
+                                    $('#cb-category option').removeAttr("selected", "selected");
+                                    if(msg.Obj == 'EDIT') {
+                                        $('#add-modal').hide();
+                                        window.location.reload();
+                                    }
+                                }else{
+                                    alert(msg.Message)
+                                }
+                            },
+                            error: function(msg) {
+                                console.log('Error:', msg);
+                            }
+                        }).done(function(msg){
+                            el.html('Simpan');
+                            el.removeAttr('disabled');
+                        });
+                    } else {
+                        alert('Data Belum Lengkap.');
+                        el.html('Simpan');
+                        el.removeAttr('disabled');
                     }
-
-                },
-                error: function(msg) {
-                    console.log('Error:', msg);
                 }
-            }).done(function(msg){
-                el.html('Simpan');
-                el.removeAttr('disabled');
-            });//$.ajax
+            });
         });
 
         $('.select2').select2();
     });
 
-
-function loadData(page,status){
+function loadData(page,category){
     $.ajax({
-        url:"{{ route('aksi.getTabel') }}",
+        url:"{{ route('action.getTabel') }}",
         method:"POST",
-        data:{page:page, status:status},
+        data:{page:page, category:category},
         success:function(data){
             $('#tbl').html(data);
         }
@@ -277,7 +322,7 @@ function checkdelete(id,el)
             $.ajax({
                 url:"{{route('action.delete') }}",
                 method:"POST",
-                data:{kdProgram:id},
+                data:{id:id},
                 success:function(data){
                     if(data.Message=='Sukses')
                     {

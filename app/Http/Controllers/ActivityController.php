@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Activity;
 use App\Models\ActivityDtl;
 use App\Models\Address;
+use App\SmartSystem\General;
 use Carbon\Carbon;
 use App\Adn;
 use Validator;
@@ -20,6 +21,8 @@ class ActivityController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $vargeneral = new General();
+        $this->general = $vargeneral;
         if (!SESSION::has('UserID')) {
             // return redirect()->route('aman');
         }

@@ -6,7 +6,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
+use App\Models\CategoryAction;
 use App\Models\Response;
+use Maatwebsite\Excel\Facades\Excel;
+use App\SmartSystem\General;
+use Carbon\Carbon;
+use Validator;
 use App\Adn;
 
 class ResponseController extends Controller
@@ -14,76 +19,20 @@ class ResponseController extends Controller
     public function __construct()
     {
         if (!SESSION::has('UserID')) {
-            // return redirect()->route('aman');
         }
+        $vargeneral = new General();
+        $this->general = $vargeneral;
         $this->middleware('auth');
     }
 
     public function index(Request $req)
     {
-        $app['judul']   = "Respon";
+        $app['judul']       = "Respon";
+        $app['category']    = CategoryAction::all();
 
         $tampilBarisTabel  = Adn::getSysVar('TampilBarisTabel');
         Session::put('TampilBarisTabel', $tampilBarisTabel);
-        return view('pages.response.index', $app);
-    }
-
-    public function get(Request $req)
-    {
-        $data = Response::where('id',$req->id)->get()->toArray();
-
-        return response()->json($data);
-    }
-
-    public function save(Request $req)
-    {
-        try {
-            $obj = new Response;
-            if ($req->mode=='EDIT')
-            {
-                $obj = Response::find($req->id);
-            }
-            if($obj==null){
-                $response= Adn::Response(false,"Data Karyawan Tidak Ditemukan.");
-                return response()->json($response);
-            }
-
-            $obj->code=$req->code;
-            $obj->name=$req->name;
-            $obj->type=$req->type;
-            $obj->cby=1;
-            $obj->uby=1;
-
-            $obj->save();
-
-            $response= Adn::Response(true,"Sukses");
-        }
-        catch(\PDOException $e)
-        {
-            $response= Adn::Response(false,"Database > " .$e->getMessage());
-        }
-        catch (\Error $e) {
-            $response= Adn::Response(false,$e->getMessage());
-        }
-
-        return response()->json($response);
-    }
-
-    public function delete(Request $req)
-    {
-        try {
-            Response::where('id',$req->id)->delete();
-            $response= Adn::Response(true,"Sukses");
-        }
-        catch(\PDOException $e)
-        {
-            $response= Adn::Response(false,"Database > " .$e->getMessage());
-        }
-        catch (\Error $e) {
-            $response= Adn::Response(false,$e->getMessage());
-        }
-
-        return response()->json($response);
+        return view('pages.Response.index', $app);
     }
 
     public function getTabel(Request $req){
@@ -91,40 +40,50 @@ class ResponseController extends Controller
         <table class="table table-bordered card-table table-vcenter text-nowrap" width="100%">
         <thead>
           <tr class="border-top">
+            <th class="py-2" width="5%">#</th>
             <th class="py-2">Kode</th>
             <th class="py-2">Nama Respon</th>
-            <th class="py-2" colspan="2" width="6%"></th>
+            <th class="py-2">Kategori</th>';
+        $output .='<th class="py-2" colspan="2" width="5%"></th>
           </tr>
         </thead>
         <tbody>';
-
-        $status = (trim($req->status))!='1'?0:1;
 
         $page = (isset($req->page))?$req->page:1;
         $limit = session('TampilBarisTabel');
         $limit_start = ($page - 1) * $limit;
         $no = $limit_start + 1;
 
-        $q = Response::selectRaw("*")
-        ->limit($limit)->get();
-        $jmh = DB::table('cr_product_type');
-        $total_records =$jmh->count();
+        $category = $req->category;
+        $q = DB::table('cr_Response');
+        if($category == '') { //Jika tidak dipilih
+            $q = $q->whereNull('category_id');
+        } elseif ($category != '' && $category != 999) { //Jika dipilh
+            $q = $q->where('category_id',$category);
+        }
 
+        $total_records = $q->count();
+
+        $q = $q->offset($limit_start)
+            ->limit($limit)->get();
+            
         $kelas_baris_akhir ='';
         $tr = '';
         foreach ($q as $row) {
+            $getCategory = (!empty($row->category_id)) ? CategoryAction::where('id', $row->category_id)->first() : '';
+            $setNameType = !empty($getCategory) ? $getCategory->name : '';
             $tr .= '
             <tr ' . $kelas_baris_akhir .'>
               <input type="hidden" value="'. $row->id .'">
+              <td class="py-1">'. $no .'</td>
               <td class="py-1">'. $row->code .'</td>
               <td class="py-1">'. $row->name .'</td>
-
-              <td class="py-1">
+              <td class="py-1">'. $setNameType .'</td>';
+            $tr .= '<td class="py-1">
                     <button type="button" class="btn bg-info-transparent py-0 px-2 btn-edit" ><i class="fe fe-edit"></i></button>
                     <button type="button" class="btn bg-danger-transparent py-0 px-2 btn-delete"><i class="fe fe-x-square"></i></button>
                 </td>
-            </tr>'
-        ;
+            </tr>';
             $no++;
             if ($no==($limit_start + $limit))
             {
@@ -181,14 +140,91 @@ class ResponseController extends Controller
         echo $output;
     }
 
+    public function get(Request $req)
+    {
+        $data = Response::selectRaw('cr_response.*, pt.name as category_name')
+                ->leftJoin('rf_category_Response AS pt','pt.id', '=', 'cr_response.category_id')
+                ->where('cr_response.id',$req->id)
+                ->get()->toArray();
+        return response()->json($data);
+    }
+
+    public static function validation(Request $req)
+    {
+        $validator = Validator::make($req->all(), [
+            'name' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error'=>$validator->errors()->all()]);
+        }
+
+        return response()->json(["status"=>true,"Message"=>"Data Lengkap."]);
+    }
+
     public function isExist(Request $req)
     {
         $result =false;
-        $q = Response::where('nip','=',$req->nip)->get();
+        $q = Response::where('name','=',$req->name)->get();
         if($q->count()>0)
         {
             $result = true;
         }
         return json_encode($result);
+    }
+
+    public function save(Request $req)
+    {
+        try {
+            //Simpan Respon
+            $obj = new Response;
+            if ($req->mode=='EDIT')
+            {
+                $obj = Response::find($req->id);
+            }
+            if($obj==null){
+                $response= Adn::Response(false,"Data Respon Tidak Ditemukan.");
+                return response()->json($response);
+            }
+            
+            $obj->code=$req->code;
+            $obj->name=$req->name;
+            $obj->desc=$req->desc;
+            $obj->category_id=$req->category;
+            if ($req->mode=='EDIT') {
+                $obj->uby=auth()->user()->id;
+            } else {
+                $obj->cby=auth()->user()->id;
+            }
+            $obj->save();
+            
+            $response= Adn::Response(true,"Sukses",$req->mode);
+        }
+        catch(\PDOException $e)
+        {
+            $response= Adn::Response(false,"Database > " .$e->getMessage());
+        }
+        catch (\Error $e) {
+            $response= Adn::Response(false,$e->getMessage());
+        }
+
+        return response()->json($response);
+    }
+
+    public function delete(Request $req)
+    {
+        try {
+            Response::where('id',$req->id)->delete();
+            $response= Adn::Response(true,"Sukses");
+        }
+        catch(\PDOException $e)
+        {
+            $response= Adn::Response(false,"Database > " .$e->getMessage());
+        }
+        catch (\Error $e) {
+            $response= Adn::Response(false,$e->getMessage());
+        }
+
+        return response()->json($response);
     }
 }

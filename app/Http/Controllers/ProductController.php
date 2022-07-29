@@ -6,18 +6,26 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
-use App\Models\Product;
 use App\Models\ProductType;
+use App\Models\Product;
+use App\Models\SalesOwner;
+use App\Models\MsUpload;
+use App\Exports\AllExport;
+use App\Imports\ProductImport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\SmartSystem\General;
+use Carbon\Carbon;
+use Validator;
 use App\Adn;
 
 class ProductController extends Controller
 {
     public function __construct()
     {
-
         if (!SESSION::has('UserID')) {
-            // return redirect()->route('aman');
         }
+        $vargeneral = new General();
+        $this->general = $vargeneral;
         $this->middleware('auth');
     }
 
@@ -31,103 +39,50 @@ class ProductController extends Controller
         return view('pages.product.index', $app);
     }
 
-    public function get(Request $req)
-    {
-        $data = Product::where('id',$req->id)->get()->toArray();
-
-        return response()->json($data);
-    }
-
-    public function save(Request $req)
-    {
-        try {
-            $obj = new Product;
-            if ($req->mode=='EDIT')
-            {
-                $obj = Product::find($req->id);
-            }
-            if($obj==null){
-                $response= Adn::Response(false,"Data Karyawan Tidak Ditemukan.");
-                return response()->json($response);
-            }
-
-            $obj->code=$req->code;
-            $obj->name=$req->name;
-            $obj->type=$req->type;
-            $obj->cby=1;
-            $obj->uby=1;
-
-            $obj->save();
-
-            $response= Adn::Response(true,"Sukses");
-        }
-        catch(\PDOException $e)
-        {
-            $response= Adn::Response(false,"Database > " .$e->getMessage());
-        }
-        catch (\Error $e) {
-            $response= Adn::Response(false,$e->getMessage());
-        }
-
-        return response()->json($response);
-    }
-
-    public function delete(Request $req)
-    {
-        try {
-            Product::where('id',$req->id)->delete();
-            $response= Adn::Response(true,"Sukses");
-        }
-        catch(\PDOException $e)
-        {
-            $response= Adn::Response(false,"Database > " .$e->getMessage());
-        }
-        catch (\Error $e) {
-            $response= Adn::Response(false,$e->getMessage());
-        }
-
-        return response()->json($response);
-    }
-
     public function getTabel(Request $req){
         $output ='
         <table class="table table-bordered card-table table-vcenter text-nowrap" width="100%">
         <thead>
           <tr class="border-top">
-            <th class="py-2" width="10%">Kode</th>
+            <th class="py-2" width="5%">#</th>
+            <th class="py-2">Kode</th>
             <th class="py-2">Nama Produk</th>
-            <th class="py-2">Jenis</th>
-            <th class="py-2" colspan="2" width="6%"></th>
+            <th class="py-2">Kategori</th>
+            <th class="py-2" colspan="2" width="5%"></th>
           </tr>
         </thead>
         <tbody>';
-
-        $status = (trim($req->status))!='1'?0:1;
 
         $page = (isset($req->page))?$req->page:1;
         $limit = session('TampilBarisTabel');
         $limit_start = ($page - 1) * $limit;
         $no = $limit_start + 1;
 
-        $q = Product::selectRaw("*")
-        ->offset($limit_start)
-        ->limit($limit)->get();
-        $jmh = DB::table('cr_product');
-        $total_records =$jmh->count();
+        $type = $req->type;
+        $q = DB::table('cr_product');
+        if($type == '') { //Jika tidak dipilih
+            $q = $q->whereNull('type');
+        } elseif ($type != '' && $type != 999) { //Jika dipilh
+            $q = $q->where('type',$type);
+        }
 
+        $total_records = $q->count();
+
+        $q = $q->offset($limit_start)
+            ->limit($limit)->get();
+            
         $kelas_baris_akhir ='';
         $tr = '';
-        $status = 'AKTIF';
         foreach ($q as $row) {
-            $type = ProductType::select("name")->where('id',$row->type)->first();
-            $status = ($row->status==1)?'AKTIF':'TIDAK AKTIF';
+            $getType = (!empty($row->type)) ? ProductType::where('id', $row->type)->first() : '';
+            $setNameType = !empty($getType) ? $getType->name : '';
             $tr .= '
             <tr ' . $kelas_baris_akhir .'>
               <input type="hidden" value="'. $row->id .'">
+              <td class="py-1">'. $no .'</td>
               <td class="py-1">'. $row->code .'</td>
               <td class="py-1">'. $row->name .'</td>
-              <td class="py-1">'. $type->name .'</td>
-
+              <td class="py-1">'. $setNameType .'</td>
               <td class="py-1">
                     <button type="button" class="btn bg-info-transparent py-0 px-2 btn-edit" ><i class="fe fe-edit"></i></button>
                     <button type="button" class="btn bg-danger-transparent py-0 px-2 btn-delete"><i class="fe fe-x-square"></i></button>
@@ -190,14 +145,90 @@ class ProductController extends Controller
         echo $output;
     }
 
+    public function get(Request $req)
+    {
+        $data = Product::selectRaw('cr_product.*, pt.name as type_name')
+                ->leftJoin('cr_product_type AS pt','pt.id', '=', 'cr_product.type')
+                ->where('cr_product.id',$req->id)
+                ->get()->toArray();
+        return response()->json($data);
+    }
+
+    public static function validation(Request $req)
+    {
+        $validator = Validator::make($req->all(), [
+            'name' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error'=>$validator->errors()->all()]);
+        }
+
+        return response()->json(["status"=>true,"Message"=>"Data Lengkap."]);
+    }
+
     public function isExist(Request $req)
     {
         $result =false;
-        $q = Product::where('nip','=',$req->nip)->get();
+        $q = Product::where('name','=',$req->name)->get();
         if($q->count()>0)
         {
             $result = true;
         }
         return json_encode($result);
+    }
+
+    public function save(Request $req)
+    {
+        try {
+            //Simpan Produk
+            $obj = new Product;
+            if ($req->mode=='EDIT')
+            {
+                $obj = Product::find($req->id);
+            }
+            if($obj==null){
+                $response= Adn::Response(false,"Data Produk Tidak Ditemukan.");
+                return response()->json($response);
+            }
+
+            $obj->code=$req->code;
+            $obj->name=$req->name;
+            $obj->type=$req->type;
+            if ($req->mode=='EDIT') {
+                $obj->uby=auth()->user()->id;
+            } else {
+                $obj->cby=auth()->user()->id;
+            }
+            $obj->save();
+            
+            $response= Adn::Response(true,"Sukses",$req->mode);
+        }
+        catch(\PDOException $e)
+        {
+            $response= Adn::Response(false,"Database > " .$e->getMessage());
+        }
+        catch (\Error $e) {
+            $response= Adn::Response(false,$e->getMessage());
+        }
+
+        return response()->json($response);
+    }
+
+    public function delete(Request $req)
+    {
+        try {
+            Product::where('id',$req->id)->delete();
+            $response= Adn::Response(true,"Sukses");
+        }
+        catch(\PDOException $e)
+        {
+            $response= Adn::Response(false,"Database > " .$e->getMessage());
+        }
+        catch (\Error $e) {
+            $response= Adn::Response(false,$e->getMessage());
+        }
+
+        return response()->json($response);
     }
 }

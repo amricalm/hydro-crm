@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
 use App\Models\Employe;
+use Validator;
 use App\Adn;
 
 class EmployeController extends Controller
@@ -35,6 +36,19 @@ class EmployeController extends Controller
         return response()->json($data);
     }
 
+    public static function validation(Request $req)
+    {
+        $validator = Validator::make($req->all(), [
+            'name' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error'=>$validator->errors()->all()]);
+        }
+
+        return response()->json(["status"=>true,"Message"=>"Data Lengkap."]);
+    }
+
     public function save(Request $req)
     {
         try {
@@ -56,12 +70,15 @@ class EmployeController extends Controller
             $obj->facebook=$req->facebook;
             $obj->instagram=$req->instagram;
             $obj->status=!($req->aktif);
-            $obj->cby=1;
-            $obj->uby=1;
+            if ($req->mode=='EDIT') {
+                $obj->uby=auth()->user()->id;
+            } else {
+                $obj->cby=auth()->user()->id;
+            }
 
             $obj->save();
 
-            $response= Adn::Response(true,"Sukses");
+            $response= Adn::Response(true,"Sukses",$req->mode);
         }
         catch(\PDOException $e)
         {
@@ -96,10 +113,13 @@ class EmployeController extends Controller
         <table class="table table-bordered card-table table-vcenter text-nowrap" width="100%">
         <thead>
           <tr class="border-top">
+            <th class="py-2" width="5%">#</th>
             <th class="py-2" width="10%">NIP</th>
-            <th class="py-2">Nama Lengkap</th>
-            <th class="py-2">Status</th>
-            <th class="py-2" colspan="2" width="6%"></th>
+            <th class="py-2" width="15%">Nama</th>
+            <th class="py-2" width="10%">Hp</th>
+            <th class="py-2">Alamat</th>
+            <th class="py-2" width="5%">Status</th>
+            <th class="py-2" colspan="2" width="5%"></th>
           </tr>
         </thead>
         <tbody>';
@@ -126,8 +146,11 @@ class EmployeController extends Controller
             $tr .= '
             <tr ' . $kelas_baris_akhir .'>
               <input type="hidden" value="'. $row->id .'">
+              <td class="py-1">'. $no .'</td>
               <td class="py-1">'. $row->nip .'</td>
               <td class="py-1">'. $row->name .'</td>
+              <td class="py-1">'. $row->hp .'</td>
+              <td class="py-1">'. $row->address .'</td>
               <td class="py-1">'. $status .'</td>
 
               <td class="py-1">
@@ -195,7 +218,7 @@ class EmployeController extends Controller
     public function isExist(Request $req)
     {
         $result =false;
-        $q = Employe::where('nip','=',$req->nip)->get();
+        $q = Employe::where('name','=',$req->name)->get();
         if($q->count()>0)
         {
             $result = true;

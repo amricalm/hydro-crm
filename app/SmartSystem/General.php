@@ -81,6 +81,23 @@ class General extends Model
         return $name;
     }
 
+    public function category_action_name($name)
+    {
+        $id = '';
+        switch ($name) {
+            case 'HARIAN':
+                $id = '1';
+                break;
+            case 'KPI':
+                $id = '2';
+                break;
+
+            default:
+                break;
+        }
+        return $id;
+    }
+
     public function category_action_id($name)
     {
         $id = '';

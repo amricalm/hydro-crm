@@ -14,5 +14,5 @@ class Response extends Model
     const UPDATED_AT = 'uon';
 
     protected $table = "cr_response";
-    protected $fillable = ['id','code','name','desc','cby','uby'];
+    protected $fillable = ['id','code','name','category_id','desc','cby','uby'];
 }

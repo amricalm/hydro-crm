@@ -28,28 +28,34 @@
                 <!-- Row -->
                 <div class="row">
                     <div class="col-md-12 col-lg-12">
-
-
                         <div class="card mb-4">
                             <div class="card-body py-4">
                                 <div class="form-group row row-sm mb-0">
+                                    <label class="col-md-1 form-label">Sales</label>
+                                    <div class="col-md-4">
+                                        <select name="sales" id="cb-sales" class="form-select form-control form-control-sm mb-2" tabindex="10">
+                                            @if($roleName == 'ADMIN')
+                                            <option value="">-- Pilih Sales --</option>
+                                            <option value="999">-- Pilih Semua Sales --</option>
+                                            @endif
+                                            @foreach($karyawan as $item)
+                                                <option value="{{$item->id}}">{{$item->name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                     <label class="col-md-1 form-label">Status</label>
-                                    <div class="col-md-3">
-                                        <select name="status" id="pilih-status" class="form-select form-control  form-control-sm  mb-2" tabindex="1">
-                                            <option value="0">Tidak Aktif</option>
+                                    <div class="col-md-2">
+                                        <select name="status" id="pilih-status" class="form-select form-control form-control-sm mb-2" tabindex="1">
                                             <option value="1" selected>Aktif</option>
+                                            <option value="0">Tidak Aktif</option>
                                         </select>
                                     </div>
                                     <div class="col-md-1">
                                         <button type="button" id="tampil" class="btn btn-sm btn-primary"><i class="fe fe-search"></i>Tampil</button>
                                     </div>
-
-
                                 </div>
-
                             </div>
                         </div>
-
                         <div class="card">
                             <div class="card-body">
                                 <div class="table-responsive" id="tbl">
@@ -94,45 +100,47 @@
                                                 <div class="card-body">
                                                     <div class="form-group row row-sm mb-0">
                                                         <label class="col-md-3 form-label">Nama Lengkap</label>
-                                                        <div class="col-md-9">
-                                                            <input type="text" id="tx-name" name="name" autocomplete="off" class="form-control  form-control-sm  mb-2" tabindex="13">
+                                                        <div class="col-md-9" id="div-id">
+                                                            <input type="text" id="tx-name" name="name" autocomplete="off" class="form-control form-control-sm mb-2">
                                                         </div>
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
                                                         <label class="col-md-3 form-label">Alamat</label>
                                                         <div class="col-md-9">
-                                                            <textarea type="text" id="tx-address" name="address" autocomplete="off" class="form-control  form-control-sm  mb-2" tabindex="13"></textarea>
+                                                            <textarea type="text" id="tx-address" name="address" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
                                                         </div>
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
                                                         <label class="col-md-3 form-label">HP</label>
                                                         <div class="col-md-9">
-                                                            <input type="text" id="tx-hp" name="hp" autocomplete="off" class="form-control  form-control-sm  mb-2" tabindex="13">
+                                                            <input type="text" id="tx-hp" name="hp" autocomplete="off" class="form-control form-control-sm mb-2">
                                                         </div>
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
                                                         <label class="col-md-3 form-label">Email</label>
                                                         <div class="col-md-9">
-                                                            <input type="text" id="tx-email" name="email" autocomplete="off" class="form-control  form-control-sm  mb-2" tabindex="13">
+                                                            <input type="text" id="tx-email" name="email" autocomplete="off" class="form-control form-control-sm mb-2">
                                                         </div>
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
                                                         <label class="col-md-3 form-label">Facebook</label>
                                                         <div class="col-md-9">
-                                                            <input type="text" id="tx-facebook" name="facebook" autocomplete="off" class="form-control  form-control-sm  mb-2" tabindex="13">
+                                                            <input type="text" id="tx-facebook" name="facebook" autocomplete="off" class="form-control form-control-sm mb-2">
                                                         </div>
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
                                                         <label class="col-md-3 form-label">Instagram</label>
                                                         <div class="col-md-9">
-                                                            <input type="text" id="tx-instagram" name="instagram" autocomplete="off" class="form-control  form-control-sm  mb-2" tabindex="13">
+                                                            <input type="text" id="tx-instagram" name="instagram" autocomplete="off" class="form-control form-control-sm mb-2">
                                                         </div>
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
                                                         <label class="col-md-3 form-label">Sales Owner</label>
                                                         <div class="col-md-9">
-                                                            <select name="kd_kategori" id="kd-kategori" class="form-select form-control  form-control-sm  mb-2" tabindex="10">
+                                                            <select name="sales" id="cb-sales" class="form-select form-control form-control-sm mb-2" tabindex="10">
+                                                                @if($roleName == 'ADMIN')
                                                                 <option value="">-- Pilih Sales --</option>
+                                                                @endif
                                                                 @foreach($karyawan as $item)
                                                                 <option value="{{$item->id}}">{{$item->name}}</option>
                                                                 @endforeach
@@ -234,9 +242,6 @@
   </div>
 @endsection
 @section('footer')
-<?php
-    use App\Http\Controllers\MProgramController;
-?>
 <script type="text/javascript">
 
     var mode = 'TAMBAH';
@@ -255,17 +260,17 @@
         $(document).ajaxStop(function() {
             $("#ajax-loading").hide();
         });
-        loadData(1,$('#pilih-status').val());
+        loadData(1,$('#pilih-status').val(), $('#cb-sales').val());
 
-        $('#tx-nip').on('change', function(){
+        $('#tx-name').on('change', function(){
             var el = $(this);
             $.ajax({
                 url:"{{ route('customer.isExist') }}",
                 method:"POST",
-                data:{nip:el.val()},
+                data:{name:el.val()},
                 success:function(data){
                     if(data==='true'){
-                        alert('NIP telah ada.');
+                        alert('Nama Pelanggan telah ada.');
                         el.val('');
                         el.focus();
                     }
@@ -276,12 +281,14 @@
         $(document).on('click', '.halaman', function(){
            var page = $(this).attr("id");
            var status = $('#pilih-status').val();
-           loadData(page,status);
+           var employe = $('#cb-sales').val();
+           loadData(page,status,employe);
         });
 
         $('#tampil').click(function () {
            var status = $('#pilih-status').val();
-           loadData(1,status);
+           var employe = $('#cb-sales').val();
+           loadData(1,status,employe);
         });
 
         $('#createNew').click(function(){
@@ -296,23 +303,25 @@
         $(document).on('click','.btn-edit',function(){
             mode = 'EDIT';
             var id = $(this).closest('tr').find('input').val();
-            console.log(id);
             $.ajax({
                 url:"{{ route('customer.get') }}",
                 method:"POST",
                 data:{id:id.trim()},
                 success:function(data){
-                    console.log(data);
-                        var obj = data[0];
-
-                        $('#tx-nip').val(obj.nip);
-                        $('#tx-name').val(obj.name);
-                        $('#tx-address').val(obj.address);
-                        $('#kd-hp').val(obj.hp);
-                        $('#tx-email').val(obj.email);
-                        $('#tx-facebook').val(obj.facebook);
-                        $('#tx-instagram').val(obj.instagram);
-                        $("#chk-aktif").prop('checked', !(Boolean(Number(obj.aktif))));
+                    var obj = data[0];
+                    var input = document.createElement("input");
+                    input.setAttribute("type", "hidden");
+                    input.setAttribute("name", "id");
+                    input.setAttribute("value", obj.id);
+                    document.getElementById("div-id").appendChild(input);
+                    $('#tx-name').val(obj.name);
+                    $('#tx-address').val(obj.address);
+                    $('#tx-hp').val(obj.hp);
+                    $('#tx-email').val(obj.email);
+                    $('#tx-facebook').val(obj.facebook);
+                    $('#tx-instagram').val(obj.instagram);
+                    $('#cb-sales option[value="'+obj.eid+'"]').attr("selected", "selected");
+                    $('#chk-aktif').prop('checked', !(Boolean(obj.status)));
                 }
             })
             $('#ajax-loading').show();
@@ -327,21 +336,31 @@
 
         $('#add-modal').on('shown.bs.modal', function (e) {
             //AktivasiTab();
-            $('#tx-nip').focus();
+            $('#tx-name').focus();
         });
 
         $('#btn-close').click(function () {
             $('#add-modal').hide();
+            var frm = document.querySelector("#trn");
+            frm.reset();
+            $('#cb-sales option').removeAttr("selected", "selected");
+            var status = $('#pilih-status').val();
+            var employe = $('#cb-sales').val();
+            loadData(1,status,employe);
         });
 
         $('#btn-close-import').click(function () {
             $('#modalImport').hide();
+            var status = $('#pilih-status').val();
+            var employe = $('#cb-sales').val();
+            loadData(1,status,employe);
         });
 
         $('#batal').click(function () {
             mode = 'TAMBAH';
             var frm = document.querySelector("#trn");
             frm.reset();
+            $('#cb-sales option').removeAttr("selected", "selected");
         });
 
         $('#batalImport').click(function () {
@@ -357,32 +376,49 @@
             var kirim = true;
             const frm = new FormData(document.querySelector("#trn"));
             const obj = Object.fromEntries(frm.entries());
-
+            var name = $('#tx-name').val();
             obj.mode = mode;
 
             $.ajax({
-                data: obj,
-                url:  "{{ route('customer.save') }}",
+                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                url: "{{ url('pelanggan/validation') }}",
                 type: "POST",
-                success: function(msg) {
-                    console.log(msg);
-                    if (msg.IsSuccess){
-                        alert('Sukses.');
-                        $('#trn').trigger("reset");
-                        $('#add-modal').hide();
-                        window.location.reload();
-                    }else{
-                        alert(msg.Message)
+                data: {name:name},
+                dataType: "json",
+                success: function (respon) {
+                    if($.isEmptyObject(respon.error)) {
+                        $.ajax({
+                            data: obj,
+                            url:  "{{ route('customer.save') }}",
+                            type: "POST",
+                            success: function(msg) {
+                                if (msg.IsSuccess){
+                                    console.log(msg.Obj);
+                                    alert('Sukses.');
+                                    $('#trn').trigger("reset");
+                                    $('#cb-sales option').removeAttr("selected", "selected");
+                                    if(msg.Obj == 'EDIT') {
+                                        $('#add-modal').hide();
+                                        window.location.reload();
+                                    }
+                                }else{
+                                    alert(msg.Message)
+                                }
+                            },
+                            error: function(msg) {
+                                console.log('Error:', msg);
+                            }
+                        }).done(function(msg){
+                            el.html('Simpan');
+                            el.removeAttr('disabled');
+                        });
+                    } else {
+                        alert('Data Belum Lengkap.');
+                        el.html('Simpan');
+                        el.removeAttr('disabled');
                     }
-
-                },
-                error: function(msg) {
-                    console.log('Error:', msg);
                 }
-            }).done(function(msg){
-                el.html('Simpan');
-                el.removeAttr('disabled');
-            });//$.ajax
+            });
         });
 
         $('#btnProses').on('click',function(){
@@ -390,7 +426,6 @@
             var form_data = new FormData();
             form_data.append('file', file_data);
             form_data.append("_token","{{ csrf_token() }}");
-
             $.ajax({
                 url: '{{ route('customer.upload') }}',
                 dataType: 'text',
@@ -408,17 +443,18 @@
                         }
                     },
             });
+                    
         });
 
         $('.select2').select2();
     });
 
 
-function loadData(page,status){
+function loadData(page,status,employe){
     $.ajax({
         url:"{{ route('pelanggan.getTabel') }}",
         method:"POST",
-        data:{page:page, status:status},
+        data:{page:page, status:status, employe:employe},
         success:function(data){
             $('#tbl').html(data);
         }
@@ -441,7 +477,7 @@ function checkdelete(id,el)
             $.ajax({
                 url:"{{route('customer.delete') }}",
                 method:"POST",
-                data:{kdProgram:id},
+                data:{id:id},
                 success:function(data){
                     if(data.Message=='Sukses')
                     {

@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
-use App\Models\Product;
 use App\Models\ProductType;
+use Validator;
 use App\Adn;
 
 class ProductTypeController extends Controller
@@ -22,7 +22,7 @@ class ProductTypeController extends Controller
 
     public function index(Request $req)
     {
-        $app['judul']   = "Jenis Produk";
+        $app['judul']   = "Kategori Produk";
 
         $tampilBarisTabel  = Adn::getSysVar('TampilBarisTabel');
         Session::put('TampilBarisTabel', $tampilBarisTabel);
@@ -31,9 +31,22 @@ class ProductTypeController extends Controller
 
     public function get(Request $req)
     {
-        $data = ProductType::where('id',$req->id)->get()->toArray();
+        $data = ProductType::where('id', $req->id)->get()->toArray();
 
         return response()->json($data);
+    }
+
+    public static function validation(Request $req)
+    {
+        $validator = Validator::make($req->all(), [
+            'name' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error'=>$validator->errors()->all()]);
+        }
+
+        return response()->json(["status"=>true,"Message"=>"Data Lengkap."]);
     }
 
     public function save(Request $req)
@@ -45,19 +58,21 @@ class ProductTypeController extends Controller
                 $obj = ProductType::find($req->id);
             }
             if($obj==null){
-                $response= Adn::Response(false,"Data Karyawan Tidak Ditemukan.");
+                $response= Adn::Response(false,"Data Kategori Produk Tidak Ditemukan.");
                 return response()->json($response);
             }
 
             $obj->code=$req->code;
             $obj->name=$req->name;
-            $obj->type=$req->type;
-            $obj->cby=1;
-            $obj->uby=1;
+            if ($req->mode=='EDIT') {
+                $obj->uby=auth()->user()->id;
+            } else {
+                $obj->cby=auth()->user()->id;
+            }
 
             $obj->save();
 
-            $response= Adn::Response(true,"Sukses");
+            $response= Adn::Response(true,"Sukses",$req->mode);
         }
         catch(\PDOException $e)
         {
@@ -92,14 +107,13 @@ class ProductTypeController extends Controller
         <table class="table table-bordered card-table table-vcenter text-nowrap" width="100%">
         <thead>
           <tr class="border-top">
+            <th class="py-2" width="5%">#</th>
             <th class="py-2">Kode</th>
-            <th class="py-2">Jenis Produk</th>
-            <th class="py-2" colspan="2" width="6%"></th>
+            <th class="py-2">Nama Kategori Produk</th>
+            <th class="py-2" colspan="2" width="5%"></th>
           </tr>
         </thead>
         <tbody>';
-
-        $status = (trim($req->status))!='1'?0:1;
 
         $page = (isset($req->page))?$req->page:1;
         $limit = session('TampilBarisTabel');
@@ -107,8 +121,9 @@ class ProductTypeController extends Controller
         $no = $limit_start + 1;
 
         $q = ProductType::selectRaw("*")
+        ->offset($limit_start)
         ->limit($limit)->get();
-        $jmh = DB::table('cr_product_type');
+        $jmh = ProductType::select('id');
         $total_records =$jmh->count();
 
         $kelas_baris_akhir ='';
@@ -117,9 +132,9 @@ class ProductTypeController extends Controller
             $tr .= '
             <tr ' . $kelas_baris_akhir .'>
               <input type="hidden" value="'. $row->id .'">
+              <td class="py-1">'. $no .'</td>
               <td class="py-1">'. $row->code .'</td>
               <td class="py-1">'. $row->name .'</td>
-
               <td class="py-1">
                     <button type="button" class="btn bg-info-transparent py-0 px-2 btn-edit" ><i class="fe fe-edit"></i></button>
                     <button type="button" class="btn bg-danger-transparent py-0 px-2 btn-delete"><i class="fe fe-x-square"></i></button>
@@ -185,7 +200,7 @@ class ProductTypeController extends Controller
     public function isExist(Request $req)
     {
         $result =false;
-        $q = ProductType::where('nip','=',$req->nip)->get();
+        $q = ProductType::where('name','=',$req->name)->get();
         if($q->count()>0)
         {
             $result = true;

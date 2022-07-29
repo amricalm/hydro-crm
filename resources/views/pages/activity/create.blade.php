@@ -653,7 +653,7 @@
                             return false;
                         }
 
-                        // console.log(o);
+                        $('.btn-simpan').prop('disabled', true);
                         $.ajax({
                             headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                             url: "{{ url('aktivitas/save') }}",
@@ -666,6 +666,7 @@
                                 {
                                     showAlert('success','',respon.Message);
                                     window.location.reload();
+                                    $('.btn-simpan').prop('disabled', false);
                                 }
                                 else {
                                     showAlert('error','',"Terjadi Kesalahan: " + respon.Message);
