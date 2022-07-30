@@ -32,7 +32,7 @@ class ResponseController extends Controller
 
         $tampilBarisTabel  = Adn::getSysVar('TampilBarisTabel');
         Session::put('TampilBarisTabel', $tampilBarisTabel);
-        return view('pages.Response.index', $app);
+        return view('pages.response.index', $app);
     }
 
     public function getTabel(Request $req){

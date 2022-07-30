@@ -31,10 +31,21 @@ class ActivityController extends Controller
     public function index(Request $req)
     {
         $app['judul']   = "Aktivitas";
-        $app['sales']   = DB::table('aa_employe')->get()->toArray();
         $app['customer']   = DB::table('aa_customer')->get()->toArray();
         $app['action']   = DB::table('cr_action')->get()->toArray();
         $app['response']   = DB::table('cr_response')->get()->toArray();
+
+
+
+        $app['roleName']= $this->general->role_name();
+        $app['sales']   = DB::table('aa_employe')->get()->toArray();
+        $app['startDate'] = (isset($_GET['tglDr'])&&$_GET['tglDr']!='') ? $_GET['tglDr'] : ((!isset($_GET['tglDr'])) ? Carbon::now()->format('Y-m-d') : '');
+        $app['endDate']   = (isset($_GET['tglSd'])&&$_GET['tglSd']!='') ? $_GET['tglSd'] : ((!isset($_GET['tglDr'])) ? Carbon::now()->format('Y-m-d') : '');
+        if ($app['roleName'] == 'ADMIN') {
+            $app['salesId']    = (isset($_GET['salesId'])&&$_GET['salesId']!='') ? $_GET['salesId'] : '';
+        } elseif ($app['roleName'] == 'SALES') {
+            $app['salesId']    = auth()->user()->eid;
+        }
 
         $tampilBarisTabel  = Adn::getSysVar('TampilBarisTabel');
         Session::put('TampilBarisTabel', $tampilBarisTabel);
@@ -45,17 +56,6 @@ class ActivityController extends Controller
     {
         $data = Activity::where('id',$req->id)->get()->toArray();
         return response()->json($data);
-    }
-
-    public function createx(Request $req)
-    {
-        $app['judul']       = "Aktivitas";
-        $app['sales']       = DB::table('aa_employe')->get()->toArray();
-        $app['customer']    = DB::table('aa_customer')->get()->toArray();
-        $app['action']      = DB::table('cr_action')->get()->toArray();
-        $app['response']    = DB::table('cr_response')->get()->toArray();
-
-        return view('pages.activity.create', $app);
     }
 
     public function create()
@@ -99,65 +99,6 @@ class ActivityController extends Controller
         }
     }
 
-    public function save_old(Request $req)
-    {
-        try {
-            $obj = new Activity;
-            if ($req->mode=='EDIT')
-            {
-                $obj = Activity::find($req->id);
-            }
-            if($obj==null)
-            {
-                $response= Adn::Response(false,"Data Karyawan Tidak Ditemukan.");
-                return response()->json($response);
-            }
-
-            $activity = Activity::updateOrCreate(
-                [ 'id' => $req->id ],
-                [
-                    'date' => $req->date,
-                    'customer_id' => $req->customer_id,
-                    'sales_id' => $req->sales_id,
-                    'action_id' => $req->action_id,
-                    'action_desc' => $req->action_desc,
-                    'response_id' => $req->response_id,
-                    'response_desc' => $req->response_desc,
-                    'cby' => 1,
-                    'uby' => 1
-                ]
-            );
-
-            $address = Address::updateOrCreate(
-                [ 'pid' => $req->customer_id ],
-                [
-                    'type' => $req->type,
-                    'address' => $req->address,
-                    'province' => 1, //$req->province,
-                    'city' => 1, //$req->city,
-                    'district' => 0,
-                    'village' => 0,
-                    'post_code' => $req->post_code,
-                    'latitude' => '',
-                    'longitude' => '',
-                    'cby' => 1,
-                    'uby' => 1
-                ]
-            );
-
-            $response= Adn::Response(true,"Sukses");
-        }
-        catch(\PDOException $e)
-        {
-            $response= Adn::Response(false,"Database > " .$e->getMessage());
-        }
-        catch (\Error $e) {
-            $response= Adn::Response(false,$e->getMessage());
-        }
-
-        return response()->json($response);
-    }
-
     public function delete(Request $req)
     {
         try {
@@ -189,8 +130,6 @@ class ActivityController extends Controller
         </thead>
         <tbody>';
 
-        $status = (trim($req->status))!='1'?0:1;
-
         $page = (isset($req->page))?$req->page:1;
         $limit = session('TampilBarisTabel');
         $limit_start = ($page - 1) * $limit;
@@ -204,7 +143,8 @@ class ActivityController extends Controller
 
         $kelas_baris_akhir ='';
         $tr = '';
-        $status = 'AKTIF';
+        
+        
         foreach ($q as $row) {
             $history = Activity::select('aa_employe.name as name','cr_action.name as action','cr_response.name as response','response_desc')
                         ->join('aa_employe','cr_activity.sales_id','=','aa_employe.id')

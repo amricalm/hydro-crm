@@ -61,7 +61,6 @@ class HomeController extends Controller
 
         $app['target']  = $target;
 
-        // dd($app['target']);
         //Laporan Harian
         $app['time']        = DB::table('rf_times')->get();
         $app['actionDaily'] = DB::table('cr_action AS a')

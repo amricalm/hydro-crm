@@ -29,32 +29,35 @@
                     <div class="col-md-12 col-lg-12">
                         <div class="card mb-4">
                             <div class="card-body py-4">
-                                <div class="form-group row row-sm mb-0">
+                                <div class="form-group row row-sm">
                                     <label class="col-md-2 form-label">Tanggal</label>
                                     <div class="col-md-3">
-                                        <input type="date" name="date" id="tx-date" autocomplete="off" class="form-control  form-control-sm  mb-2" tabindex="13">
+                                        <input type="date" name="tglDr" id="tglDr" autocomplete="off" class="form-control  form-control-sm  mb-2" value="{{ $startDate }}">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="date" name="tglSd" id="tglSd" autocomplete="off" class="form-control  form-control-sm  mb-2" value="{{ $endDate }}">
                                     </div>
                                 </div>
-                                <div class="form-group row row-sm mb-0">
-                                    <label class="col-md-2 form-label">Pelanggan</label>
-                                    <div class="col-md-3">
-                                        <select name="customer_id" id="customer_id" class="form-select form-control  form-control-sm  mb-2" tabindex="10">
-                                            <option value="">-- Pilih Pelanggan --</option>
-                                            @foreach($customer as $item)
-                                                <option value="{{$item->id}}">{{$item->name}}</option>
-                                            @endforeach
-                                        </select>
+                                @if ($roleName == 'ADMIN')
+                                    <div class="form-group row row-sm mb-0">
+                                        <label class="col-md-2 form-label">Sales</label>
+                                        <div class="col-md-6">
+                                            <select name="salesId" id="salesId" class="form-select form-control form-control-sm  mb-2" tabindex="10">
+                                                <option value="">-- Pilih Sales --</option>
+                                                @foreach($sales as $item)
+                                                    <option value="{{$item->id}}" {{ $item->id == $salesId ? 'selected' : ''  }}>{{$item->name}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                     </div>
-                                    <div class="col-md-1">
-                                        <button type="button" id="tampil" class="btn btn-sm btn-primary"><i class="fe fe-search"></i>Tampil</button>
-                                    </div>
-                                    <div class="col-md-1">
-                                        <button type="button" id="tampil" class="btn btn-sm btn-success"><i class="fe fe-download"></i> Excel</button>
+                                @endif
+                                <div class="form-group row row-sm">
+                                        <div class="col-md-8 text-right">
+                                        <button class="btn btn-sm btn-primary" id="tampil"><i class="fe fe-search"></i>Tampil</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                         <div class="card">
                             <div class="card-body">
                                 <div class="table-responsive" id="tbl">
@@ -90,17 +93,22 @@
         $(document).ajaxStop(function() {
             $("#ajax-loading").hide();
         });
-        loadData(1,$('#pilih-status').val());
+
+        loadData(1,$('#tglDr').val(),$('#tglSd').val(),$('#salesId').val());
 
         $(document).on('click', '.halaman', function(){
            var page = $(this).attr("id");
-           var status = $('#pilih-status').val();
-           loadData(page,status);
+           var tglDr = $('#tglDr').val();
+           var tglSd = $('#tglSd').val();
+           var salesId = $('#salesId').val();
+           loadData(page,tglDr,tglSd,salesId);
         });
 
         $('#tampil').click(function () {
-           var status = $('#pilih-status').val();
-           loadData(1,status);
+           var tglDr = $('#tglDr').val();
+           var tglSd = $('#tglSd').val();
+           var salesId = $('#salesId').val();
+           loadData(1,tglDr,tglSd,salesId);
         });
 
         $(document).on('click','.btn-edit',function(){
@@ -137,11 +145,11 @@
     });
 
 
-function loadData(page,status){
+function loadData(page,tglDr,tglSd,SalesId){
     $.ajax({
         url:"{{ route('activity.getTabel') }}",
         method:"POST",
-        data:{page:page, status:status},
+        data:{page:page, tglDr:tglDr, tglSd:tglSd, salesId:salesId},
         success:function(data){
             $('#tbl').html(data);
         }
