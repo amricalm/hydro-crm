@@ -63,6 +63,7 @@ Route::post('/pelanggan', [CustomerController::class, 'save'])->name('customer.s
 Route::post('/pelanggan/delete', [CustomerController::class, 'delete'])->name('customer.delete');
 Route::get('/pelanggan/export',[CustomerController::class, 'template']);
 Route::post('/pelanggan/export',[CustomerController::class, 'upload'])->name('customer.upload');
+Route::get('/karyawan/export',[CustomerController::class, 'employeList']);
 //===================== ROUTE END PELANGGAN ===========================//
 
 

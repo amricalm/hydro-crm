@@ -205,6 +205,16 @@
                                                         <li>
                                                             <div class="row p-2">
                                                                 <div class="col-md-12">
+                                                                    <label for="files">Download Daftar Karyawan</label>
+                                                                </div>
+                                                                <div class="col-md-12">
+                                                                    <a href="{{ url('karyawan/export') }}" target="_blank" class="btn btn-sm btn-primary"><i class="fas fa-file-download"></i> Download</a>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="row p-2">
+                                                                <div class="col-md-12">
                                                                     <label for="files">Download Template Pelanggan</label>
                                                                 </div>
                                                                 <div class="col-md-12">
@@ -215,10 +225,43 @@
                                                         <li>
                                                             <div class="row p-2">
                                                                 <div class="col-md-12">
+                                                                    <label for="files">Buka file <b>Pelanggan.xlsx</b></label>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="row p-2">
+                                                                <div class="col-md-12">
+                                                                    <label>Isi <b>DATA PELANGGAN</b> secara lengkap</label>
+                                                                </div>
+                                                                <div class="col-md-12">
+                                                                    <label>Isi <b>PERIODE</b> dengan format 4 digit tahun dan 2 digit bulan. Contoh : <b>202208</b></label>
+                                                                </div>
+                                                                <div class="col-md-12">
+                                                                    <label>Isi <b>ID SALES OWNER</b> yang didapat dari file <b>Daftar Karyawan.xlsx</b> yang sudah didownload</label>
+                                                                </div>
+                                                                <div class="col-md-12">
+                                                                    <label><b>Save As</b> data yang sudah sesuai Fieldnya dengan nama file yang memudahkan Anda.</label>
+                                                                </div>
+                                                                <div class="col-md-12">
+                                                                    <img src="{{ asset('uploads/import_pelanggan.jpg') }}" alt="ilustrasi" width="100%">
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="row p-2">
+                                                                <div class="col-md-12">
                                                                     <div class="form-group">
                                                                         <label for="files">Upload Filenya disini</label>
                                                                         <input type="file" class="form-control-file" name="file" id="file">
                                                                     </div>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="row p-2">
+                                                                <div class="col-md-12">
+                                                                    <label>Klik Tombol <b>Simpan</b> kanan diatas. Lalu tunggu sampai ada notifikasi berhasil.</label>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -443,7 +486,7 @@
                         }
                     },
             });
-                    
+
         });
 
         $('.select2').select2();

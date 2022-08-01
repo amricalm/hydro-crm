@@ -122,10 +122,12 @@ class ActivityController extends Controller
         <thead>
           <tr class="border-top">
             <th class="py-2" width="10%">Tanggal</th>
+            <th class="py-2">Nama Pelanggan</th>
+            <th class="py-2">Hp</th>
             <th class="py-2">Sales</th>
             <th class="py-2">Aksi</th>
             <th class="py-2">Respon</th>
-            <th class="py-2">Keterangan</th>
+            <th class="py-2" colspan="2" width="5%"></th>
           </tr>
         </thead>
         <tbody>';
@@ -143,8 +145,8 @@ class ActivityController extends Controller
 
         $kelas_baris_akhir ='';
         $tr = '';
-        
-        
+
+
         foreach ($q as $row) {
             $history = Activity::select('aa_employe.name as name','cr_action.name as action','cr_response.name as response','response_desc')
                         ->join('aa_employe','cr_activity.sales_id','=','aa_employe.id')
@@ -276,7 +278,7 @@ class ActivityController extends Controller
                 foreach ($v as $kdtl => $vdtl) {
                     $getAction          = DB::table('cr_action')->where('name',$vdtl['action'])->first();
                     $getResponse        = DB::table('cr_response')->where('name',$vdtl['response'])->first();
-                    
+
                     $dtl = new ActivityDtl;
                     $dtl->activity_id   = $activityId;
                     $dtl->action_id     = $getAction->id;

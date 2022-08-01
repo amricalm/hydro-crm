@@ -18,7 +18,12 @@ class AllExport implements FromView
         switch ($datas['type']) {
             case 'customer':
                 unset($datas['type']);
-                return view('pages.customer.export',$datas);
+                return view('pages.customer.export_customer',$datas);
+                break;
+
+            case 'employe':
+                unset($datas['type']);
+                return view('pages.customer.export_employe',$datas);
                 break;
 
             default:

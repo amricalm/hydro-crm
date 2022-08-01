@@ -4,9 +4,8 @@ namespace App\Imports;
 
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
-use App\Models\Assessment;
 use App\Models\Customer;
-use App\Models\GradeWeight;
+use App\Models\SalesOwner;
 
 class CustomerImport implements ToCollection
 {
@@ -23,20 +22,34 @@ class CustomerImport implements ToCollection
             $email      = $rows[$i+1][3];
             $facebook   = $rows[$i+1][4];
             $instagram  = $rows[$i+1][5];
+            $periode    = $rows[$i+1][6];
+            $eid        = $rows[$i+1][7];
 
+            $customer = Customer::updateOrCreate(
+                            [
+                                'name' => $name,
+                                'hp' => $hp,
+                            ],
+                            [
+                                'address' => $address,
+                                'email' => $email,
+                                'facebook' => $facebook,
+                                'instagram' => $instagram,
+                                'uby' => auth()->user()->id,
+                                'cby' => auth()->user()->id,
+                            ]
+                         );
 
-            Customer::updateOrCreate(
+            $cid    = $customer->id;
+            SalesOwner::updateOrCreate(
                 [
-                    'name' => $name,
-                    'hp' => $hp,
+                    'periode' => $periode,
+                    'cid' => $cid,
+                    'eid' => $eid,
+                    'cby' => auth()->user()->id,
                 ],
                 [
-                    'address' => $address,
-                    'email' => $email,
-                    'facebook' => $facebook,
-                    'instagram' => $instagram,
                     'uby' => auth()->user()->id,
-                    'cby' => auth()->user()->id,
                 ]
             );
         }

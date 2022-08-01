@@ -75,7 +75,7 @@ class CustomerController extends Controller
                 })
             ->leftJoin('aa_employe AS emp','so.eid','=','emp.id')
             ->where('cus.status', $status);
-            
+
             if($employe == '') { //Jika sales tidak dipilih
                 $q =  $q->whereNotIn('cus.id',
                     DB::table('cr_sales_owner AS so')
@@ -249,7 +249,7 @@ class CustomerController extends Controller
                     ['eid' => $req->sales, 'cby' => auth()->user()->id, 'uby' => auth()->user()->id]
                 );
             }
-            
+
             $response= Adn::Response(true,"Sukses",$req->mode);
         }
         catch(\PDOException $e)
@@ -284,6 +284,14 @@ class CustomerController extends Controller
     {
         $array = array('type'=>'customer');
         return Excel::download(new AllExport($array),'Pelanggan.xlsx');
+    }
+
+    public function employeList(Request $request)
+    {
+        $data = Employe::select('id','name')->get();
+        $array = array('type'=>'employe');
+        $array += array('alldata'=>$data);
+        return Excel::download(new AllExport($array),'Daftar Karyawan.xlsx');
     }
 
     public function upload(Request $request)
