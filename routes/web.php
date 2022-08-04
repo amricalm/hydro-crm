@@ -14,6 +14,7 @@ use App\Http\Controllers\ProductTypeController;
 use App\Http\Controllers\ActionController;
 use App\Http\Controllers\ResponseController;
 use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\SaleingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -122,6 +123,16 @@ Route::post('/aktivitas/search', [ActivityController::class, 'search']);
 Route::post('/aktivitas/validation', [ActivityController::class, 'validation']);
 Route::post('/aktivitas/save', [ActivityController::class, 'save']);
 //===================== ROUTE END PELANGGAN ===========================//
+
+//============================= PENJUALAN ============================//
+Route::get('/penjualan', [SaleingController::class, 'index']);
+Route::post('/penjualan/getTabel', [SaleingController::class, 'getTabel'])->name('saleing.getTabel');
+Route::post('/penjualan/get', [SaleingController::class, 'get'])->name('saleing.get');
+Route::post('/penjualan/validation', [SaleingController::class, 'validation']);
+Route::post('/penjualan/isExist', [SaleingController::class, 'isExist'])->name('saleing.isExist');
+Route::post('/penjualan', [SaleingController::class, 'save'])->name('saleing.save');
+Route::post('/penjualan/delete', [SaleingController::class, 'delete'])->name('saleing.delete');
+//===================== ROUTE END PENJUALAN ===========================//
 
 Route::get('/clear-cache', function () {
     $configCache = Artisan::call('config:cache');

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Employe;
 use App\Models\Customer;
 use App\Models\SalesOwner;
+use App\Models\Saleing;
 use App\Models\MsUpload;
 use App\Exports\AllExport;
 use App\Imports\CustomerImport;
@@ -18,7 +19,7 @@ use Carbon\Carbon;
 use Validator;
 use App\Adn;
 
-class CustomerController extends Controller
+class SaleingController extends Controller
 {
     public function __construct()
     {
@@ -31,17 +32,23 @@ class CustomerController extends Controller
 
     public function index(Request $req)
     {
-        $app['judul']   = "Pelanggan";
+        $app['judul']   = "Penjualan";
         $app['roleName']= $this->general->role_name();
         if ($app['roleName'] == 'ADMIN') {
-            $app['karyawan']   = Employe::all();
+            $app['karyawan']    = Employe::all();
+            $app['customer']    = Customer::getCustomerName();
         } elseif ($app['roleName'] == 'SALES') {
-            $app['karyawan']   = Employe::where('id', auth()->user()->eid)->get();
+            $app['karyawan']    = Employe::where('id', auth()->user()->eid)->get();
+            $app['customer']    = Customer::getCustomerName(auth()->user()->eid);
         }
+        $app['product']         = DB::table('cr_product')->get()->toArray();
+        $app['date']            = Carbon::now()->format('Y-m-d');
+        $app['startDate']       = (isset($_GET['tglDr'])&&$_GET['tglDr']!='') ? $_GET['tglDr'] : ((!isset($_GET['tglDr'])) ? Carbon::now()->format('Y-m-d') : '');
+        $app['endDate']         = (isset($_GET['tglSd'])&&$_GET['tglSd']!='') ? $_GET['tglSd'] : ((!isset($_GET['tglDr'])) ? Carbon::now()->format('Y-m-d') : '');
 
         $tampilBarisTabel  = Adn::getSysVar('TampilBarisTabel');
         Session::put('TampilBarisTabel', $tampilBarisTabel);
-        return view('pages.customer.index', $app);
+        return view('pages.saleing.index', $app);
     }
 
     public function getTabel(Request $req){
@@ -50,68 +57,45 @@ class CustomerController extends Controller
         <thead>
           <tr class="border-top">
             <th class="py-2" width="5%">#</th>
-            <th class="py-2" width="20%">Nama Pelanggan</th>
-            <th class="py-2" width="15%">Hp</th>
-            <th class="py-2">Alamat</th>
+            <th class="py-2">Tanggal</th>
+            <th class="py-2">Nama Pelanggan</th>
+            <th class="py-2">Produk</th>
+            <th class="py-2">Teknisi</th>
             <th class="py-2">Sales</th>
+            <th class="py-2">Harga</th>
             <th class="py-2" colspan="2" width="5%"></th>
           </tr>
         </thead>
         <tbody>';
 
-        $status = (trim($req->status))!='1'?0:1;
         $employe = $req->employe;
-        $page = (isset($req->page))?$req->page:1;
-        $limit = session('TampilBarisTabel');
+        $dateFr  = $req->tglDr;
+        $dateTo  = $req->tglSd;
+        $page    = (isset($req->page))?$req->page:1;
+        $limit   = session('TampilBarisTabel');
         $limit_start = ($page - 1) * $limit;
         $no = $limit_start + 1;
 
-        $q = DB::table('aa_customer AS cus')
-            ->selectRaw('cus.*, emp.name as sales_name')
-            ->leftJoin('cr_sales_owner AS so', function($join)
-                {
-                    $join->on('cus.id', '=', 'so.cid');
-                    $join->on('so.periode', '=', DB::raw((int)Carbon::now()->format('Ym')));
-                })
-            ->leftJoin('aa_employe AS emp','so.eid','=','emp.id')
-            ->where('cus.status', $status);
+        $q = Saleing::getSaleing($dateFr,$dateTo,$employe,'');
 
-            if($employe == '') { //Jika sales tidak dipilih
-                $q =  $q->whereNotIn('cus.id',
-                    DB::table('cr_sales_owner AS so')
-                    ->select('cid')
-                    ->leftJoin('aa_employe AS emp','so.eid','=','emp.id')
-                    ->where('periode',DB::raw((int)Carbon::now()->format('Ym')))
-                );
-            } elseif ($employe == 999) { //Jika sales dipilh semua
-                $q =  $q->whereIn('cid',
-                    DB::table('cr_sales_owner AS so')
-                    ->select('cid')
-                    ->leftJoin('aa_employe AS emp','so.eid','=','emp.id')
-                    ->where('periode',DB::raw((int)Carbon::now()->format('Ym')))
-                );
-            } else {
-                $q = $q->where('emp.id',$employe); //Jika sales dipilih
-            }
+        $total_records = $q->count();
 
-            $total_records = $q->count();
-
-            $q = $q->offset($limit_start)
-                    ->limit($limit)->get();
+        $q = $q->offset($limit_start)
+                ->limit($limit)->get();
 
         $kelas_baris_akhir ='';
         $tr = '';
-        $status = 'AKTIF';
         foreach ($q as $row) {
-            $status = ($row->status==1)?'AKTIF':'TIDAK AKTIF';
             $tr .= '
             <tr ' . $kelas_baris_akhir .'>
               <input type="hidden" value="'. $row->id .'">
               <td class="py-1">'. $no .'</td>
-              <td class="py-1">'. $row->name .'</td>
-              <td class="py-1">'. $row->hp .'</td>
-              <td class="py-1">'. $row->address .'</td>
+              <td class="py-1">'. Carbon::parse($row->date)->format('d/m/Y') .'</td>
+              <td class="py-1">'. $row->customer_name .'</td>
+              <td class="py-1">'. $row->product_name .'</td>
+              <td class="py-1">'. $row->technician_name .'</td>
               <td class="py-1">'. $row->sales_name .'</td>
+              <td class="py-1">'. $row->amount .'</td>
 
               <td class="py-1">
                     <button type="button" class="btn bg-info-transparent py-0 px-2 btn-edit" ><i class="fe fe-edit"></i></button>
@@ -177,15 +161,7 @@ class CustomerController extends Controller
 
     public function get(Request $req)
     {
-        $data = Customer::selectRaw('aa_customer.*, eid')
-                ->leftJoin('cr_sales_owner AS so', function($join)
-                {
-                    $join->on('aa_customer.id', '=', 'so.cid');
-                    $join->on('so.periode', '=', DB::raw((int)Carbon::now()->format('Ym')));
-                })
-                ->where('aa_customer.id',$req->id)
-                ->get()
-                ->toArray();
+        $data = Saleing::getSaleing('','','',$req->id)->get()->toArray();
         return response()->json($data);
     }
 
@@ -216,39 +192,30 @@ class CustomerController extends Controller
     public function save(Request $req)
     {
         try {
-            //Simpan Pelanggan
-            $obj = new Customer;
+            //Simpan
+            $obj = new Saleing;
             if ($req->mode=='EDIT')
             {
-                $obj = Customer::find($req->id);
+                $obj = Saleing::find($req->id);
             }
             if($obj==null){
-                $response= Adn::Response(false,"Data Karyawan Tidak Ditemukan.");
+                $response= Adn::Response(false,"Data Penjualan Tidak Ditemukan.");
                 return response()->json($response);
             }
 
-            $obj->name=$req->name;
-            $obj->address=$req->address;
-            $obj->hp=$req->hp;
-            $obj->email=$req->email;
-            $obj->facebook=$req->facebook;
-            $obj->instagram=$req->instagram;
-            $obj->status=!($req->aktif);
+            $obj->date=$req->date;
+            $obj->customer_id=$req->customer;
+            $obj->product_id=$req->product;
+            $obj->technician_id=$req->technician;
+            $obj->sales_id=$req->sales;
+            $obj->desc=$req->desc;
+            $obj->amount=$req->amount;
             if ($req->mode=='EDIT') {
                 $obj->uby=auth()->user()->id;
             } else {
                 $obj->cby=auth()->user()->id;
             }
             $obj->save();
-
-            if($req->sales != '') {
-                //Simpan Sales Owner
-                $customer_id = $obj->id;
-                $salesOwner = SalesOwner::updateOrCreate(
-                    ['periode' => Carbon::now()->format('Ym'), 'cid' => $customer_id],
-                    ['eid' => $req->sales, 'cby' => auth()->user()->id, 'uby' => auth()->user()->id]
-                );
-            }
 
             $response= Adn::Response(true,"Sukses",$req->mode);
         }
@@ -266,7 +233,7 @@ class CustomerController extends Controller
     public function delete(Request $req)
     {
         try {
-            Customer::where('id',$req->id)->delete();
+            Saleing::where('id',$req->id)->delete();
             $response= Adn::Response(true,"Sukses");
         }
         catch(\PDOException $e)
@@ -278,49 +245,5 @@ class CustomerController extends Controller
         }
 
         return response()->json($response);
-    }
-
-    public function template(Request $request)
-    {
-        $array = array('type'=>'customer');
-        return Excel::download(new AllExport($array),'Pelanggan.xlsx');
-    }
-
-    public function employeList(Request $request)
-    {
-        $data = Employe::select('id','name')->get();
-        $array = array('type'=>'employe');
-        $array += array('alldata'=>$data);
-        return Excel::download(new AllExport($array),'Daftar Karyawan.xlsx');
-    }
-
-    public function upload(Request $request)
-    {
-        $ext = $request->file('file')->getClientOriginalExtension();
-        if($ext!='xls'&&$ext!='xlsx')
-        {
-            echo 'File harus file excel (xls/xlsx)!';
-            die();
-        }
-
-        $fileModel = new MsUpload;
-        $fileModel->eid = (auth()->user()->pid!='') ? auth()->user()->pid : auth()->user()->id;
-        $fileModel->desc = 'Import Pelanggan';
-        $fileModel->cby = auth()->user()->id;
-        $fileModel->uby = '0';
-
-        if($request->file())
-        {
-            $filename = time().'_'.$request->file->getClientOriginalName();
-            $filepath = $request->file('file')->storeAs('',$filename,'upload');
-
-            $fileModel->url = $filepath;
-            $fileModel->original_file = 'uploads/'.$filepath;
-            $fileModel->save();
-
-            $import = Excel::import(new CustomerImport, $fileModel->original_file);
-
-            // echo 'Berhasil|'.$request->file->extension().'|'.$f
-        }
     }
 }
