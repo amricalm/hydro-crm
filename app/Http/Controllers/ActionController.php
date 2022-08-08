@@ -41,9 +41,13 @@ class ActionController extends Controller
         <thead>
           <tr class="border-top">
             <th class="py-2" width="5%">#</th>
+            <th class="py-2">Kategori</th>
             <th class="py-2">Kode</th>
             <th class="py-2">Nama Aksi</th>
-            <th class="py-2">Kategori</th>';
+            <th class="py-2">weight(%)</th>
+            <th class="py-2">Target/Bln</th>
+            <th class="py-2">Keterangan</th>
+        ';
         $output .='<th class="py-2" colspan="2" width="5%"></th>
           </tr>
         </thead>
@@ -66,7 +70,7 @@ class ActionController extends Controller
 
         $q = $q->offset($limit_start)
             ->limit($limit)->get();
-            
+
         $kelas_baris_akhir ='';
         $tr = '';
         foreach ($q as $row) {
@@ -76,9 +80,13 @@ class ActionController extends Controller
             <tr ' . $kelas_baris_akhir .'>
               <input type="hidden" value="'. $row->id .'">
               <td class="py-1">'. $no .'</td>
+              <td class="py-1">'. $setNameType .'</td>
               <td class="py-1">'. $row->code .'</td>
               <td class="py-1">'. $row->name .'</td>
-              <td class="py-1">'. $setNameType .'</td>';
+              <td class="py-1">'. $row->weight .'</td>
+              <td class="py-1">'. $row->target .'</td>
+              <td class="py-1">'. $row->desc .'</td>
+            ';
             $tr .= '<td class="py-1">
                     <button type="button" class="btn bg-info-transparent py-0 px-2 btn-edit" ><i class="fe fe-edit"></i></button>
                     <button type="button" class="btn bg-danger-transparent py-0 px-2 btn-delete"><i class="fe fe-x-square"></i></button>
@@ -186,18 +194,20 @@ class ActionController extends Controller
                 $response= Adn::Response(false,"Data Aksi Tidak Ditemukan.");
                 return response()->json($response);
             }
-            
+
+            $obj->category_id=$req->category;
             $obj->code=$req->code;
             $obj->name=$req->name;
+            $obj->weight=$req->weight;
+            $obj->target=$req->target;
             $obj->desc=$req->desc;
-            $obj->category_id=$req->category;
             if ($req->mode=='EDIT') {
                 $obj->uby=auth()->user()->id;
             } else {
                 $obj->cby=auth()->user()->id;
             }
             $obj->save();
-            
+
             $response= Adn::Response(true,"Sukses",$req->mode);
         }
         catch(\PDOException $e)

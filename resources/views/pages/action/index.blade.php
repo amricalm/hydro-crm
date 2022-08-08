@@ -89,6 +89,17 @@
                                             <div class="card">
                                                 <div class="card-body">
                                                     <div class="form-group row row-sm mb-0">
+                                                        <label class="col-md-3 form-label">Kategori Aksi</label>
+                                                        <div class="col-md-9">
+                                                            <select name="category" id="cb-category" class="form-select form-control form-control-sm mb-2" tabindex="10">
+                                                                <option value="">-- Pilih Kategori Aksi --</option>
+                                                                @foreach($category as $item)
+                                                                <option value="{{$item->id}}">{{$item->name}}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row row-sm mb-0">
                                                         <label class="col-md-3 form-label">Kode Aksi</label>
                                                         <div class="col-md-9">
                                                             <input type="text" id="tx-code" name="code" autocomplete="off" class="form-control form-control-sm mb-2">
@@ -101,20 +112,21 @@
                                                         </div>
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-3 form-label">Keterangan</label>
+                                                        <label class="col-md-3 form-label">Bobot(%)</label>
                                                         <div class="col-md-9">
-                                                            <textarea type="text" id="tx-desc" name="desc" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
+                                                            <input type="number" min="0" max="100" id="tx-weight" name="weight" autocomplete="off" class="form-control form-control-sm mb-2">
                                                         </div>
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-3 form-label">Kategori Aksi</label>
+                                                        <label class="col-md-3 form-label">Target/Bln</label>
                                                         <div class="col-md-9">
-                                                            <select name="category" id="cb-category" class="form-select form-control form-control-sm mb-2" tabindex="10">
-                                                                <option value="">-- Pilih Kategori Aksi --</option>
-                                                                @foreach($category as $item)
-                                                                <option value="{{$item->id}}">{{$item->name}}</option>
-                                                                @endforeach
-                                                            </select>
+                                                            <input type="number" id="tx-target" name="target" autocomplete="off" class="form-control form-control-sm mb-2">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row row-sm mb-0">
+                                                        <label class="col-md-3 form-label">Keterangan</label>
+                                                        <div class="col-md-9">
+                                                            <textarea type="text" id="tx-desc" name="desc" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -203,10 +215,12 @@
                     input.setAttribute("name", "id");
                     input.setAttribute("value", obj.id);
                     document.getElementById("div-id").appendChild(input);
+                    $('#cb-category option[value="'+obj.category_id+'"]').attr("selected", "selected");
                     $('#tx-code').val(obj.code);
                     $('#tx-name').val(obj.name);
+                    $('#tx-weight').val(obj.weight);
+                    $('#tx-target').val(obj.target);
                     $('#tx-desc').val(obj.desc);
-                    $('#cb-category option[value="'+obj.category+'"]').attr("selected", "selected");
                 }
             })
             $('#ajax-loading').show();

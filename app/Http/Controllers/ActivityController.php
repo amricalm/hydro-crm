@@ -34,9 +34,6 @@ class ActivityController extends Controller
         $app['customer']   = DB::table('aa_customer')->get()->toArray();
         $app['action']   = DB::table('cr_action')->get()->toArray();
         $app['response']   = DB::table('cr_response')->get()->toArray();
-
-
-
         $app['roleName']= $this->general->role_name();
         $app['sales']   = DB::table('aa_employe')->get()->toArray();
         $app['startDate'] = (isset($_GET['tglDr'])&&$_GET['tglDr']!='') ? $_GET['tglDr'] : ((!isset($_GET['tglDr'])) ? Carbon::now()->format('Y-m-d') : '');
@@ -67,6 +64,8 @@ class ActivityController extends Controller
         $app['action']      = DB::table('cr_action')->get()->toArray();
         $app['response']    = DB::table('cr_response')->get()->toArray();
         $app['user']        = DB::table('users')->where('id', auth()->user()->id)->first();
+        $app['date']        = Carbon::now()->format('Y-m-d');
+        $app['time']        = Carbon::now()->format('H:00');
         $app['ModeEdit'] = "Edit";
         return view('pages.activity.create', $app);
     }
@@ -268,7 +267,7 @@ class ActivityController extends Controller
         foreach ($req as $k => $v) {
             if($k == 0) {
                 $hdr = new Activity;
-                $hdr->date          = Carbon::now()->toDateTimeString();
+                $hdr->date          = $v["date"].' '.$v["time"];//Carbon::now()->toDateTimeString();
                 $hdr->customer_id   = isset($v["customer"]) ? $v["customer"] : 0;
                 $hdr->sales_id      = auth()->user()->eid;
                 $hdr->cby           = auth()->user()->id;

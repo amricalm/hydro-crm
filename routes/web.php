@@ -12,6 +12,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductTypeController;
 use App\Http\Controllers\ActionController;
+use App\Http\Controllers\ActionTargetController;
 use App\Http\Controllers\ResponseController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\SaleingController;
@@ -67,7 +68,6 @@ Route::post('/pelanggan/export',[CustomerController::class, 'upload'])->name('cu
 Route::get('/karyawan/export',[CustomerController::class, 'employeList']);
 //===================== ROUTE END PELANGGAN ===========================//
 
-
 //============================= PRODUK ============================//
 Route::get('/produk', [ProductController::class, 'index']);
 Route::post('/produk/getTabel', [ProductController::class, 'getTabel'])->name('produk.getTabel');
@@ -97,6 +97,18 @@ Route::post('/aksi', [ActionController::class, 'save'])->name('action.save');
 Route::post('/aksi/delete', [ActionController::class, 'delete'])->name('action.delete');
 Route::post('/aksi/isExist', [ActionController::class, 'isExist'])->name('action.isExist');
 //===================== ROUTE END AKSI ===========================//
+
+
+//============================= PRODUK ============================//
+Route::get('/target-aksi', [ActionTargetController::class, 'index']);
+Route::post('/target-aksi/getTabel', [ActionTargetController::class, 'getTabel'])->name('action-target.getTabel');
+Route::post('/target-aksi/get', [ActionTargetController::class, 'get'])->name('action-target.get');
+Route::post('/target-aksi/validation', [ActionTargetController::class, 'validation']);
+Route::post('/target-aksi', [ActionTargetController::class, 'save'])->name('action-target.save');
+Route::post('/target-aksi/delete', [ActionTargetController::class, 'delete'])->name('action-target.delete');
+Route::post('/target-aksi/isExist', [ActionTargetController::class, 'isExist'])->name('action-target.isExist');
+//===================== ROUTE END PRODUK ===========================//
+
 
 //============================= RESPON ============================//
 Route::get('/respon', [ResponseController::class, 'index']);

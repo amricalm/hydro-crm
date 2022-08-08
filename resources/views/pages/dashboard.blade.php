@@ -59,7 +59,7 @@
                         <div class="col-md-12 col-lg-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h3 class="card-title">Key Performance Indicator</h3>
+                                    <h3 class="card-title">Key Performance Indicator ({{ $startDate }} s/d {{ $endDate }})</h3>
                                 </div>
                                 <div class="card-body">
                                     <div class="form-group row">
@@ -70,23 +70,9 @@
                                                     <div class="row">
                                                         <div class="col-md-12 col-sm-12 col-12">
                                                             <div class="">
-                                                                <div class="fs-14 font-weight-normal text-center">{{ $action->name }}</div>
-                                                                @if ($salesId!='')
-                                                                    @php $hasil = 0; @endphp
-                                                                    @foreach ($capaian as $result)
-                                                                        @if ($action->id == $result->id)
-                                                                            @php $hasil = $result->result; break; @endphp
-                                                                        @endif
-                                                                    @endforeach
-                                                                @endif
-                                                                <h2 class="mb-2 number-font carn1 font-weight-bold text-center">{{ $hasil ?? '-' }}</h2>
-                                                                <div class="text-center">
-                                                                    @for ($i = 0; $i < count($target); $i++)
-                                                                        @if ($target[$i]->action_id == $action->id)
-                                                                            / {{ $target[$i]->target }}
-                                                                        @endif
-                                                                    @endfor
-                                                                </div>
+                                                                <div class="fs-14 font-weight-normal text-center">{{ $action->name ?? '-' }}</div>
+                                                                <h2 class="mb-2 number-font carn1 font-weight-bold text-center">{{ $action->result ?? '-' }}</h2>
+                                                                <div class="text-center">/ {{ $action->target ?? '-' }}</div>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6 col-sm-6 col-6 my-auto mx-auto">
@@ -120,8 +106,8 @@
                                                 <tr>
                                                     <th class="fw-bold">No</th>
                                                     <th class="fw-bold">Nama Aksi</th>
-                                                    @foreach ($time as $rows)
-                                                        <th class="text-center fw-bold">{{ $rows->name }}</th>
+                                                    @foreach (range($timeRange['min'], $timeRange['max']) as $rows)
+                                                        <th class="text-center fw-bold">{{ $rows }}:00</th>
                                                     @endforeach
                                                     <th class="text-center fw-bold">Total</th>
                                                 </tr>
@@ -133,24 +119,23 @@
                                                         <td>{{ ($i+1) }}</td>
                                                         <td>{{ $v->name }}</td>
                                                         @if ($salesId!='')
-                                                        @php $total = 0; @endphp
+                                                            @php $total = 0; @endphp
                                                         @endif
-                                                        @foreach ($time as $a=>$b)
-                                                        @if ($salesId!='')
-                                                        @php $tampil = 0; @endphp
-                                                            @foreach($daiylReport as $t=>$u)
-                                                                @php
-                                                                $hour = substr($b->name,0,2);
-                                                                if($u->id == $v->id && $hour == $u->hour)
-                                                                {
-                                                                    $tampil = $u->results;
-                                                                    break;
-                                                                }
-                                                                @endphp
-                                                            @endforeach
-                                                        @php $total+= $tampil; @endphp
-                                                        @endif
-                                                        <td class="text-center">{{ $tampil ?? '-' }}</td>
+                                                        @foreach (range($timeRange['min'], $timeRange['max']) as $hour)
+                                                            @if ($salesId!='')
+                                                                @php $tampil = 0; @endphp
+                                                                    @foreach($dailyReport as $t=>$u)
+                                                                        @php
+                                                                        if($u->action_id == $v->id && $hour == $u->hour)
+                                                                        {
+                                                                            $tampil = $u->result;
+                                                                            break;
+                                                                        }
+                                                                        @endphp
+                                                                    @endforeach
+                                                                @php $total+= $tampil; @endphp
+                                                            @endif
+                                                            <td class="text-center">{{ $tampil ?? '-' }}</td>
                                                         @endforeach
                                                         <td class="text-center fw-bold">{{ $total ?? '-' }}</td>
                                                     </tr>

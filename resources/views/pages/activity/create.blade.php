@@ -9,10 +9,10 @@
                 <div class="card mb-0">
                     <div class="card-header">
                         <a href="{{ url('home') }}"><button type="button" class="btn btn-outline-warning position-relative"><i class="fe fe-arrow-left"></i></button></a>
-                        <h4 class="col-md-2 page-title text-primary">{{ $judul }} &nbsp;&nbsp;{{ date('d-m-Y') }}</h4>
-                        <div class="col-md-8 text-center">
+                        <h4 class="col-md-10 page-title text-primary">{{ $judul }}</h4>
+                        {{-- <div class="col-md-8 text-center">
                             <div id="jam" class="page-title text-primary">0</div>
-                        </div>
+                        </div> --}}
                         <div class="float-right col-md-2 text-center">
                             <button type="button" class="btn btn-outline-danger position-relative btn-batal" id="Batal"><i class="fe fe-slash"></i>
                                 Batal</button>
@@ -54,6 +54,15 @@
                                     <hr class="border-info mt-4 mb-4">
                                     <div class="row">
                                         <div class="col-md-6">
+                                            <div class="form-group row row-sm mb-0">
+                                                <label class="col-md-3 form-label">Tanggal</label>
+                                                <div class="col-md-5">
+                                                    <input type="date" name="date" id="date" autocomplete="off" class="form-control  form-control-sm  mb-2" value="{{ $date }}">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <input type="time" name="time" id="time" autocomplete="off" class="form-control  form-control-sm  mb-2" value="{{ $time }}">
+                                                </div>
+                                            </div>
                                             <div class="form-group row row-sm mb-0">
                                                 <label class="col-md-3 form-label">Nama Pelanggan</label>
                                                 <div class="col-md-9">
@@ -401,7 +410,7 @@
             kolom = baris.cells[idxKolomRespon];
             var res = $(kolom).children('.kd-res').val();//kolom.childNodes[1].value;
             kolom.innerHTML = setResponse() + '<input type="hidden" class="kd-res" ori-text="'+res+'"  ori-value="' + res + '" name="kd-prj[]" value="' +res+ '"/>';
-            
+
             cboEditRes = $('#entri-edit-response').combobox().data('combobox');;
             cboEditRes.select();
             cboEditRes.$element.val(res).trigger('change');
@@ -413,7 +422,7 @@
             kolom = baris.cells[idxKolomAksiDesc];
             var actDesc = $(kolom).children('.kd-act-desc').val(); //kolom.innerHTML;
             kolom.innerHTML = '<textarea type="text" class="form-control input-sm entri-edit-action-desc" rows="1" tabindex = "104" name="action_desc" original-value="' + actDesc + '">' + actDesc + '</textarea>';
-            
+
             kolom = baris.cells[idxKolomResponDesc];
             var resDesc = $(kolom).children('.kd-res-desc').val(); //kolom.innerHTML;
             kolom.innerHTML = '<textarea type="text" class="form-control input-sm entri-edit-response-desc" rows="1" tabindex = "104" name="response_desc" original-value="' + resDesc + '">' + resDesc + '</textarea>';
@@ -507,12 +516,12 @@
             tbl = document.getElementById(idTbl);
         }
 
-        function setBarisUpdateNilai(baris) 
+        function setBarisUpdateNilai(baris)
         {
             kolom = baris.cells.item(idxKolomAksi);
             var act = $(kolom).children('.cbo-action').val();
             kolom.innerHTML =  '<span>'+ act + '</span><input type="hidden" class="kd-act" name="action-id[]" value="' + act + '"/>';
-            
+
             kolom = baris.cells.item(idxKolomRespon);
             var res = $(kolom).children('.cbo-response').val();
             kolom.innerHTML =  '<span>'+ res + '</span><input type="hidden" class="kd-res" name="response-id[]" value="' + res + '"/>';
@@ -521,14 +530,14 @@
             el = kolom.firstChild;
             var actDesc = el.value;
             kolom.innerHTML = '<span>'+ actDesc + '</span><textarea style="display:none;" class="kd-act-desc" name="action-id-desc[]" style="display:none;">' + actDesc + '</textarea>';
-            
+
             kolom = baris.cells.item(idxKolomResponDesc);
             el = kolom.firstChild;
             var resDesc = el.value;
             kolom.innerHTML = '<span>'+ resDesc + '</span><textarea class="kd-res-desc" name="response-id-desc[]" style="display:none;">' + resDesc + '</textarea>';
         }
 
-        function setBarisKeNilaiOriginal(baris) 
+        function setBarisKeNilaiOriginal(baris)
         {
             kolom = baris.cells.item(idxKolomAksi);
             var act = $(kolom).children('.kd-act').attr('ori-value');
@@ -563,7 +572,7 @@
                 alert('Pencarian tidak boleh kosong');
                 return;
             }
-            
+
             $("#ajax-loading").show();
             $('#btnSearch').html('<i class="fa fa-circle-o-notch fa-spin"></i>&nbsp;&nbsp;Sedang mencari');
             $('#btnSearch').attr('disabled',true);
@@ -601,6 +610,8 @@
                 dtlID = 0;
 
             var modeEdit = 'Edit',
+                date = $('#date').val(),
+                time = $('#time').val(),
                 customer = parseInt($('#customer').val()),
                 hp = $('#hp').val(),
                 address = $('#address').val(),
@@ -621,8 +632,8 @@
                 dataType: "json",
                 success: function (respon) {
                     if($.isEmptyObject(respon.error)) {
-                        const o = [{ModeEdit:modeEdit , customer:customer, hp:hp, address:address, email:email, facebook:facebook, instagram:instagram}];
-                        
+                        const o = [{ModeEdit:modeEdit , date:date, time:time, customer:customer, hp:hp, address:address, email:email, facebook:facebook, instagram:instagram}];
+
                         baris = tbl.tBodies[0].getElementsByTagName('tr');
                         rowCount = 0;
                         for (i = 0; i < baris.length - 1; i++)
@@ -635,7 +646,7 @@
                             actionDesc          = $(actionDescColumn).children(':input').val();
                             responseDescColumn  = baris.item(i).cells.item(idxKolomResponDesc);
                             responseDesc        = $(responseDescColumn).children(':input').val();
-                            
+
 
                             var btn = baris.item(i).cells.item(idxKolomEdit).firstChild.getAttribute('data-btn');
                             if(btn.toString().trim().toUpperCase()=="OK")

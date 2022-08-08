@@ -9,10 +9,9 @@ class Action extends Model
 {
     use HasFactory;
 
-
     const CREATED_AT = 'con';
     const UPDATED_AT = 'uon';
 
     protected $table = "cr_action";
-    protected $fillable = ['id','code','name','desc','category_id','weight','cby','uby'];
+    protected $fillable = ['id','code','name','category_id','weight','target','desc','cby','uby'];
 }

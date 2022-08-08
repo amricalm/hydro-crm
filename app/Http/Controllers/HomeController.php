@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\SmartSystem\General;
+use App\Models\Action;
+use App\Models\Activity;
 use Carbon\Carbon;
 
 class HomeController extends Controller
@@ -20,11 +22,13 @@ class HomeController extends Controller
 
     public function index(Request $req)
     {
-        $app['judul']   = 'Dashboard';
-        $app['roleName']= $this->general->role_name();
-        $app['sales']   = DB::table('aa_employe')->get()->toArray();
-        $app['startDate'] = (isset($_GET['tglDr'])&&$_GET['tglDr']!='') ? $_GET['tglDr'] : ((!isset($_GET['tglDr'])) ? Carbon::now()->format('Y-m-d') : '');
-        $app['endDate']   = (isset($_GET['tglSd'])&&$_GET['tglSd']!='') ? $_GET['tglSd'] : ((!isset($_GET['tglDr'])) ? Carbon::now()->format('Y-m-d') : '');
+        $app['judul']       = 'Dashboard';
+        $app['roleName']    = $this->general->role_name();
+        $app['sales']       = DB::table('aa_employe')->get()->toArray();
+        $app['startDate']   = (isset($_GET['tglDr'])&&$_GET['tglDr']!='') ? $_GET['tglDr'] : ((!isset($_GET['tglDr'])) ? Carbon::now()->format('Y-m-d') : '');
+        $app['endDate']     = (isset($_GET['tglSd'])&&$_GET['tglSd']!='') ? $_GET['tglSd'] : ((!isset($_GET['tglDr'])) ? Carbon::now()->format('Y-m-d') : '');
+        $startDate          = $app['startDate'];
+        $endDate            = $app['endDate'];
         if ($app['roleName'] == 'ADMIN') {
             $app['salesId']    = (isset($_GET['salesId'])&&$_GET['salesId']!='') ? $_GET['salesId'] : '';
         } elseif ($app['roleName'] == 'SALES') {
@@ -32,66 +36,35 @@ class HomeController extends Controller
         }
 
         //KPI
-        $app['actionKpi'] = DB::table('cr_action AS a')
-                            ->leftJoin('rf_category_action as ca','category_id','=','ca.id')
-                            ->where('ca.id', $this->general->category_action_id('KPI'))
-                            ->select('a.id','a.name')
+        $app['actionKpi'] = Action::select('cr_action.id', 'cr_action.name', 'cr_action.target', DB::raw('COUNT(vit.sales_id) AS result'))
+                            ->leftJoin('cr_activity_dtl AS dtl','cr_action.id','=','dtl.action_id')
+                            ->leftJoin('cr_activity AS vit', function($join) use($app,$startDate,$endDate)
+                            {
+                                $join->on('dtl.activity_id','=','vit.id');
+                                if($app['salesId']!='') {
+                                    $join->on('vit.sales_id','=', DB::raw($app['salesId']));
+                                }
+
+                                $join->on('vit.date','>=', DB::raw("'$startDate'"));
+                                $join->on('vit.date','<=', DB::raw("'$endDate'"));
+                            })
+                            ->where('cr_action.category_id', $this->general->category_action_id('KPI'))
+                            ->groupBy('cr_action.id')
                             ->get();
-        $app['capaian'] = DB::table('cr_action AS act')
-                        ->selectRaw('act.id, COUNT(dtl.action_id) AS result')
-                        ->leftJoin('cr_activity_dtl AS dtl','act.id', '=', 'dtl.action_id')
-                        ->leftJoin('cr_activity AS vit','dtl.activity_id', '=', 'vit.id')
-                        ->leftJoin('rf_category_action as ca','category_id','=','ca.id')
-                        ->leftjoin('aa_employe AS em','vit.sales_id', '=', 'em.id')
-                        ->where('ca.id', $this->general->category_action_id('KPI'))
-                        ->where('vit.sales_id', $app['salesId'])
-                        ->groupBy('act.id')
-                        ->get();
-
-        $countDate = Carbon::parse($app['startDate'])->diffInDays(Carbon::parse($app['endDate'])) + 1;
-
-        $target = array();
-        foreach ($app['actionKpi'] as $rows) {
-            $qry        = DB::table('cr_action_target')
-                        ->selectRaw("action_id, target *'$countDate' AS target")
-                        ->where('action_id', $rows->id)
-                        ->latest('id')->first();
-            $target[]   = $qry;
-        }
-
-        $app['target']  = $target;
 
         //Laporan Harian
-        $app['time']        = DB::table('rf_times')->get();
         $app['actionDaily'] = DB::table('cr_action AS a')
                             ->leftJoin('rf_category_action as ca','category_id','=','ca.id')
                             ->where('ca.id', $this->general->category_action_id('DAILY'))
                             ->select('a.id','a.name')
                             ->get();
+        $timeRange = Activity::getTimeRange($app['salesId'], $startDate,$endDate);
+        $timeRangeMin = $timeRange->min>9 ? 9 : $timeRange->min;
+        $timeRangeMax = $timeRange->max<16 ? 16 : $timeRange->max;
+        $app['timeRange'] = ['min'=>$timeRangeMin,'max'=>$timeRangeMax];
 
-            $res = array();
-            for ($i=0; $i < count($app['time']); $i++) {
-                $dtimefr = $app['startDate'].' '.$app['time'][$i]->name.':00';
-                $dtimeto = $app['endDate'].' '.substr($app['time'][$i]->name,0,2).':59:00';
+        $app['dailyReport'] = Activity::getDailyReport($app['salesId'], $startDate,$endDate);
 
-                $qry    = DB::table('cr_action AS act')
-                        ->leftJoin('cr_activity_dtl AS dtl','act.id', '=', 'dtl.action_id')
-                        ->leftJoin('cr_activity AS vit','dtl.activity_id', '=', 'vit.id')
-                        ->leftjoin('aa_employe AS em','vit.sales_id', '=', 'em.id')
-                        ->selectRaw('act.id, COUNT(vit.id) AS results')
-                        ->whereBetween('date', [$dtimefr, $dtimeto])
-                        ->where('em.id', $app['salesId'])
-                        ->groupBy('act.id')
-                        ->get()->toArray();
-
-                if(count($qry) > 0) {
-                    foreach ($qry as $key => $value) {
-                        $value->hour = substr($app['time'][$i]->name,0,2);
-                        $res[]   = $value;
-                    }
-                }
-            }
-            $app['daiylReport'] = $res;
         return view('pages.dashboard', $app);
     }
 }

@@ -78,10 +78,11 @@ class SaleingController extends Controller
 
         $q = Saleing::getSaleing($dateFr,$dateTo,$employe,'');
 
-        $total_records = $q->count();
-
         $q = $q->offset($limit_start)
                 ->limit($limit)->get();
+
+        $saleingList = Saleing::getSaleing($dateFr,$dateTo,$employe,'');
+        $total_records = $saleingList->count();
 
         $kelas_baris_akhir ='';
         $tr = '';

@@ -19,8 +19,8 @@ class Saleing extends Model
 
     public static function getSaleing($dateFr='',$dateTo='',$salesId='',$id='')
     {
-            $qryTechnician  = Employe::select('aa_employe.id','aa_employe.name')->leftJoin('cr_saleing AS sal','aa_employe.id','=','sal.technician_id')->groupBy('aa_employe.id');
-            $qrySales       = Employe::select('aa_employe.id','aa_employe.name')->leftJoin('cr_saleing AS sal','aa_employe.id','=','sal.sales_id')->groupBy('aa_employe.id');
+            $qryTechnician  = Employe::selectRaw('aa_employe.id, aa_employe.name')->leftJoin('cr_saleing AS sal','aa_employe.id','=','sal.technician_id')->groupBy('aa_employe.id');
+            $qrySales       = Employe::selectRaw('aa_employe.id, aa_employe.name')->leftJoin('cr_saleing AS sal','aa_employe.id','=','sal.sales_id')->groupBy('aa_employe.id');
 
             $q = DB::table('cr_saleing AS sal')
                 ->selectRaw('sal.id, date, puc.id AS product_id, puc.name AS product_name, cus.id AS customer_id, cus.name AS customer_name, hp, tec.id AS technician_id, tec.name AS technician_name, sls.id AS sales_id, sls.name AS sales_name, sal.desc, sal.amount')
@@ -35,7 +35,7 @@ class Saleing extends Model
                     $q->where('sls.id',$salesId);
                 }
                 if($dateFr!='' && $dateTo!='') {
-                    $q->whereBetween('sal.date', [$dateFr, $dateTo]);
+                    $q->whereBetween('sal.date', [(string)$dateFr, (string)$dateTo]);
                 }
 
         return $q;
