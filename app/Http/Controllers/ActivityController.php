@@ -30,43 +30,58 @@ class ActivityController extends Controller
 
     public function index(Request $req)
     {
-        $app['judul']   = "Aktivitas";
-        $app['customer']   = DB::table('aa_customer')->get()->toArray();
-        $app['action']   = DB::table('cr_action')->get()->toArray();
-        $app['response']   = DB::table('cr_response')->get()->toArray();
-        $app['roleName']= $this->general->role_name();
-        $app['sales']   = DB::table('aa_employe')->get()->toArray();
-        $app['startDate'] = (isset($_GET['tglDr'])&&$_GET['tglDr']!='') ? $_GET['tglDr'] : ((!isset($_GET['tglDr'])) ? Carbon::now()->format('Y-m-d') : '');
-        $app['endDate']   = (isset($_GET['tglSd'])&&$_GET['tglSd']!='') ? $_GET['tglSd'] : ((!isset($_GET['tglDr'])) ? Carbon::now()->format('Y-m-d') : '');
+        $app['judul']       = "Aktivitas";
+        $app['customer']    = DB::table('aa_customer')->get()->toArray();
+        $app['action']      = DB::table('cr_action')->get()->toArray();
+        $app['response']    = DB::table('cr_response')->get()->toArray();
+        $app['roleName']    = $this->general->role_name();
+        $app['sales']       = DB::table('aa_employe')->get()->toArray();
+        $app['startDate']   = (isset($_GET['tglDr'])&&$_GET['tglDr']!='') ? $_GET['tglDr'] : ((!isset($_GET['tglDr'])) ? Carbon::now()->format('Y-m-d') : '');
+        $app['endDate']     = (isset($_GET['tglSd'])&&$_GET['tglSd']!='') ? $_GET['tglSd'] : ((!isset($_GET['tglDr'])) ? Carbon::now()->format('Y-m-d') : '');
         if ($app['roleName'] == 'ADMIN') {
-            $app['salesId']    = (isset($_GET['salesId'])&&$_GET['salesId']!='') ? $_GET['salesId'] : '';
+            $app['salesId'] = (isset($_GET['salesId'])&&$_GET['salesId']!='') ? $_GET['salesId'] : '';
         } elseif ($app['roleName'] == 'SALES') {
-            $app['salesId']    = auth()->user()->eid;
+            $app['salesId'] = auth()->user()->eid;
         }
 
-        $tampilBarisTabel  = Adn::getSysVar('TampilBarisTabel');
+        $tampilBarisTabel   = Adn::getSysVar('TampilBarisTabel');
         Session::put('TampilBarisTabel', $tampilBarisTabel);
         return view('pages.activity.sales', $app);
     }
 
     public function get(Request $req)
     {
-        $data = Activity::where('id',$req->id)->get()->toArray();
-        return response()->json($data);
+        // $data = Activity::where('id',$req->id)->get()->toArray();
+        // return response()->json($data);
+        return $this->create($req->mode);
     }
 
     public function create()
     {
         $app['judul']       = "Aktivitas";
-        $app['sales']       = DB::table('aa_employe')->get()->toArray();
-        $app['customer']    = DB::table('aa_customer')->get()->toArray();
-        $app['category']    = DB::table('rf_category_action')->get()->toArray();
-        $app['action']      = DB::table('cr_action')->get()->toArray();
-        $app['response']    = DB::table('cr_response')->get()->toArray();
-        $app['user']        = DB::table('users')->where('id', auth()->user()->id)->first();
-        $app['date']        = Carbon::now()->format('Y-m-d');
-        $app['time']        = Carbon::now()->format('H:00');
-        $app['ModeEdit'] = "Edit";
+        // if(!isset($_GET['id'])) { //add
+        //     $app['sales']       = DB::table('aa_employe')->get()->toArray();
+        //     $app['customer']    = DB::table('aa_customer')->get()->toArray();
+        //     $app['category']    = DB::table('rf_category_action')->get()->toArray();
+        //     $app['action']      = DB::table('cr_action')->get()->toArray();
+        //     $app['response']    = DB::table('cr_response')->get()->toArray();
+        //     $app['user']        = DB::table('users')->where('id', auth()->user()->id)->first();
+        //     $app['date']        = Carbon::now()->format('Y-m-d');
+        //     $app['time']        = Carbon::now()->format('H:00');
+        //     $app['ModeEdit']    = 'EDIT';
+        // } else { //edit
+            // $activity = Activity::where('id', $_GET['id'])->first();
+            $app['sales']       = DB::table('aa_employe')->get()->toArray();
+            $app['customer']    = DB::table('aa_customer')->get()->toArray();
+            $app['category']    = DB::table('rf_category_action')->get()->toArray();
+            $app['action']      = DB::table('cr_action')->get()->toArray();
+            $app['response']    = DB::table('cr_response')->get()->toArray();
+            $app['user']        = DB::table('users')->where('id', auth()->user()->id)->first();
+            $app['date']        = Carbon::now()->format('Y-m-d');
+            $app['time']        = Carbon::now()->format('H:00');
+            $app['ModeEdit']    = 'EDIT';
+        // }
+
         return view('pages.activity.create', $app);
     }
 
@@ -101,7 +116,13 @@ class ActivityController extends Controller
     public function delete(Request $req)
     {
         try {
-            Activity::where('id',$req->id)->delete();
+            $getDtl = ActivityDtl::leftJoin('cr_activity AS act','cr_activity_dtl.activity_id','=','act.id')
+                    ->where('cr_activity_dtl.activity_id',$req->id)
+                    ->get();
+            $activity_id = $getDtl->activity_id;
+            $dtl = Activity::where('id',$activity_id)->delete();
+            $dtl = ActivityDtl::where('activity_id',$getDtl->activity_id)->delete();
+
             $response= Adn::Response(true,"Sukses");
         }
         catch(\PDOException $e)
@@ -123,44 +144,43 @@ class ActivityController extends Controller
             <th class="py-2" width="10%">Tanggal</th>
             <th class="py-2">Nama Pelanggan</th>
             <th class="py-2">Hp</th>
-            <th class="py-2">Sales</th>
             <th class="py-2">Aksi</th>
             <th class="py-2">Respon</th>
+            <th class="py-2">Sales</th>
             <th class="py-2" colspan="2" width="5%"></th>
           </tr>
         </thead>
         <tbody>';
 
+        $salesId = $req->salesId;
+        $dateFr  = $req->tglDr;
+        $dateTo  = $req->tglSd;
         $page = (isset($req->page))?$req->page:1;
         $limit = session('TampilBarisTabel');
         $limit_start = ($page - 1) * $limit;
         $no = $limit_start + 1;
 
-        $q = Activity::selectRaw("*")
-        ->offset($limit_start)
-        ->limit($limit)->get();
-        $jmh = DB::table('cr_activity');
-        $total_records =$jmh->count();
+        $q = Activity::getActivity($dateFr,$dateTo,$salesId,'');
+
+        $q = $q->offset($limit_start)
+            ->limit($limit)->get();
+
+        $activityList = Activity::getActivity($dateFr,$dateTo,$salesId,'');
+        $total_records =$activityList->count();
 
         $kelas_baris_akhir ='';
         $tr = '';
-
-
         foreach ($q as $row) {
-            $history = Activity::select('aa_employe.name as name','cr_action.name as action','cr_response.name as response','response_desc')
-                        ->join('aa_employe','cr_activity.sales_id','=','aa_employe.id')
-                        ->join('cr_action','cr_activity.action_id','=','cr_action.id')
-                        ->join('cr_response','cr_activity.response_id','=','cr_response.id')
-                        ->where('cr_activity.id',$row->id)
-                        ->get();
             $tr .= '
             <tr ' . $kelas_baris_akhir .'>
               <input type="hidden" value="'. $row->id .'">
               <td class="py-1">'. $row->date .'</td>
-              <td class="py-1">'. $history->name .'</td>
-              <td class="py-1">'. $history->action .'</td>
-              <td class="py-1">'. $history->response .'</td>
-              <td class="py-1">'. $history->response_desc .'</td>
+              <td class="py-1">'. $row->name .'</td>
+              <td class="py-1">'. $row->hp .'</td>
+              <td class="py-1">'. $row->action .'</td>
+              <td class="py-1">'. $row->response .'</td>
+              <td class="py-1">'. $row->sales .'</td>
+
             </tr>'
         ;
             $no++;
@@ -217,17 +237,6 @@ class ActivityController extends Controller
         </div>';
 
         echo $output;
-    }
-
-    public function isExist(Request $req)
-    {
-        $result =false;
-        $q = Activity::where('nip','=',$req->nip)->get();
-        if($q->count()>0)
-        {
-            $result = true;
-        }
-        return json_encode($result);
     }
 
     public function search(Request $request)

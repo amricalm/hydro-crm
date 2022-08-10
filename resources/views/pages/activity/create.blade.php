@@ -8,7 +8,7 @@
             <div class="col-md-12">
                 <div class="card mb-0">
                     <div class="card-header">
-                        <a href="{{ url('home') }}"><button type="button" class="btn btn-outline-warning position-relative"><i class="fe fe-arrow-left"></i></button></a>
+                        <a href="{{ url('aktivitas') }}"><button type="button" class="btn btn-outline-warning position-relative"><i class="fe fe-arrow-left"></i></button></a>
                         <h4 class="col-md-10 page-title text-primary">{{ $judul }}</h4>
                         {{-- <div class="col-md-8 text-center">
                             <div id="jam" class="page-title text-primary">0</div>

@@ -94,7 +94,7 @@
             $("#ajax-loading").hide();
         });
 
-        loadData(1,$('#tglDr').val(),$('#tglSd').val(),$('#salesId').val());
+        loadData(1,$('#tglDr').val(), $('#tglSd').val(), $('#salesId').val());
 
         $(document).on('click', '.halaman', function(){
            var page = $(this).attr("id");
@@ -114,23 +114,24 @@
         $(document).on('click','.btn-edit',function(){
             mode = 'EDIT';
             var id = $(this).closest('tr').find('input').val();
+            var url = '{{ url('aktivitas/create') }}?id='+id;
             console.log(id);
             $.ajax({
-                url:"{{ route('customer.get') }}",
-                method:"POST",
+                url:"{{ url('aktivitas/create') }}",
+                method:"GET",
                 data:{id:id.trim()},
                 success:function(data){
-                    console.log(data);
-                        var obj = data[0];
-
-                        $('#tx-nip').val(obj.nip);
-                        $('#tx-name').val(obj.name);
-                        $('#tx-address').val(obj.address);
-                        $('#kd-hp').val(obj.hp);
-                        $('#tx-email').val(obj.email);
-                        $('#tx-facebook').val(obj.facebook);
-                        $('#tx-instagram').val(obj.instagram);
-                        $("#chk-aktif").prop('checked', !(Boolean(Number(obj.aktif))));
+                    window.location = url;
+                    // console.log(data);
+                    // var obj = data[0];
+                    // $('#tx-nip').val(obj.nip);
+                    // $('#tx-name').val(obj.name);
+                    // $('#tx-address').val(obj.address);
+                    // $('#kd-hp').val(obj.hp);
+                    // $('#tx-email').val(obj.email);
+                    // $('#tx-facebook').val(obj.facebook);
+                    // $('#tx-instagram').val(obj.instagram);
+                    // $("#chk-aktif").prop('checked', !(Boolean(Number(obj.aktif))));
                 }
             })
             $('#ajax-loading').show();
@@ -145,9 +146,9 @@
     });
 
 
-function loadData(page,tglDr,tglSd,SalesId){
+function loadData(page,tglDr,tglSd,salesId){
     $.ajax({
-        url:"{{ route('activity.getTabel') }}",
+        url:"{{ url('aktivitas/getTabel') }}",
         method:"POST",
         data:{page:page, tglDr:tglDr, tglSd:tglSd, salesId:salesId},
         success:function(data){
@@ -170,7 +171,7 @@ function checkdelete(id,el)
         }).then((result) => {
         if (result.value) {
             $.ajax({
-                url:"{{route('customer.delete') }}",
+                url:"{{route('activity.delete') }}",
                 method:"POST",
                 data:{kdProgram:id},
                 success:function(data){

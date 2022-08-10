@@ -16,6 +16,7 @@ use App\Http\Controllers\ActionTargetController;
 use App\Http\Controllers\ResponseController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\SaleingController;
+use App\Http\Controllers\UsersController;
 
 /*
 |--------------------------------------------------------------------------
@@ -126,10 +127,9 @@ Route::get('/aktivitas', [ActivityController::class, 'index']);
 Route::post('/aktivitas/getTabel', [ActivityController::class, 'getTabel'])->name('activity.getTabel');
 Route::post('/aktivitas/getByCategoryAction', [ActivityController::class, 'getByCategoryAction']);
 Route::post('/aktivitas/getCustomer', [ActivityController::class, 'getCustomer']);
-Route::post('/aktivitas/get', [ActivityController::class, 'get'])->name('activity.get');
+// Route::get('/aktivitas/create', [ActivityController::class, 'create'])->name('activity.get');
 Route::post('/aktivitas', [ActivityController::class, 'save_old'])->name('activity.save');
 Route::post('/aktivitas/delete', [ActivityController::class, 'delete'])->name('activity.delete');
-Route::post('/aktivitas/isExist', [ActivityController::class, 'isExist'])->name('activity.isExist');
 Route::get('/aktivitas/create', [ActivityController::class, 'create'])->name('activity.create');
 Route::post('/aktivitas/search', [ActivityController::class, 'search']);
 Route::post('/aktivitas/validation', [ActivityController::class, 'validation']);
@@ -145,6 +145,17 @@ Route::post('/penjualan/isExist', [SaleingController::class, 'isExist'])->name('
 Route::post('/penjualan', [SaleingController::class, 'save'])->name('saleing.save');
 Route::post('/penjualan/delete', [SaleingController::class, 'delete'])->name('saleing.delete');
 //===================== ROUTE END PENJUALAN ===========================//
+
+//============================= PENGGUNA ============================//
+Route::get('/pengguna', [UsersController::class, 'index']);
+Route::post('/pengguna/getTabel', [UsersController::class, 'getTabel'])->name('users.getTabel');
+Route::post('/pengguna/get', [UsersController::class, 'get'])->name('users.get');
+Route::post('/pengguna/validation', [UsersController::class, 'validation']);
+Route::post('/pengguna', [UsersController::class, 'save'])->name('users.save');
+Route::post('/pengguna/delete', [UsersController::class, 'delete'])->name('users.delete');
+Route::post('/pengguna/isExist', [UsersController::class, 'isExist'])->name('users.isExist');
+//===================== ROUTE END PENGGUNA ===========================//
+
 
 Route::get('/clear-cache', function () {
     $configCache = Artisan::call('config:cache');
