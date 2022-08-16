@@ -15,7 +15,7 @@ class Customer extends Model
     const UPDATED_AT = 'uon';
 
     protected $table = "aa_customer";
-    protected $fillable = ['name','address','province','city','zip_code','hp','email','facebook','instagram','sales_owner','status','cby','uby'];
+    protected $fillable = ['name','address','province','city','zip_code','hp','email','facebook','instagram','sales_owner','status','history','cby','uby'];
 
     public static function getCustomerName($id='')
     {

@@ -46,12 +46,11 @@ class HomeController extends Controller
                                 }
 
                                 $join->on('vit.date','>=', DB::raw("'$startDate'"));
-                                $join->on('vit.date','<=', DB::raw("'$endDate'"));
+                                $join->on('vit.date','<=', DB::raw("'$endDate' + INTERVAL 1 DAY"));
                             })
                             ->where('cr_action.category_id', $this->general->category_action_id('KPI'))
                             ->groupBy('cr_action.id')
                             ->get();
-
         //Laporan Harian
         $app['actionDaily'] = DB::table('cr_action AS a')
                             ->leftJoin('rf_category_action as ca','category_id','=','ca.id')

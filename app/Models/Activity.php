@@ -21,7 +21,7 @@ class Activity extends Model
         $q = DB::table('cr_activity')
             ->selectRaw('MIN(HOUR(DATE)) AS min, MAX(HOUR(DATE)) AS max')
             ->where('sales_id',$salesId)
-            ->whereBetween('date',[$startDate, $endDate])
+            ->whereBetween(DB::raw('DATE(date)'),[$startDate, $endDate])
             ->first();
         return $q;
     }
@@ -32,7 +32,7 @@ class Activity extends Model
             ->selectRaw('action_id, HOUR(date) AS hour, COUNT(HOUR(DATE)) result')
             ->leftJoin('cr_activity AS vit','dtl.activity_id','=','vit.id')
             ->where('sales_id',$salesId)
-            ->whereBetween('date',[DB::raw("'$startDate'"), DB::raw("'$endDate'")])
+            ->whereBetween(DB::raw('DATE(date)'),[DB::raw("'$startDate'"), DB::raw("'$endDate'")])
             ->groupBy('action_id', DB::raw("HOUR(date)"))
             ->get();
         return $q;
@@ -56,10 +56,10 @@ class Activity extends Model
                 $q->where('act.sales_id',$salesId);
             }
             if($dateFr!='' && $dateTo!='') {
-                $q->whereBetween('act.date', [(string)$dateFr, (string)$dateTo]);
+                $q->whereBetween(DB::raw('DATE(act.date)'), [(string)$dateFr, (string)$dateTo]);
             }
 
-        $q = $q->groupBy('cus.name');
+        $q = $q->groupBy('cus.name','act.id','act.date','cus.hp');
 
         return $q;
     }

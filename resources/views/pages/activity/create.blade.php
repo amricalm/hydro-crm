@@ -14,7 +14,7 @@
                             <div id="jam" class="page-title text-primary">0</div>
                         </div>
                         <div class="float-right col-md-2 text-center">
-                            <button type="button" class="btn btn-outline-danger position-relative btn-batal" id="Batal"><i class="fe fe-slash"></i>
+                            <button type="button" class="btn btn-outline-danger position-relative btn-batal" id="batal"><i class="fe fe-slash"></i>
                                 Batal</button>
                             <button type="button" class="btn btn-blue position-relative btn-simpan" data-adnmode="ADD"><i class="fe fe-save"></i>
                                 Simpan</button>
@@ -104,6 +104,12 @@
                                                 <label class="col-md-3 form-label">Instagram</label>
                                                 <div class="col-md-9">
                                                     <input type="text" name="instagram" id="instagram" autocomplete="off" class="form-control  form-control-sm  mb-2" tabindex="13">
+                                                </div>
+                                            </div>
+                                            <div class="form-group row row-sm mb-0">
+                                                <label class="col-md-3 form-label">Riwayat</label>
+                                                <div class="col-md-9">
+                                                    <textarea type="text" name="history" id="history" rows="2" autocomplete="off" class="form-control  form-control-sm  mb-2" disabled></textarea>
                                                 </div>
                                             </div>
                                         </div>
@@ -215,12 +221,6 @@
             }
             currentTime();
 
-            $('#batal').click(function () {
-                mode = 'TAMBAH';
-                var frm = document.querySelector("#trn")
-                frm.reset();
-            });
-
             $('#category').on("change",function(){
                 getByCategoryAction($(this).val());
             });
@@ -277,6 +277,17 @@
             });
         });
 
+        $('#batal').click(function () {
+            mode = 'TAMBAH';
+            $('#customer').val('');
+            $('#hp').val('');
+            $('#address').val('');
+            $('#email').val('');
+            $('#facebook').val('');
+            $('#instagram').val('');
+            $('#history').val('');
+        });
+
         function getByCategoryAction(id)
         {
             var action = '@Model.action';
@@ -318,6 +329,7 @@
                 $('#email').val('');
                 $('#facebook').val('');
                 $('#instagram').val('');
+                $('#history').val('');
                 return false;
             }
 
@@ -337,6 +349,7 @@
                             $('#email').val(Obj.email);
                             $('#facebook').val(Obj.facebook);
                             $('#instagram').val(Obj.instagram);
+                            $('#history').val(Obj.history);
                             $('#customer').focus();
                         }
                     }

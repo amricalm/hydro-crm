@@ -59,7 +59,7 @@
                         <div class="col-md-12 col-lg-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h3 class="card-title">Key Performance Indicator ({{ $startDate }} s/d {{ $endDate }})</h3>
+                                    <h3 class="card-title">Key Performance Indicator ({{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }} s/d {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }})</h3>
                                 </div>
                                 <div class="card-body">
                                     <div class="form-group row">
@@ -97,7 +97,7 @@
                         <div class="col-xl-12 col-lg-12 col-md-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h3 class="card-title">Laporan Harian ({{ $startDate }} s/d {{ $endDate }})</h3>
+                                    <h3 class="card-title">Laporan Harian ({{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }} s/d {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }})</h3>
                                 </div>
                                 <div class="card-body">
                                     <div class="table-responsive">

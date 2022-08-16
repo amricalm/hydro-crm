@@ -14,6 +14,7 @@ use App\Models\Address;
 use App\SmartSystem\General;
 use Carbon\Carbon;
 use App\Adn;
+use App\Models\Customer;
 use Validator;
 
 class ActivityController extends Controller
@@ -34,10 +35,10 @@ class ActivityController extends Controller
         $app['customer']    = DB::table('aa_customer')->get()->toArray();
         $app['action']      = DB::table('cr_action')->get()->toArray();
         $app['response']    = DB::table('cr_response')->get()->toArray();
-        $app['roleName']    = $this->general->role_name();
         $app['sales']       = DB::table('aa_employe')->get()->toArray();
         $app['startDate']   = (isset($_GET['tglDr'])&&$_GET['tglDr']!='') ? $_GET['tglDr'] : ((!isset($_GET['tglDr'])) ? Carbon::now()->format('Y-m-d') : '');
         $app['endDate']     = (isset($_GET['tglSd'])&&$_GET['tglSd']!='') ? $_GET['tglSd'] : ((!isset($_GET['tglDr'])) ? Carbon::now()->format('Y-m-d') : '');
+        $app['roleName']    = $this->general->role_name();
         if ($app['roleName'] == 'ADMIN') {
             $app['salesId'] = (isset($_GET['salesId'])&&$_GET['salesId']!='') ? $_GET['salesId'] : '';
         } elseif ($app['roleName'] == 'SALES') {
@@ -71,12 +72,19 @@ class ActivityController extends Controller
         //     $app['ModeEdit']    = 'EDIT';
         // } else { //edit
             // $activity = Activity::where('id', $_GET['id'])->first();
-            $app['sales']       = DB::table('aa_employe')->get()->toArray();
-            $app['customer']    = DB::table('aa_customer')->get()->toArray();
-            $app['category']    = DB::table('rf_category_action')->get()->toArray();
-            $app['action']      = DB::table('cr_action')->get()->toArray();
-            $app['response']    = DB::table('cr_response')->get()->toArray();
-            $app['user']        = DB::table('users')->where('id', auth()->user()->id)->first();
+            $qry    = DB::table('aa_customer AS cus')->select('cus.id','cus.name')
+                    ->rightJoin('cr_sales_owner AS own','cus.id','=','own.cid')
+                    ->where('periode',DB::raw((int)Carbon::now()->format('Ym')));
+            if ($this->general->role_name() == 'SALES') {
+                $qry = $qry->where('eid',auth()->user()->id);
+            }
+            $qry    = $qry->orderBy('cus.id','DESC')
+                    ->get()->toArray();
+
+            $app['customer']    = $qry;
+            $app['category']    = DB::table('rf_category_action')->select('id','name')->get()->toArray();
+            $app['action']      = DB::table('cr_action')->select('id','name')->get()->toArray();
+            $app['response']    = DB::table('cr_response')->select('id','name')->get()->toArray();
             $app['date']        = Carbon::now()->format('Y-m-d');
             $app['time']        = Carbon::now()->format('H:00');
             $app['ModeEdit']    = 'EDIT';
@@ -136,7 +144,8 @@ class ActivityController extends Controller
         return response()->json($response);
     }
 
-    public function getTabel(Request $req){
+    public function getTabel(Request $req)
+    {
         $output ='
         <table class="table table-bordered card-table table-vcenter text-nowrap" width="100%">
         <thead>
@@ -152,7 +161,11 @@ class ActivityController extends Controller
         </thead>
         <tbody>';
 
-        $salesId = $req->salesId;
+        if ($this->general->role_name() == 'ADMIN') {
+            $salesId = $req->salesId;
+        } elseif ($this->general->role_name() == 'SALES') {
+            $salesId = auth()->user()->eid;
+        }
         $dateFr  = $req->tglDr;
         $dateTo  = $req->tglSd;
         $page = (isset($req->page))?$req->page:1;
@@ -166,6 +179,7 @@ class ActivityController extends Controller
             ->limit($limit)->get();
 
         $activityList = Activity::getActivity($dateFr,$dateTo,$salesId,'');
+        // dd($activityList->toSql());
         $total_records =$activityList->count();
 
         $kelas_baris_akhir ='';
@@ -241,15 +255,22 @@ class ActivityController extends Controller
 
     public function search(Request $request)
     {
-        $search = $request->search;
-        $qry = DB::table('aa_customer')
-            ->where('name', 'LIKE', '%'.$search.'%')
+        $search             = $request->search;
+        $qry = DB::table('aa_customer AS cus')
+            ->rightJoin('cr_sales_owner AS own','cus.id','=','own.cid')
+            ->where('periode',DB::raw((int)Carbon::now()->format('Ym')));
+
+            if ($this->general->role_name() == 'SALES') {
+                $qry = $qry->where('eid',auth()->user()->id);
+            }
+
+            $qry = $qry->where('name', 'LIKE', '%'.$search.'%')
             ->orWhere('hp', 'LIKE', '%'.$search.'%')
             ->orWhere('address','LIKE', '%'.$search.'%')
             ->orWhere('email','LIKE', '%'.$search.'%')
             ->orWhere('facebook','LIKE', '%'.$search.'%')
             ->orWhere('instagram','LIKE', '%'.$search.'%')
-            ->select('id','name')
+            ->select('cus.id','cus.name')
             ->get();
         $array = array('resultSearch'=>$qry);
         echo (count($qry)>0) ? json_encode($array) : '' ;
@@ -282,6 +303,10 @@ class ActivityController extends Controller
                 $hdr->cby           = auth()->user()->id;
                 $hdr->save();
                 $activityId = $hdr->id;
+
+                // Update Pelanggan
+                $customer = Customer::find($hdr->customer_id);
+                $customer->update(['address' => $v["address"], 'hp' => $v["hp"], 'email' => $v["email"], 'facebook' => $v["facebook"], 'instagram' => $v["instagram"]]);
             } else {
                 foreach ($v as $kdtl => $vdtl) {
                     $getAction          = DB::table('cr_action')->where('name',$vdtl['action'])->first();
