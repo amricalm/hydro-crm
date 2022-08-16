@@ -64,7 +64,7 @@
 														</a>
 														<div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow animated">
 															<div class="text-center">
-																<div class="text-center user pb-0 font-weight-bold">{{ Session::get('UserName')}}</div>
+																<div class="text-center user pb-0 font-weight-bold">{{ auth()->user()->name }}</div>
 																<div class="dropdown-divider"></div>
 															</div>
 															<a class="dropdown-item" href="{{ route('logout') }}"

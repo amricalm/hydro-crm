@@ -24,17 +24,21 @@ class CustomerImport implements ToCollection
             $instagram  = $rows[$i+1][5];
             $periode    = $rows[$i+1][6];
             $eid        = $rows[$i+1][7];
+            $history    = $rows[$i+1][8];
+            $status     = $rows[$i+1][9];
 
             $customer = Customer::updateOrCreate(
                             [
-                                'name' => $name,
                                 'hp' => $hp,
                             ],
                             [
+                                'name' => $name,
                                 'address' => $address,
                                 'email' => $email,
                                 'facebook' => $facebook,
                                 'instagram' => $instagram,
+                                'status' => $status,
+                                'history' => $history,
                                 'uby' => auth()->user()->id,
                                 'cby' => auth()->user()->id,
                             ]

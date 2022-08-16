@@ -194,7 +194,6 @@
         });
 
         $('#cpass').click(function(){
-            console.log('masuk');
             $('#cpass').remove();
             var input = document.createElement("input");
             input.setAttribute("type", "text");
@@ -234,7 +233,7 @@
                         };
                     });
                     document.getElementById("div-password").appendChild(button);
-                    
+
                     $('.cpass').click(function () {
                         $('.cpass').remove();
                         var input = document.createElement("input");
@@ -295,7 +294,8 @@
             const obj = Object.fromEntries(frm.entries());
             var email = $('#tx-email').val();
             obj.mode = mode;
-            console.log(obj);
+            obj.employeName = $('#cb-name option[value="'+obj.name+'"]').text();
+
             $.ajax({
                 headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                 url: "{{ url('pengguna/validation') }}",
@@ -310,7 +310,6 @@
                             type: "POST",
                             success: function(msg) {
                                 if (msg.IsSuccess){
-                                    console.log(msg.Obj);
                                     alert('Sukses.');
                                     $('#trn').trigger("reset");
                                     $('#cb-name option').removeAttr("selected", "selected");

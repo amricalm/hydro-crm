@@ -189,11 +189,11 @@ class UsersController extends Controller
                 return response()->json($response);
             }
 
-            $obj->name=$req->name;
+            $obj->name=$req->employeName;
             $obj->email=$req->email;
             $obj->password=Hash::make($req->password);
             $obj->role=$req->role;
-            $obj->eid=$req->eid;
+            $obj->eid=$req->name;
             if ($req->mode=='EDIT') {
                 $obj->uby=auth()->user()->id;
             } else {

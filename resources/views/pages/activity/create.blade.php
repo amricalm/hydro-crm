@@ -9,10 +9,10 @@
                 <div class="card mb-0">
                     <div class="card-header">
                         <a href="{{ url('aktivitas') }}"><button type="button" class="btn btn-outline-warning position-relative"><i class="fe fe-arrow-left"></i></button></a>
-                        <h4 class="col-md-10 page-title text-primary">{{ $judul }}</h4>
-                        {{-- <div class="col-md-8 text-center">
+                        <h4 class="col-md-2 page-title text-primary">{{ $judul }}</h4>
+                        <div class="col-md-8 text-center">
                             <div id="jam" class="page-title text-primary">0</div>
-                        </div> --}}
+                        </div>
                         <div class="float-right col-md-2 text-center">
                             <button type="button" class="btn btn-outline-danger position-relative btn-batal" id="Batal"><i class="fe fe-slash"></i>
                                 Batal</button>
