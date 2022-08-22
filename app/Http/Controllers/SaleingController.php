@@ -204,8 +204,35 @@ class SaleingController extends Controller
                 return response()->json($response);
             }
 
+
+            $cus = new Customer;
+            if ($req->mode=='EDIT')
+            {
+                $cus = Customer::find($obj->customer_id);
+            }
+            $cus->name=$req->customer;
+            $cus->address=$req->address;
+            $cus->hp=$req->hp;
+            $cus->email=$req->email;
+            $cus->facebook=$req->facebook;
+            $cus->instagram=$req->instagram;
+            $cus->cby=auth()->user()->id;
+            $cus->uby=auth()->user()->id;
+            $cus->save();
+            $cusid = $cus->id;
+
+            $sal = new SalesOwner;
+            if ($req->mode=='EDIT')
+            {
+                $sal = SalesOwner::firstOrNew(['cid'=>$cusid, 'periode'=>DB::raw((int)Carbon::now()->format('Ym'))]);
+            }
+            $sal->periode=Carbon::now()->format('Ym');
+            $sal->cid=$cusid;
+            $sal->eid=$req->sales;
+            $sal->save();
+
             $obj->date=$req->date;
-            $obj->customer_id=$req->customer;
+            $obj->customer_id=$cusid;
             $obj->product_id=$req->product;
             $obj->technician_id=$req->technician;
             $obj->sales_id=$req->sales;

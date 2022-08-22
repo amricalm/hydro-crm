@@ -46,13 +46,14 @@ class CustomerController extends Controller
 
     public function getTabel(Request $req){
         $output ='
-        <table class="table table-bordered card-table table-vcenter text-nowrap" width="100%">
+        <table class="table table-bordered card-table table-vcenter text-wrap" width="100%">
         <thead>
           <tr class="border-top">
             <th class="py-2" width="5%">#</th>
             <th class="py-2" width="20%">Nama Pelanggan</th>
             <th class="py-2" width="15%">Hp</th>
             <th class="py-2">Alamat</th>
+            <th class="py-2">Jenis/Tipe Produk</th>
             <th class="py-2">Sales</th>
             <th class="py-2" colspan="2" width="5%"></th>
           </tr>
@@ -67,13 +68,15 @@ class CustomerController extends Controller
         $no = $limit_start + 1;
 
         $q = DB::table('aa_customer AS cus')
-            ->selectRaw('cus.*, emp.name as sales_name')
+            ->selectRaw('cus.id, cus.name, cus.hp, cus.address, cus.history, pr.name AS product_name, cus.status, emp.name as sales_name')
             ->leftJoin('cr_sales_owner AS so', function($join)
                 {
                     $join->on('cus.id', '=', 'so.cid');
                     $join->on('so.periode', '=', DB::raw((int)Carbon::now()->format('Ym')));
                 })
             ->leftJoin('aa_employe AS emp','so.eid','=','emp.id')
+            ->leftJoin('cr_saleing AS sl','cus.id','=','sl.customer_id')
+            ->leftJoin('cr_product AS pr','sl.product_id','=','pr.id')
             ->where('cus.status', $status);
 
             if($employe == '') { //Jika sales tidak dipilih
@@ -97,13 +100,16 @@ class CustomerController extends Controller
             $total_records = $q->count();
 
             $q = $q->offset($limit_start)
-                    ->limit($limit)->get();
+                    ->limit($limit)
+                    ->orderBy('cus.id','DESC')
+                    ->get();
 
         $kelas_baris_akhir ='';
         $tr = '';
         $status = 'AKTIF';
         foreach ($q as $row) {
             $status = ($row->status==1)?'AKTIF':'TIDAK AKTIF';
+            $product_name = ($row->product_name!='') ? $row->product_name : '';
             $tr .= '
             <tr ' . $kelas_baris_akhir .'>
               <input type="hidden" value="'. $row->id .'">
@@ -111,6 +117,7 @@ class CustomerController extends Controller
               <td class="py-1">'. $row->name .'</td>
               <td class="py-1">'. $row->hp .'</td>
               <td class="py-1">'. $row->address .'</td>
+              <td class="py-1">'. $row->history .''. $product_name .'</td>
               <td class="py-1">'. $row->sales_name .'</td>
 
               <td class="py-1">

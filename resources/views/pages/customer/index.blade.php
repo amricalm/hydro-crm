@@ -19,8 +19,8 @@
                     </div>
                     <div class="page-rightheader">
                         <div class="btn-list">
-                            <a href="javascript:void(0)" id="import" class="btn btn-sm btn-secondary"><i class="fe fe-download"></i> Impor dari Excel</a>
-                            <a href="javascript:void(0)" id="createNew" class="btn btn-outline-primary" ><i class="fe fe-plus-square"></i> Tambah</a>
+                            {{-- <a href="javascript:void(0)" id="import" class="btn btn-sm btn-secondary"><i class="fe fe-download"></i> Impor dari Excel</a> --}}
+                            <a href="{{ url('penjualan') }}" id="createNew" class="btn btn-outline-primary" ><i class="fe fe-plus-square"></i> Tambah</a>
                         </div>
                     </div>
                 </div>
@@ -335,8 +335,8 @@
         });
 
         $('#createNew').click(function(){
-            mode = 'TAMBAH';
-            $('#add-modal').show();
+            // mode = 'TAMBAH';
+            // $('#add-modal').show();
         });
 
         $('#import').click(function(){

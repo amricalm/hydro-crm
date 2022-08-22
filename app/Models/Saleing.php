@@ -23,7 +23,7 @@ class Saleing extends Model
             $qrySales       = Employe::selectRaw('aa_employe.id, aa_employe.name')->leftJoin('cr_saleing AS sal','aa_employe.id','=','sal.sales_id')->groupBy('aa_employe.id');
 
             $q = DB::table('cr_saleing AS sal')
-                ->selectRaw('sal.id, date, puc.id AS product_id, puc.name AS product_name, cus.id AS customer_id, cus.name AS customer_name, hp, tec.id AS technician_id, tec.name AS technician_name, sls.id AS sales_id, sls.name AS sales_name, sal.desc, sal.amount')
+                ->selectRaw('sal.id, date, puc.id AS product_id, puc.name AS product_name, cus.id AS customer_id, cus.name AS customer_name, address, hp, email, facebook, instagram, tec.id AS technician_id, tec.name AS technician_name, sls.id AS sales_id, sls.name AS sales_name, sal.desc, sal.amount')
                 ->leftJoin('cr_product AS puc','sal.product_id','=','puc.id')
                 ->leftJoin('aa_customer AS cus','sal.customer_id','=','cus.id')
                 ->leftJoin(DB::raw('('.$qryTechnician->toSql().') as tec'),'sal.technician_id','=','tec.id')

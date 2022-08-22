@@ -107,14 +107,45 @@
                                                     <div class="form-group row row-sm mb-0">
                                                         <label class="col-md-3 form-label">Pelanggan</label>
                                                         <div class="col-md-9">
-                                                            <select name="customer" id="cb-customer" class="form-select form-control form-control-sm mb-2">
-                                                                @if($roleName == 'ADMIN')
-                                                                <option value="">-- Pilih Sales --</option>
-                                                                @endif
-                                                                @foreach($customer as $item)
-                                                                <option value="{{$item->id}}">{{$item->name}}</option>
-                                                                @endforeach
-                                                            </select>
+                                                            <input type="text" id="tx-customer" name="customer" autocomplete="off" class="form-control form-control-sm mb-2">
+                                                            {{-- <select name="customer" id="cb-customer" class="form-select form-control form-control-sm mb-2"> --}}
+                                                                {{-- @if($roleName == 'ADMIN') --}}
+                                                                {{-- <option value="">-- Pilih Sales --</option> --}}
+                                                                {{-- @endif --}}
+                                                                {{-- @foreach($customer as $item) --}}
+                                                                {{-- <option value="{{$item->id}}">{{$item->name}}</option> --}}
+                                                                {{-- @endforeach --}}
+                                                            {{-- </select> --}}
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row row-sm mb-0">
+                                                        <label class="col-md-3 form-label">Alamat</label>
+                                                        <div class="col-md-9">
+                                                            <textarea type="text" id="tx-address" name="address" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row row-sm mb-0">
+                                                        <label class="col-md-3 form-label">HP</label>
+                                                        <div class="col-md-9">
+                                                            <input type="text" id="tx-hp" name="hp" autocomplete="off" class="form-control form-control-sm mb-2">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row row-sm mb-0">
+                                                        <label class="col-md-3 form-label">Email</label>
+                                                        <div class="col-md-9">
+                                                            <input type="text" id="tx-email" name="email" autocomplete="off" class="form-control form-control-sm mb-2">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row row-sm mb-0">
+                                                        <label class="col-md-3 form-label">Facebook</label>
+                                                        <div class="col-md-9">
+                                                            <input type="text" id="tx-facebook" name="facebook" autocomplete="off" class="form-control form-control-sm mb-2">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row row-sm mb-0">
+                                                        <label class="col-md-3 form-label">Instagram</label>
+                                                        <div class="col-md-9">
+                                                            <input type="text" id="tx-instagram" name="instagram" autocomplete="off" class="form-control form-control-sm mb-2">
                                                         </div>
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
@@ -246,7 +277,13 @@
                     var date = now.getFullYear()+"-"+(month)+"-"+(day);
                     console.log(obj.sales_id);
                     $('#tx-date').val(date);
-                    $('#cb-customer option[value="'+obj.customer_id+'"]').attr("selected", "selected");
+                    // $('#cb-customer option[value="'+obj.customer_id+'"]').attr("selected", "selected");
+                    $('#tx-customer').val(obj.customer_name);
+                    $('#tx-address').val(obj.address);
+                    $('#tx-hp').val(obj.hp);
+                    $('#tx-email').val(obj.email);
+                    $('#tx-facebook').val(obj.facebook);
+                    $('#tx-instagram').val(obj.instagram);
                     $('#cb-product option[value="'+obj.product_id+'"]').attr("selected", "selected");
                     $('#cb-technician option[value="'+obj.technician_id+'"]').attr("selected", "selected");
                     $('#cbe-sales option[value="'+obj.sales_id+'"]').attr("selected", "selected");
@@ -266,14 +303,15 @@
 
         $('#add-modal').on('shown.bs.modal', function (e) {
             //AktivasiTab();
-            $('#cb-customer').focus();
+            // $('#cb-customer').focus();
+            $('#tx-customer').focus();
         });
 
         $('#btn-close').click(function () {
             $('#add-modal').hide();
             var frm = document.querySelector("#trn");
             frm.reset();
-            $('#cb-customer option').removeAttr("selected", "selected");
+            // $('#cb-customer option').removeAttr("selected", "selected");
             $('#cb-product option').removeAttr("selected", "selected");
             $('#cb-technician option').removeAttr("selected", "selected");
             $('#cbe-sales option').removeAttr("selected", "selected");
@@ -295,7 +333,7 @@
             mode = 'TAMBAH';
             var frm = document.querySelector("#trn");
             frm.reset();
-            $('#cb-customer option').removeAttr("selected", "selected");
+            // $('#cb-customer option').removeAttr("selected", "selected");
             $('#cb-product option').removeAttr("selected", "selected");
             $('#cb-technician option').removeAttr("selected", "selected");
             $('#cbe-sales option').removeAttr("selected", "selected");
@@ -309,7 +347,7 @@
             var kirim = true;
             const frm = new FormData(document.querySelector("#trn"));
             const obj = Object.fromEntries(frm.entries());
-            var name = $('#cb-customer').val();
+            var name = $('#tx-customer').val();//$('#cb-customer').val();
             obj.mode = mode;
 
             $.ajax({
@@ -329,7 +367,7 @@
                                     console.log(msg.Obj);
                                     alert('Sukses.');
                                     $('#trn').trigger("reset");
-                                    $('#cb-customer option').removeAttr("selected", "selected");
+                                    // $('#cb-customer option').removeAttr("selected", "selected");
                                     $('#cb-product option').removeAttr("selected", "selected");
                                     $('#cb-technician option').removeAttr("selected", "selected");
                                     $('#cbe-sales option').removeAttr("selected", "selected");

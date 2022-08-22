@@ -15,6 +15,7 @@ use App\SmartSystem\General;
 use Carbon\Carbon;
 use App\Adn;
 use App\Models\Customer;
+use App\Models\Employe;
 use Validator;
 
 class ActivityController extends Controller
@@ -41,7 +42,7 @@ class ActivityController extends Controller
         $app['roleName']    = $this->general->role_name();
         if ($app['roleName'] == 'ADMIN') {
             $app['salesId'] = (isset($_GET['salesId'])&&$_GET['salesId']!='') ? $_GET['salesId'] : '';
-        } elseif ($app['roleName'] == 'SALES') {
+        } else {
             $app['salesId'] = auth()->user()->eid;
         }
 
@@ -163,7 +164,7 @@ class ActivityController extends Controller
 
         if ($this->general->role_name() == 'ADMIN') {
             $salesId = $req->salesId;
-        } elseif ($this->general->role_name() == 'SALES') {
+        } else {
             $salesId = auth()->user()->eid;
         }
         $dateFr  = $req->tglDr;
@@ -299,7 +300,19 @@ class ActivityController extends Controller
                 $hdr = new Activity;
                 $hdr->date          = $v["date"].' '.$v["time"];//Carbon::now()->toDateTimeString();
                 $hdr->customer_id   = isset($v["customer"]) ? $v["customer"] : 0;
-                $hdr->sales_id      = auth()->user()->eid;
+
+                if (auth()->user()->role == 1) {
+                    $eid = Employe::select('aa_employe.id')
+                            ->leftJoin('cr_sales_owner','aa_employe.id','=','cr_sales_owner.eid')
+                            ->rightJoin('aa_customer','cr_sales_owner.cid','=','aa_customer.id')
+                            ->where('periode',DB::raw((int)Carbon::now()->format('Ym')))
+                            ->where('aa_customer.id',$hdr->customer_id)
+                            ->first();
+                    $hdr->sales_id      = !empty($eid) ? $eid->id : auth()->user()->eid;
+                } else {
+                    $hdr->sales_id      = auth()->user()->eid;
+                }
+
                 $hdr->cby           = auth()->user()->id;
                 $hdr->save();
                 $activityId = $hdr->id;
