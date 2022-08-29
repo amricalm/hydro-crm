@@ -19,7 +19,7 @@
                     </div>
                     <div class="page-rightheader">
                         <div class="btn-list">
-                            <a href="javascript:void(0)" id="createNew" class="btn btn-outline-primary" ><i class="fe fe-plus-square"></i> Tambah</a>
+                            <a href="{{ url('penjualan/create') }}" class="btn btn-outline-primary" ><i class="fe fe-plus-square"></i> Tambah</a>
                         </div>
                     </div>
                 </div>
@@ -106,7 +106,7 @@
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
                                                         <label class="col-md-3 form-label">Pelanggan</label>
-                                                        <div class="col-md-9">
+                                                        <div class="col-md-9" id="tx-customer-id">
                                                             <input type="text" id="tx-customer" name="customer" autocomplete="off" class="form-control form-control-sm mb-2">
                                                             {{-- <select name="customer" id="cb-customer" class="form-select form-control form-control-sm mb-2"> --}}
                                                                 {{-- @if($roleName == 'ADMIN') --}}
@@ -278,12 +278,23 @@
                     console.log(obj.sales_id);
                     $('#tx-date').val(date);
                     // $('#cb-customer option[value="'+obj.customer_id+'"]').attr("selected", "selected");
+                    var cusid = document.createElement("input");
+                    cusid.setAttribute("type", "hidden");
+                    cusid.setAttribute("name", "customer_id");
+                    cusid.setAttribute("value", obj.customer_id);
+                    document.getElementById("tx-customer-id").appendChild(cusid);
                     $('#tx-customer').val(obj.customer_name);
+                    $("#tx-customer").prop('disabled', true);
                     $('#tx-address').val(obj.address);
+                    $("#tx-address").prop('disabled', true);
                     $('#tx-hp').val(obj.hp);
+                    $("#tx-hp").prop('disabled', true);
                     $('#tx-email').val(obj.email);
+                    $("#tx-email").prop('disabled', true);
                     $('#tx-facebook').val(obj.facebook);
+                    $("#tx-facebook").prop('disabled', true);
                     $('#tx-instagram').val(obj.instagram);
+                    $("#tx-instagram").prop('disabled', true);
                     $('#cb-product option[value="'+obj.product_id+'"]').attr("selected", "selected");
                     $('#cb-technician option[value="'+obj.technician_id+'"]').attr("selected", "selected");
                     $('#cbe-sales option[value="'+obj.sales_id+'"]').attr("selected", "selected");

@@ -121,7 +121,7 @@ class CustomerController extends Controller
               <td class="py-1">'. $row->sales_name .'</td>
 
               <td class="py-1">
-                    <button type="button" class="btn bg-info-transparent py-0 px-2 btn-edit" ><i class="fe fe-edit"></i></button>
+                    <button type="button" class="btn bg-info-transparent py-0 px-2 btn-edit"><i class="fe fe-edit"></i></button>
                     <button type="button" class="btn bg-danger-transparent py-0 px-2 btn-delete"><i class="fe fe-x-square"></i></button>
                 </td>
             </tr>'
@@ -240,6 +240,7 @@ class CustomerController extends Controller
             $obj->email=$req->email;
             $obj->facebook=$req->facebook;
             $obj->instagram=$req->instagram;
+            $obj->history=$req->history;
             $obj->status=!($req->aktif);
             if ($req->mode=='EDIT') {
                 $obj->uby=auth()->user()->id;

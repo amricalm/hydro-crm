@@ -127,10 +127,10 @@ Route::get('/aktivitas', [ActivityController::class, 'index']);
 Route::post('/aktivitas/getTabel', [ActivityController::class, 'getTabel'])->name('activity.getTabel');
 Route::post('/aktivitas/getByCategoryAction', [ActivityController::class, 'getByCategoryAction']);
 Route::post('/aktivitas/getCustomer', [ActivityController::class, 'getCustomer']);
-// Route::get('/aktivitas/create', [ActivityController::class, 'create'])->name('activity.get');
 Route::post('/aktivitas', [ActivityController::class, 'save_old'])->name('activity.save');
 Route::post('/aktivitas/delete', [ActivityController::class, 'delete'])->name('activity.delete');
 Route::get('/aktivitas/create', [ActivityController::class, 'create'])->name('activity.create');
+Route::post('/aktivitas/create', [ActivityController::class, 'create']);
 Route::post('/aktivitas/search', [ActivityController::class, 'search']);
 Route::post('/aktivitas/validation', [ActivityController::class, 'validation']);
 Route::post('/aktivitas/save', [ActivityController::class, 'save']);
@@ -144,6 +144,12 @@ Route::post('/penjualan/validation', [SaleingController::class, 'validation']);
 Route::post('/penjualan/isExist', [SaleingController::class, 'isExist'])->name('saleing.isExist');
 Route::post('/penjualan', [SaleingController::class, 'save'])->name('saleing.save');
 Route::post('/penjualan/delete', [SaleingController::class, 'delete'])->name('saleing.delete');
+
+Route::post('/penjualan/getCustomer', [SaleingController::class, 'getCustomer']);
+Route::get('/penjualan/create', [SaleingController::class, 'create'])->name('saleing.create');
+Route::post('/penjualan/search', [SaleingController::class, 'search']);
+Route::post('/penjualan/validationCustomer', [SaleingController::class, 'validationCustomer']);
+Route::post('/penjualan/saveSaleing', [SaleingController::class, 'saveSaleing']);
 //===================== ROUTE END PENJUALAN ===========================//
 
 //============================= PENGGUNA ============================//

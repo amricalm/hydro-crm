@@ -112,26 +112,14 @@
         });
 
         $(document).on('click','.btn-edit',function(){
-            mode = 'EDIT';
             var id = $(this).closest('tr').find('input').val();
             var url = '{{ url('aktivitas/create') }}?id='+id;
-            console.log(id);
             $.ajax({
                 url:"{{ url('aktivitas/create') }}",
                 method:"GET",
                 data:{id:id.trim()},
                 success:function(data){
                     window.location = url;
-                    // console.log(data);
-                    // var obj = data[0];
-                    // $('#tx-nip').val(obj.nip);
-                    // $('#tx-name').val(obj.name);
-                    // $('#tx-address').val(obj.address);
-                    // $('#kd-hp').val(obj.hp);
-                    // $('#tx-email').val(obj.email);
-                    // $('#tx-facebook').val(obj.facebook);
-                    // $('#tx-instagram').val(obj.instagram);
-                    // $("#chk-aktif").prop('checked', !(Boolean(Number(obj.aktif))));
                 }
             })
             $('#ajax-loading').show();
@@ -173,7 +161,7 @@ function checkdelete(id,el)
             $.ajax({
                 url:"{{route('activity.delete') }}",
                 method:"POST",
-                data:{kdProgram:id},
+                data:{id:id},
                 success:function(data){
                     if(data.Message=='Sukses')
                     {

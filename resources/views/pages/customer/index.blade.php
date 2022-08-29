@@ -20,7 +20,7 @@
                     <div class="page-rightheader">
                         <div class="btn-list">
                             {{-- <a href="javascript:void(0)" id="import" class="btn btn-sm btn-secondary"><i class="fe fe-download"></i> Impor dari Excel</a> --}}
-                            <a href="{{ url('penjualan') }}" id="createNew" class="btn btn-outline-primary" ><i class="fe fe-plus-square"></i> Tambah</a>
+                            <a href="javascript:void(0)" id="createNew" class="btn btn-outline-primary" ><i class="fe fe-plus-square"></i> Tambah</a>
                         </div>
                     </div>
                 </div>
@@ -135,6 +135,12 @@
                                                         </div>
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
+                                                        <label class="col-md-3 form-label">Jenis/Tipe Produk</label>
+                                                        <div class="col-md-9">
+                                                            <textarea id="tx-history" rows="4" name="history" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row row-sm mb-0">
                                                         <label class="col-md-3 form-label">Sales Owner</label>
                                                         <div class="col-md-9">
                                                             <select name="sales" id="cb-sales" class="form-select form-control form-control-sm mb-2" tabindex="10">
@@ -171,9 +177,8 @@
                 <!-- End Row -->
             </div>
         </div>
-      </div>
     </div>
-  </div>
+</div>
 <!--#endregion === Modal=== -->
 <!-- Modal -->
 <div class="modal" tabindex="-1" id="modalImport" data-bs-backdrop="static">
@@ -335,8 +340,8 @@
         });
 
         $('#createNew').click(function(){
-            // mode = 'TAMBAH';
-            // $('#add-modal').show();
+            mode = 'TAMBAH';
+            $('#add-modal').show();
         });
 
         $('#import').click(function(){
@@ -363,6 +368,7 @@
                     $('#tx-email').val(obj.email);
                     $('#tx-facebook').val(obj.facebook);
                     $('#tx-instagram').val(obj.instagram);
+                    $('#tx-history').val(obj.history);
                     $('#cb-sales option[value="'+obj.eid+'"]').attr("selected", "selected");
                     $('#chk-aktif').prop('checked', !(Boolean(obj.status)));
                 }

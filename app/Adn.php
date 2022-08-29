@@ -21,8 +21,8 @@ class Adn{
         return $result;
     }
 
-    public static function SetDMY($aDate) {
-        $result = Date("Y-m-d",$aDate);
+    public static function SetdmYHi($aDate) {
+        $result = Date("d/m/Y H:i",strtotime($aDate));
         return $result;
     }
 

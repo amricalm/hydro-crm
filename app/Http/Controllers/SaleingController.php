@@ -96,7 +96,7 @@ class SaleingController extends Controller
               <td class="py-1">'. $row->product_name .'</td>
               <td class="py-1">'. $row->technician_name .'</td>
               <td class="py-1">'. $row->sales_name .'</td>
-              <td class="py-1">'. $row->amount .'</td>
+              <td class="py-1">'. number_format($row->amount, 0,'.','.') .'</td>
 
               <td class="py-1">
                     <button type="button" class="btn bg-info-transparent py-0 px-2 btn-edit" ><i class="fe fe-edit"></i></button>
@@ -205,34 +205,34 @@ class SaleingController extends Controller
             }
 
 
-            $cus = new Customer;
-            if ($req->mode=='EDIT')
-            {
-                $cus = Customer::find($obj->customer_id);
-            }
-            $cus->name=$req->customer;
-            $cus->address=$req->address;
-            $cus->hp=$req->hp;
-            $cus->email=$req->email;
-            $cus->facebook=$req->facebook;
-            $cus->instagram=$req->instagram;
-            $cus->cby=auth()->user()->id;
-            $cus->uby=auth()->user()->id;
-            $cus->save();
-            $cusid = $cus->id;
+            // $cus = new Customer;
+            // if ($req->mode=='EDIT')
+            // {
+            //     $cus = Customer::find($obj->customer_id);
+            // }
+            // $cus->name=$req->customer;
+            // $cus->address=$req->address;
+            // $cus->hp=$req->hp;
+            // $cus->email=$req->email;
+            // $cus->facebook=$req->facebook;
+            // $cus->instagram=$req->instagram;
+            // $cus->cby=auth()->user()->id;
+            // $cus->uby=auth()->user()->id;
+            // $cus->save();
+            // $cusid = $cus->id;
 
-            $sal = new SalesOwner;
-            if ($req->mode=='EDIT')
-            {
-                $sal = SalesOwner::firstOrNew(['cid'=>$cusid, 'periode'=>DB::raw((int)Carbon::now()->format('Ym'))]);
-            }
-            $sal->periode=Carbon::now()->format('Ym');
-            $sal->cid=$cusid;
-            $sal->eid=$req->sales;
-            $sal->save();
+            // $sal = new SalesOwner;
+            // if ($req->mode=='EDIT')
+            // {
+            //     $sal = SalesOwner::firstOrNew(['cid'=>$cusid, 'periode'=>DB::raw((int)Carbon::now()->format('Ym'))]);
+            // }
+            // $sal->periode=Carbon::now()->format('Ym');
+            // $sal->cid=$cusid;
+            // $sal->eid=$req->sales;
+            // $sal->save();
 
             $obj->date=$req->date;
-            $obj->customer_id=$cusid;
+            $obj->customer_id=$req->customer_id;
             $obj->product_id=$req->product;
             $obj->technician_id=$req->technician;
             $obj->sales_id=$req->sales;
@@ -273,5 +273,115 @@ class SaleingController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public static function getCustomer(Request $req)
+    {
+        $id = trim($req->id);
+        try {
+            $query = DB::table('aa_customer')->where('id', 'like',"%".$id."%")->first();
+            if(isset($query)) {
+                $qry = trim($query->id);
+                if($id == $qry) {
+                    $query = DB::table('aa_customer')->where('id', $query->id)->first();
+                    return response()->json(["IsSuccess"=>true,"ID"=>$query->id,"Obj"=>$query]);
+                } else {
+                    return response()->json(["IsSuccess"=>true,"ID"=>""]);
+                }
+            } else {
+                return response()->json(["IsSuccess"=>true,"ID"=>""]);
+            }
+        } catch(\Exception $e) {
+            return response()->json(['error'=>$e]);
+        }
+    }
+
+    public function create()
+    {
+        $app['judul']       = "Penjualan";
+            $qry    = DB::table('aa_customer AS cus')->select('cus.id','cus.name')
+                    ->rightJoin('cr_sales_owner AS own','cus.id','=','own.cid')
+                    ->where('periode',DB::raw((int)Carbon::now()->format('Ym')));
+            if ($this->general->role_name() == 'SALES') {
+                $qry = $qry->where('eid',auth()->user()->id);
+            }
+            $qry    = $qry->orderBy('cus.id','DESC')
+                    ->get()->toArray();
+
+            $app['customer']    = $qry;
+            $app['product']     = DB::table('cr_product')->select('id','name')->get()->toArray();
+            $app['technician']  = DB::table('aa_employe')->select('id','name')->get()->toArray();
+            $app['sales']       = DB::table('aa_employe')->select('id','name')->get()->toArray();
+            $app['date']        = Carbon::now()->format('Y-m-d');
+            $app['ModeEdit']    = 'EDIT';
+
+        return view('pages.saleing.create', $app);
+    }
+
+    public function search(Request $request)
+    {
+        $search             = $request->search;
+        $qry = DB::table('aa_customer AS cus')
+            ->rightJoin('cr_sales_owner AS own','cus.id','=','own.cid')
+            ->where('periode',DB::raw((int)Carbon::now()->format('Ym')));
+
+            if ($this->general->role_name() == 'SALES') {
+                $qry = $qry->where('eid',auth()->user()->id);
+            }
+
+            $qry = $qry->where('name', 'LIKE', '%'.$search.'%')
+            ->orWhere('hp', 'LIKE', '%'.$search.'%')
+            ->orWhere('address','LIKE', '%'.$search.'%')
+            ->orWhere('email','LIKE', '%'.$search.'%')
+            ->orWhere('facebook','LIKE', '%'.$search.'%')
+            ->orWhere('instagram','LIKE', '%'.$search.'%')
+            ->select('cus.id','cus.name')
+            ->get();
+        $array = array('resultSearch'=>$qry);
+        echo (count($qry)>0) ? json_encode($array) : '' ;
+    }
+
+    public static function validationCustomer(Request $req)
+    {
+        $validator = Validator::make($req->all(), [
+            'customer' => 'required',
+            'hp' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error'=>$validator->errors()->all()]);
+        }
+
+        return response()->json(["status"=>true,"Message"=>"Data Lengkap."]);
+    }
+
+    public static function saveSaleing(Request $req)
+    {
+        $req = $req->all();
+        foreach ($req as $k => $v) {
+            if($k == 0) {
+                // Update Pelanggan
+                $customer = Customer::find($v["customer"]);
+                $customer->update(['address' => $v["address"], 'hp' => $v["hp"], 'email' => $v["email"], 'facebook' => $v["facebook"], 'instagram' => $v["instagram"]]);
+            } else {
+                foreach ($v as $kdtl => $vdtl) {
+                    $getProduct          = DB::table('cr_product')->select('id')->where('name',$vdtl['product'])->first();
+                    $getTechnician        = DB::table('aa_employe')->select('id')->where('name',$vdtl['technician'])->first();
+                    $getSales             = DB::table('aa_employe')->select('id')->where('name',$vdtl['sales'])->first();
+
+                    $dtl = new Saleing;
+                    $dtl->date          = $vdtl["date"]; //Carbon::now()->toDateTimeString();
+                    $dtl->customer_id   = $vdtl["customer"];
+                    $dtl->product_id    = $getProduct->id;
+                    $dtl->technician_id = $getTechnician->id;
+                    $dtl->sales_id      = $getSales->id;
+                    $dtl->desc          = $vdtl["desc"];
+                    $dtl->amount        = isset($vdtl["amount"]) ? $vdtl["amount"] : 0;
+                    $dtl->cby           = auth()->user()->id;
+                    $dtl->save();
+                }
+            }
+        }
+        return response()->json(["IsSuccess"=>true,"Message"=>"Berhasil disimpan"]);
     }
 }

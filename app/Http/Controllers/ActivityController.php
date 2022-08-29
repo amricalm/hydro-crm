@@ -58,38 +58,52 @@ class ActivityController extends Controller
         return $this->create($req->mode);
     }
 
-    public function create()
+    public function create(Request $req)
     {
         $app['judul']       = "Aktivitas";
-        // if(!isset($_GET['id'])) { //add
-        //     $app['sales']       = DB::table('aa_employe')->get()->toArray();
-        //     $app['customer']    = DB::table('aa_customer')->get()->toArray();
-        //     $app['category']    = DB::table('rf_category_action')->get()->toArray();
-        //     $app['action']      = DB::table('cr_action')->get()->toArray();
-        //     $app['response']    = DB::table('cr_response')->get()->toArray();
-        //     $app['user']        = DB::table('users')->where('id', auth()->user()->id)->first();
-        //     $app['date']        = Carbon::now()->format('Y-m-d');
-        //     $app['time']        = Carbon::now()->format('H:00');
-        //     $app['ModeEdit']    = 'EDIT';
-        // } else { //edit
-            // $activity = Activity::where('id', $_GET['id'])->first();
+        $app['roleName']    = $this->general->role_name();
+        if ($app['roleName'] == 'ADMIN') {
+            $app['karyawan']   = Employe::all();
+        } elseif ($app['roleName'] == 'SALES') {
+            $app['karyawan']   = Employe::where('id', auth()->user()->eid)->get();
+        }
+        if(!isset($req->id)) { //add
             $qry    = DB::table('aa_customer AS cus')->select('cus.id','cus.name')
                     ->rightJoin('cr_sales_owner AS own','cus.id','=','own.cid')
                     ->where('periode',DB::raw((int)Carbon::now()->format('Ym')));
             if ($this->general->role_name() == 'SALES') {
                 $qry = $qry->where('eid',auth()->user()->id);
             }
-            $qry    = $qry->orderBy('cus.id','DESC')
-                    ->get()->toArray();
+            $qry    = $qry->orderBy('cus.id','DESC')->get()->toArray();
 
-            $app['customer']    = $qry;
-            $app['category']    = DB::table('rf_category_action')->select('id','name')->get()->toArray();
-            $app['action']      = DB::table('cr_action')->select('id','name')->get()->toArray();
-            $app['response']    = DB::table('cr_response')->select('id','name')->get()->toArray();
-            $app['date']        = Carbon::now()->format('Y-m-d');
-            $app['time']        = Carbon::now()->format('H:00');
-            $app['ModeEdit']    = 'EDIT';
-        // }
+        } else { //edit
+            $app['activity']    = Activity::where('id',$req->id)->first();
+            $app['activityDtl'] = ActivityDtl::select('activity_id', 'cra.name AS action_name', 'action_desc', 'res.name AS response_name', 'response_desc')
+                                    ->leftJoin('cr_activity AS act','activity_id','=','act.id')
+                                    ->leftJoin('cr_action AS cra','action_id','=','cra.id')
+                                    ->leftJoin('cr_response AS res','response_id','=','res.id')
+                                    ->where('act.id', $req->id)
+                                    ->get();
+            //-----------------------------------------------------------------------
+            $qry    = DB::table('aa_customer AS cus')->select('cus.id','cus.name')
+                    ->rightJoin('cr_sales_owner AS own','cus.id','=','own.cid')
+                    ->where('periode',DB::raw((int)Carbon::now()->format('Ym')));
+            if ($this->general->role_name() == 'SALES') {
+                $qry = $qry->where('eid',auth()->user()->id);
+            }
+            $qry    = $qry->orderBy('cus.id','DESC')->get()->toArray();
+
+            if($req->ajax()) {
+                return response()->json(["IsSuccess"=>true,"Obj"=>$app]);
+            }
+        }
+
+        $app['customer']    = $qry;
+        $app['category']    = DB::table('rf_category_action')->select('id','name')->get()->toArray();
+        $app['action']      = DB::table('cr_action')->select('id','name')->get()->toArray();
+        $app['response']    = DB::table('cr_response')->select('id','name')->get()->toArray();
+        $app['date']        = Carbon::now()->format('Y-m-d');
+        $app['time']        = Carbon::now()->format('H:00');
 
         return view('pages.activity.create', $app);
     }
@@ -125,12 +139,13 @@ class ActivityController extends Controller
     public function delete(Request $req)
     {
         try {
-            $getDtl = ActivityDtl::leftJoin('cr_activity AS act','cr_activity_dtl.activity_id','=','act.id')
-                    ->where('cr_activity_dtl.activity_id',$req->id)
-                    ->get();
-            $activity_id = $getDtl->activity_id;
+            $qry = Activity::select('cr_activity.id')
+                    ->join('cr_activity_dtl AS dtl','cr_activity.id','=','dtl.activity_id')
+                    ->where('cr_activity.id',$req->id)
+                    ->first();
+            $activity_id = $qry->id;
             $dtl = Activity::where('id',$activity_id)->delete();
-            $dtl = ActivityDtl::where('activity_id',$getDtl->activity_id)->delete();
+            $dtl = ActivityDtl::where('activity_id',$activity_id)->delete();
 
             $response= Adn::Response(true,"Sukses");
         }
@@ -180,7 +195,7 @@ class ActivityController extends Controller
             ->limit($limit)->get();
 
         $activityList = Activity::getActivity($dateFr,$dateTo,$salesId,'');
-        // dd($activityList->toSql());
+
         $total_records =$activityList->count();
 
         $kelas_baris_akhir ='';
@@ -189,13 +204,16 @@ class ActivityController extends Controller
             $tr .= '
             <tr ' . $kelas_baris_akhir .'>
               <input type="hidden" value="'. $row->id .'">
-              <td class="py-1">'. $row->date .'</td>
+              <td class="py-1">'. Adn::SetdmYHi($row->date) .'</td>
               <td class="py-1">'. $row->name .'</td>
               <td class="py-1">'. $row->hp .'</td>
               <td class="py-1">'. $row->action .'</td>
               <td class="py-1">'. $row->response .'</td>
               <td class="py-1">'. $row->sales .'</td>
-
+              <td class="py-1">
+                <button type="button" class="btn bg-info-transparent py-0 px-2 btn-edit" ><i class="fe fe-edit"></i></button>
+                <button type="button" class="btn bg-danger-transparent py-0 px-2 btn-delete"><i class="fe fe-x-square"></i></button>
+              </td>
             </tr>'
         ;
             $no++;
@@ -295,10 +313,16 @@ class ActivityController extends Controller
     {
         $req = $req->all();
         $activityId = 0;
+        $modeEdit   = "";
         foreach ($req as $k => $v) {
             if($k == 0) {
-                $hdr = new Activity;
-                $hdr->date          = $v["date"].' '.$v["time"];//Carbon::now()->toDateTimeString();
+                $modeEdit = $v["modeEdit"];
+                if($modeEdit=="EDIT") {
+                    $hdr = Activity::find($v["activityId"]);
+                } else {
+                    $hdr = new Activity;
+                }
+                $hdr->date          = $v["date"].' '.$v["time"]; //Carbon::now()->toDateTimeString();
                 $hdr->customer_id   = isset($v["customer"]) ? $v["customer"] : 0;
 
                 if (auth()->user()->role == 1) {
@@ -319,7 +343,11 @@ class ActivityController extends Controller
 
                 // Update Pelanggan
                 $customer = Customer::find($hdr->customer_id);
-                $customer->update(['address' => $v["address"], 'hp' => $v["hp"], 'email' => $v["email"], 'facebook' => $v["facebook"], 'instagram' => $v["instagram"]]);
+                $customer->update(['address' => $v["address"], 'hp' => $v["hp"], 'email' => $v["email"], 'facebook' => $v["facebook"], 'instagram' => $v["instagram"], 'history' => $v["history"]]);
+
+                if($modeEdit=="EDIT") {
+                    $dtl = ActivityDtl::where('activity_id',$activityId)->delete();
+                }
             } else {
                 foreach ($v as $kdtl => $vdtl) {
                     $getAction          = DB::table('cr_action')->where('name',$vdtl['action'])->first();

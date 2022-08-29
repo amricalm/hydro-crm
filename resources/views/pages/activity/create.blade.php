@@ -28,12 +28,15 @@
                                         <div class="col-md-6">
                                             <div class="form-group row row-sm mb-0">
                                                 <label class="col-md-3 form-label">Jenis Aksi</label>
-                                                <div class="col-md-9">
+                                                <div class="col-md-5">
                                                     <select name="category" id="category" class="form-select form-control  form-control-sm  mb-2" tabindex="10">
                                                         @foreach($category as $item)
                                                         <option value="{{$item->id}}">{{$item->name}}</option>
                                                         @endforeach
                                                     </select>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    {{-- <button class="btn btn-sm btn-gray btn-block" id="createNew"><i class="fe fe-plus"></i> Tambah Pelanggan</button> --}}
                                                 </div>
                                             </div>
                                         </div>
@@ -45,7 +48,7 @@
                                                         <input type="text" name="search" id="txtSearch" autocomplete="off" class="form-control  form-control-sm  mb-2" placeholder="Cari Nama, Hp, Alamat, Email, FB, IG" tabindex="13">
                                                     </div>
                                                     <div class="col-md-1 text-right">
-                                                        <button class="btn btn-sm btn-primary" id="btnSearch"><i class="fe fe-search"></i> Cari</button>
+                                                        <button class="btn btn-sm btn-info" id="btnSearch"><i class="fe fe-search"></i> Cari</button>
                                                     </div>
                                                 </div>
                                             </form>
@@ -56,7 +59,7 @@
                                         <div class="col-md-6">
                                             <div class="form-group row row-sm mb-0">
                                                 <label class="col-md-3 form-label">Tanggal</label>
-                                                <div class="col-md-5">
+                                                <div class="col-md-5" id="activityEdit">
                                                     <input type="date" name="date" id="date" autocomplete="off" class="form-control  form-control-sm  mb-2" value="{{ $date }}">
                                                 </div>
                                                 <div class="col-md-4">
@@ -109,7 +112,7 @@
                                             <div class="form-group row row-sm mb-0">
                                                 <label class="col-md-3 form-label">Riwayat</label>
                                                 <div class="col-md-9">
-                                                    <textarea type="text" name="history" id="history" rows="2" autocomplete="off" class="form-control  form-control-sm  mb-2" disabled></textarea>
+                                                    <textarea type="text" name="history" id="history" rows="2" autocomplete="off" class="form-control  form-control-sm  mb-2"></textarea>
                                                 </div>
                                             </div>
                                         </div>
@@ -126,25 +129,6 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {{-- @if($ModeEdit == "EDIT")
-                                                @foreach (var item in Model.Items)
-                                                    <tr>
-                                                        <td style="width:15%;">
-                                                            <span>Program</span>
-                                                            <input type="hidden" class="kd-prg" name="program-id[]" value="" />
-                                                        </td>
-                                                        <td>
-                                                            <span>Project</span>
-                                                            <input type="hidden" class="kd-prj" name="kd-prj[]" value="@item.KdProject" />
-                                                        </td>
-                                                        <td style="text-align: right;">@item.Qty</td>
-                                                        <td style="text-align: right;">@item.Dana.ToString("N0")</td>
-                                                        <td style="text-align: right;">@item.Jmh.ToString("N0")</td>
-                                                        <td style="text-align: center;"><a href="#" class="btn-edit" data-btn="EDIT"><img src="~/content/img/edit.gif" width="12" height="12"></a></td>
-                                                        <td style="text-align: center;"><a href="#" class="btn-hapus"><img src="~/content/img/delete.gif" width="12" height="12"></a></td>
-                                                    </tr>
-                                                @end
-                                            @endif --}}
                                             <tr class="tr_clone mh-100">
                                                 <td>
                                                     <select name="action" id="action" class="form-select form-control form-control-sm mb-2 cbo-action" tabindex="10">
@@ -177,21 +161,135 @@
     </div>
 </div>
 <!-- End Page -->
+<!--#region --- Modal -------------------------------->
+<div class="modal" tabindex="-1" id="add-modal" data-bs-backdrop="static">
+    <div class="modal-dialog modal-fullscreen bwa-modal-fullscreen">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="page-title text-primary">{{ $judul }}</h4>
+            <div class="float-right">
+                <button type="button" class="btn btn-outline-primary position-relative" id="save" tabindex="-1"><i class="fe fe-save"></i>
+                    Simpan</button>
+                <button type="button" class="btn btn-outline-danger position-relative" id="batal"><i class="fe fe-slash"></i>
+                        Batal</button>
+                <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
+            </div>
+        </div>
+        <div class="modal-body bwa-modal_body">
+            <div class="bwa-modal-container">
+                <!-- Row -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row row-sm">
+                                    <div class="col-lg-6 col-md-12">
+                                        <form id="trnadd">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="form-group row row-sm mb-0">
+                                                        <label class="col-md-3 form-label">Nama Lengkap</label>
+                                                        <div class="col-md-9" id="div-id">
+                                                            <input type="text" id="tx-name" name="name" autocomplete="off" class="form-control form-control-sm mb-2">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row row-sm mb-0">
+                                                        <label class="col-md-3 form-label">Alamat</label>
+                                                        <div class="col-md-9">
+                                                            <textarea type="text" id="tx-address" name="address" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row row-sm mb-0">
+                                                        <label class="col-md-3 form-label">HP</label>
+                                                        <div class="col-md-9">
+                                                            <input type="text" id="tx-hp" name="hp" autocomplete="off" class="form-control form-control-sm mb-2">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row row-sm mb-0">
+                                                        <label class="col-md-3 form-label">Email</label>
+                                                        <div class="col-md-9">
+                                                            <input type="text" id="tx-email" name="email" autocomplete="off" class="form-control form-control-sm mb-2">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row row-sm mb-0">
+                                                        <label class="col-md-3 form-label">Facebook</label>
+                                                        <div class="col-md-9">
+                                                            <input type="text" id="tx-facebook" name="facebook" autocomplete="off" class="form-control form-control-sm mb-2">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row row-sm mb-0">
+                                                        <label class="col-md-3 form-label">Instagram</label>
+                                                        <div class="col-md-9">
+                                                            <input type="text" id="tx-instagram" name="instagram" autocomplete="off" class="form-control form-control-sm mb-2">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row row-sm mb-0">
+                                                        <label class="col-md-3 form-label">Jenis/Tipe Produk</label>
+                                                        <div class="col-md-9">
+                                                            <textarea id="tx-history" rows="4" name="history" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row row-sm mb-0">
+                                                        <label class="col-md-3 form-label">Sales Owner</label>
+                                                        <div class="col-md-9">
+                                                            <select name="sales" id="cb-sales" class="form-select form-control form-control-sm mb-2" tabindex="10">
+                                                                @if($roleName == 'ADMIN')
+                                                                <option value="">-- Pilih Sales --</option>
+                                                                @endif
+                                                                @foreach($karyawan as $item)
+                                                                <option value="{{$item->id}}">{{$item->name}}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row row-sm mb-0">
+                                                        <label class="col-md-3 form-label">
+                                                        </label>
+                                                        <div class="col-md-9 col-auto">
+                                                            <label class="custom-control custom-checkbox">
+                                                                <input type="checkbox" class="custom-control-input" id="chk-aktif" name="aktif" tabindex="19">
+                                                                <span class="custom-control-label">Tidak Aktif</span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form><!-- END Form -->
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Row -->
+            </div>
+        </div>
+    </div>
+</div>
+<!--#endregion === Modal=== -->
 @endsection
 @section('footer')
     <script type="text/javascript">
-        var mode = 'TAMBAH';
+        var mode = '';
+        var modeEdit = '';
         var idTabel = "tbl-transaksi";
+        var barisAktifIndex = -1;
         var idxKolomAksi = 0; var idxKolomAksiDesc = 1;
         var idxKolomRespon = 2; var idxKolomResponDesc = 3;
         var idxKolomEdit = 4; var idxKolomHapus = 5;
+
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const activityId = urlParams.get('id');
 
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-        $(function() {
+        $(document).ready(function () {
+            mode = 'TAMBAH';
             $(document).ajaxStart(function() {
                 $("#ajax-loading").show();
             });
@@ -220,6 +318,10 @@
                 }
             }
             currentTime();
+
+            $('#btnSearch').on('click',function(){
+                search($('#txtSearch').val());
+            });
 
             $('#category').on("change",function(){
                 getByCategoryAction($(this).val());
@@ -275,7 +377,82 @@
 
                 $('#action').focus();
             });
+
+            if (activityId)
+            {
+                $.ajax({
+                    url:'{{ url('aktivitas/create') }}?id='+activityId,
+                    method:"POST",
+                    data:{id:activityId},
+                    success: function (data) {
+                        if (data.IsSuccess) {
+                            var Obj = data.Obj;
+                            mode = 'TAMBAH';
+                            modeEdit = 'EDIT';
+                            var activity = Obj.activity;
+                            getCustomer(activity.customer_id);
+                            getDetail(Obj.activityDtl);
+
+                            //Membuat input hidden activityid
+                            var input = document.createElement("input");
+                            input.setAttribute("type", "hidden");
+                            input.setAttribute("id", "activity");
+                            input.setAttribute("name", "activity");
+                            input.setAttribute("value", activityId);
+                            document.getElementById("activityEdit").appendChild(input);
+                        }
+                        else {
+                            showAlert('error','',"Terjadi Kesalahan: " + respon.Message);
+                        }
+                    }
+                })
+            }
         });
+
+        function getDetail(dataDtl) {
+            tbl = document.getElementById(idTabel);
+            var dataBtn = '';
+
+            $.each(dataDtl, function(key, value) {
+                var tbodi = tbl.getElementsByTagName('tbody')[0];
+                var barisBody = tbodi.getElementsByTagName('tr');
+                var row = tbodi.insertRow(barisBody.length - 1);
+
+                setBarisEdit(row, value);
+
+                var cEdit = row.insertCell(idxKolomEdit);
+                var cHapus = row.insertCell(idxKolomHapus);
+                //------------------------------------------------------------------------------------------------------
+                cEdit.style.textAlign = "center";
+                cHapus.style.textAlign = "center";
+
+                var btnEdit = document.createElement("a");
+                btnEdit.href = "#";
+                btnEdit.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    btnEditEventListener(this);
+                });
+
+                var imgEdit = document.createElement("i");
+                imgEdit.setAttribute('class', 'fa fa-pencil text-success fa-lg');
+                btnEdit.setAttribute('data-btn', 'EDIT');
+                btnEdit.setAttribute('baris', key+1);
+                btnEdit.appendChild(imgEdit);
+                cEdit.appendChild(btnEdit);
+
+                var btnHapus = document.createElement("a");
+                btnHapus.href = "#";
+                btnHapus.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    btnHapusEventListener(this);
+                });
+                var imgHapus = document.createElement("i");
+                imgHapus.setAttribute('class', 'fa fa-close text-danger fa-lg');
+                btnHapus.appendChild(imgHapus);
+                cHapus.appendChild(btnHapus);
+            });
+            $('#action').focus();
+        }
 
         $('#batal').click(function () {
             mode = 'TAMBAH';
@@ -286,6 +463,10 @@
             $('#facebook').val('');
             $('#instagram').val('');
             $('#history').val('');
+        });
+
+        $('#createNew').click(function(){
+            $('#add-modal').show();
         });
 
         function getByCategoryAction(id)
@@ -368,14 +549,12 @@
             var dataBtn = '';
             var tbl = document.getElementById(idTabel);
             if (mode == 'TAMBAH') {
-                // tbl.rows[tbl.rows.length - 2].style.display = "none";
                 setKolomBtnOk_Batal(src);
                 setBarisAktif(src.parentElement.parentElement);
 
                 mode = 'EDIT';
             } else {
                 //NON AKTIF Baris AKTIF SEBELUMNYA -----------------------------------
-
                 dataBtn = src.getAttribute('data-btn');
 
                 var kolomIdx = src.parentElement.cellIndex;
@@ -410,10 +589,10 @@
 
         function setBarisAktif(baris) {
             kolom = baris.cells[idxKolomAksi];
-            var act = $(kolom).children('.kd-act').val(); //kolom.firstChild.innerHTML;
+            var act = $(kolom).children('.kd-act').val();
             kolom.innerHTML = setAction() + '<input type="hidden" class="kd-act" ori-value="' + act + '" name="kd-act[]" value="' +act + '"/>';
 
-            cboEditAction = $('#entri-edit-action').combobox().data('combobox'); //curiga
+            cboEditAction = $('#entri-edit-action').combobox().data('combobox');
             cboEditAction.select();
             cboEditAction.$element.val(act).trigger('change');
             cboEditAction.$target.val(act).trigger('change');
@@ -421,7 +600,7 @@
             cboEditAction.selected=true;
 
             kolom = baris.cells[idxKolomRespon];
-            var res = $(kolom).children('.kd-res').val();//kolom.childNodes[1].value;
+            var res = $(kolom).children('.kd-res').val();
             kolom.innerHTML = setResponse() + '<input type="hidden" class="kd-res" ori-text="'+res+'"  ori-value="' + res + '" name="kd-prj[]" value="' +res+ '"/>';
 
             cboEditRes = $('#entri-edit-response').combobox().data('combobox');;
@@ -433,11 +612,11 @@
 
 
             kolom = baris.cells[idxKolomAksiDesc];
-            var actDesc = $(kolom).children('.kd-act-desc').val(); //kolom.innerHTML;
+            var actDesc = $(kolom).children('.kd-act-desc').val();
             kolom.innerHTML = '<textarea type="text" class="form-control input-sm entri-edit-action-desc" rows="1" tabindex = "104" name="action_desc" original-value="' + actDesc + '">' + actDesc + '</textarea>';
 
             kolom = baris.cells[idxKolomResponDesc];
-            var resDesc = $(kolom).children('.kd-res-desc').val(); //kolom.innerHTML;
+            var resDesc = $(kolom).children('.kd-res-desc').val();
             kolom.innerHTML = '<textarea type="text" class="form-control input-sm entri-edit-response-desc" rows="1" tabindex = "104" name="response_desc" original-value="' + resDesc + '">' + resDesc + '</textarea>';
         }
 
@@ -474,6 +653,28 @@
             cAksiDesc.innerHTML     = '<span>'+ document.getElementsByName('action_desc')[0].value + '</span><input type="hidden" class="kd-act-desc" name="action-id-desc[]" value="' +document.getElementsByName('action_desc')[0].value + '"/>';
             cRespon.innerHTML       = '<span>'+ document.getElementsByName('response')[0].value + '</span><input type="hidden" class="kd-res" name="response-id[]" value="' +document.getElementsByName('response')[0].value + '"/>'
             cResponDesc.innerHTML   = '<span>'+ document.getElementsByName('response_desc')[0].value + '</span><input type="hidden" class="kd-res-desc" name="response-id-desc[]" value="' +document.getElementsByName('response_desc')[0].value + '"/>';
+
+            document.getElementsByName('action')[0].value ="";
+            document.getElementById('action_desc').value = "";
+            document.getElementsByName('response')[0].value ="";
+            document.getElementById('response_desc').value = "";
+        }
+
+        function setBarisEdit(baris, dataDtl) {
+            var cAksi       = baris.insertCell(idxKolomAksi);
+            var cAksiDesc   = baris.insertCell(idxKolomAksiDesc);
+            var cRespon     = baris.insertCell(idxKolomRespon);
+            var cResponDesc = baris.insertCell(idxKolomResponDesc);
+
+            document.getElementsByName('action')[0].value = dataDtl.action_name;
+            document.getElementById('action_desc').value = dataDtl.action_desc;
+            document.getElementsByName('response')[0].value = dataDtl.response_name;
+            document.getElementById('response_desc').value = dataDtl.response_desc;
+
+            cAksi.innerHTML         = '<span>'+ document.getElementsByName('action')[0].value + '</span><input type="hidden" class="kd-act" ori-value="' +document.getElementsByName('action')[0].value+ '" name="action-id[]" value="' +document.getElementsByName('action')[0].value+ '"/>';
+            cAksiDesc.innerHTML     = '<span>'+ document.getElementsByName('action_desc')[0].value + '</span><input type="hidden" class="kd-act-desc" original-value="' +document.getElementsByName('action_desc')[0].value+ '" name="action-id[]" name="action-id-desc[]" value="' +document.getElementsByName('action_desc')[0].value + '"/>';
+            cRespon.innerHTML       = '<span>'+ document.getElementsByName('response')[0].value + '</span><input type="hidden" class="kd-res" ori-value="' +document.getElementsByName('response')[0].value+ '" name="action-id[]" name="response-id[]" value="' +document.getElementsByName('response')[0].value + '"/>'
+            cResponDesc.innerHTML   = '<span>'+ document.getElementsByName('response_desc')[0].value + '</span><input type="hidden" class="kd-res-desc" original-value="' +document.getElementsByName('response_desc')[0].value+ '" name="action-id[]" name="response-id-desc[]" value="' +document.getElementsByName('response_desc')[0].value + '"/>';
 
             document.getElementsByName('action')[0].value ="";
             document.getElementById('action_desc').value = "";
@@ -564,22 +765,17 @@
             el = kolom.firstChild;
             actDesc = el.getAttribute('original-value');
             var actDesc = actDesc;
-            kolom.innerHTML = '<span>'+ actDesc + '</span><textarea style="display:none;" class="kd-act-desc" name="action-id-desc[]" style="display:none;">' + actDesc + '</textarea>'; //actDesc;
+            kolom.innerHTML = '<span>'+ actDesc + '</span><textarea style="display:none;" class="kd-act-desc" name="action-id-desc[]" style="display:none;">' + actDesc + '</textarea>';
 
             kolom = baris.cells.item(idxKolomResponDesc);
             el = kolom.firstChild;
             resDesc = el.getAttribute('original-value');
             var resDesc = resDesc;
-            kolom.innerHTML = '<span>'+ resDesc + '</span><textarea class="kd-res-desc" name="response-id-desc[]" style="display:none;">' + resDesc + '</textarea>'; //resDesc;
+            kolom.innerHTML = '<span>'+ resDesc + '</span><textarea class="kd-res-desc" name="response-id-desc[]" style="display:none;">' + resDesc + '</textarea>';
         }
 
-        $('#btnSearch').on('click',function(){
-            search();
-        });
-
-        function search()
+        function search(search)
         {
-            search  = $('#txtSearch').val();
             if(search=='' || search==' ')
             {
                 alert('Pencarian tidak boleh kosong');
@@ -595,12 +791,8 @@
                 $("#ajax-loading").hide();
                 if(data!='')
                 {
-                    // $('#profilsiswa').hide();
                     datas = JSON.parse(data);
                     resultSearch = datas.resultSearch;
-                    // list = '';
-                    // $('#tablesiswa').DataTable().clear();
-                    // $('#tablesiswa').DataTable().destroy();
                     var $el = $("#customer");
                     $el.empty();
                     $el.append('<option value="">--- Pilih Pelanggan ---</option>');
@@ -622,15 +814,15 @@
             var action = "", response="", actionDesc = "", responseDesc="", kolomPrj, kolomProgram,
                 dtlID = 0;
 
-            var modeEdit = 'Edit',
-                date = $('#date').val(),
+            var date = $('#date').val(),
                 time = $('#time').val(),
                 customer = parseInt($('#customer').val()),
                 hp = $('#hp').val(),
                 address = $('#address').val(),
                 email = $('#email').val(),
                 facebook = $('#facebook').val(),
-                instagram = $('#instagram').val();
+                instagram = $('#instagram').val(),
+                history = $('#history').val();
 
             //--------- Validasi ---------------------------------------------//
             const frm = new FormData(document.querySelector("#trn"));
@@ -645,7 +837,7 @@
                 dataType: "json",
                 success: function (respon) {
                     if($.isEmptyObject(respon.error)) {
-                        const o = [{ModeEdit:modeEdit , date:date, time:time, customer:customer, hp:hp, address:address, email:email, facebook:facebook, instagram:instagram}];
+                        const o = [{modeEdit:modeEdit, activityId:activityId, date:date, time:time, customer:customer, hp:hp, address:address, email:email, facebook:facebook, instagram:instagram, history:history}];
 
                         baris = tbl.tBodies[0].getElementsByTagName('tr');
                         rowCount = 0;
@@ -662,13 +854,13 @@
 
 
                             var btn = baris.item(i).cells.item(idxKolomEdit).firstChild.getAttribute('data-btn');
-                            if(btn.toString().trim().toUpperCase()=="OK")
-                            {
-                                showAlert('warning','','Detail Aksi Belum Lengkap.');
-                                return false;
-                            }
+                            // if(btn.toString().trim().toUpperCase()=="OK")
+                            // {
+                            //     showAlert('warning','','Detail Aksi Belum Lengkap.');
+                            //     return false;
+                            // }
 
-                            const dtl = [{dtlID:dtlID, action:action, response:response, actionDesc:actionDesc, responseDesc:responseDesc}];
+                            const dtl = [{action:action, response:response, actionDesc:actionDesc, responseDesc:responseDesc}];
                             o.push(dtl);
                         }
 

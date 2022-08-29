@@ -39,7 +39,7 @@
             <span class="side-menu__label">Aktivitas</span><i class="angle fe fe-chevron-right"></i></a>
             <ul class="slide-menu" style="display: none;">
                 <li><a href="{{ url('aktivitas') }}" class="slide-item">Aktivitas Sales</a></li>
-                <li><a href="{{ url('penjualan') }}" class="slide-item">Penjualan</a></li>
+                {{-- <li><a href="{{ url('penjualan') }}" class="slide-item">Penjualan</a></li> --}}
             </ul>
         </li>
         @if(Auth::user()->role == 1)
