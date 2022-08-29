@@ -355,9 +355,9 @@ class ActivityController extends Controller
 
                     $dtl = new ActivityDtl;
                     $dtl->activity_id   = $activityId;
-                    $dtl->action_id     = $getAction->id;
+                    $dtl->action_id     = isset($getAction->id) ? $getAction->id : '';
                     $dtl->action_desc   = $vdtl['actionDesc'];
-                    $dtl->response_id   = $getResponse->id;
+                    $dtl->response_id   = isset($getResponse->id) ? $getResponse->id : '';
                     $dtl->response_desc = $vdtl['responseDesc'];
                     $dtl->cby           = auth()->user()->id;
                     $dtl->save();
