@@ -882,8 +882,12 @@
                                 if (respon.IsSuccess)
                                 {
                                     showAlert('success','',respon.Message);
-                                    window.location.reload();
-                                    $('.btn-simpan').prop('disabled', false);
+                                    if(respon.Mode=="EDIT") {
+                                        window.location = "{{ url('aktivitas') }}";
+                                    } else {
+                                        window.location.reload();
+                                        $('.btn-simpan').prop('disabled', false);
+                                    }
                                 }
                                 else {
                                     showAlert('error','',"Terjadi Kesalahan: " + respon.Message);

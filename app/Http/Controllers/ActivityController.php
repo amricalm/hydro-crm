@@ -364,6 +364,6 @@ class ActivityController extends Controller
                 }
             }
         }
-        return response()->json(["IsSuccess"=>true,"Message"=>"Berhasil disimpan"]);
+        return response()->json(["IsSuccess"=>true,"Message"=>"Berhasil disimpan", "Mode"=>$modeEdit]);
     }
 }
