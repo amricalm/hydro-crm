@@ -442,11 +442,12 @@
                             type: "POST",
                             success: function(msg) {
                                 if (msg.IsSuccess){
-                                    console.log(msg.Obj);
+                                    const myJSON = JSON.stringify(msg.Obj);
+                                    let obj = JSON.parse(myJSON);
                                     alert('Sukses.');
                                     $('#trn').trigger("reset");
                                     $('#cb-sales option').removeAttr("selected", "selected");
-                                    if(msg.Obj == 'EDIT') {
+                                    if(obj[0] == 'EDIT') {
                                         $('#add-modal').hide();
                                         window.location.reload();
                                     }

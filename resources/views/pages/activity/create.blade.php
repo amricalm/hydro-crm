@@ -9,7 +9,7 @@
                 <div class="card mb-0">
                     <div class="card-header">
                         <a href="{{ url('aktivitas') }}"><button type="button" class="btn btn-outline-warning position-relative"><i class="fe fe-arrow-left"></i></button></a>
-                        <h4 class="col-md-2 page-title text-primary">{{ $judul }}</h4>
+                        <h4 class="col-md-2 page-title text-primary" id="title">{{ $judul }}</h4>
                         <div class="col-md-8 text-center">
                             <div id="jam" class="page-title text-primary">0</div>
                         </div>
@@ -36,7 +36,7 @@
                                                     </select>
                                                 </div>
                                                 <div class="col-md-4">
-                                                    {{-- <button class="btn btn-sm btn-gray btn-block" id="createNew"><i class="fe fe-plus"></i> Tambah Pelanggan</button> --}}
+                                                    <a href="javascript:javascript:void(0)" class="btn btn-sm btn-gray btn-block" id="createNew"><i class="fe fe-plus"></i> Tambah Pelanggan</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -168,7 +168,7 @@
         <div class="modal-header">
           <h4 class="page-title text-primary">{{ $judul }}</h4>
             <div class="float-right">
-                <button type="button" class="btn btn-outline-primary position-relative" id="save" tabindex="-1"><i class="fe fe-save"></i>
+                <button type="button" class="btn btn-outline-primary position-relative" id="save-customer" tabindex="-1"><i class="fe fe-save"></i>
                     Simpan</button>
                 <button type="button" class="btn btn-outline-danger position-relative" id="batal"><i class="fe fe-slash"></i>
                         Batal</button>
@@ -184,7 +184,7 @@
                             <div class="card-body">
                                 <div class="row row-sm">
                                     <div class="col-lg-6 col-md-12">
-                                        <form id="trnadd">
+                                        <form id="trn-customer">
                                             <div class="card">
                                                 <div class="card-body">
                                                     <div class="form-group row row-sm mb-0">
@@ -332,6 +332,72 @@
                 getCustomer($(this).val());
             });
 
+            $('#createNew').click(function(){
+                $('#add-modal').show();
+            });
+
+            $('#save-customer').click(function(e) {
+                e.preventDefault();
+                var el = $(this);
+                el.html('...');
+
+                var kirim = true;
+                const frm = new FormData(document.querySelector("#trn-customer"));
+                const obj = Object.fromEntries(frm.entries());
+                var name = $('#tx-name').val();
+                obj.mode = mode;
+
+                $.ajax({
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    url: "{{ url('pelanggan/validation') }}",
+                    type: "POST",
+                    data: {name:name},
+                    dataType: "json",
+                    success: function (respon) {
+                        if($.isEmptyObject(respon.error)) {
+                            $.ajax({
+                                data: obj,
+                                url:  "{{ route('customer.save') }}",
+                                type: "POST",
+                                success: function(msg) {
+                                    if (msg.IsSuccess){
+                                        alert('Sukses.');
+                                        //customer terpilih
+                                        const myJSON = JSON.stringify(msg.Obj);
+                                        let obj = JSON.parse(myJSON);
+                                        var id = obj[1].id; //id customer baru
+                                        getCustomer(id);
+                                        $('#trn-customer').trigger("reset");
+                                        $('#cb-sales option').removeAttr("selected", "selected");
+                                        $('#add-modal').hide();
+                                    }else{
+                                        alert(msg.Message)
+                                    }
+                                },
+                                error: function(msg) {
+                                    console.log('Error:', msg);
+                                }
+                            }).done(function(msg){
+                                el.html('Simpan');
+                                el.removeAttr('disabled');
+                            });
+                        } else {
+                            alert('Data Belum Lengkap.');
+                            el.html('Simpan');
+                            el.removeAttr('disabled');
+                        }
+                    }
+                });
+            });
+
+            $('#btn-close').click(function () {
+                $('#add-modal').hide();
+                var frm = document.querySelector("#trn-customer");
+                frm.reset();
+                $('#cb-sales option').removeAttr("selected", "selected");
+                // jika di close maka akan memilih customer yang baru saja dibuat
+            });
+
             var tbl;
             setTabel(idTabel);
 
@@ -380,6 +446,8 @@
 
             if (activityId)
             {
+                $('#title').text('Edit {{ $judul }}');
+                $("#createNew").remove();
                 $.ajax({
                     url:'{{ url('aktivitas/create') }}?id='+activityId,
                     method:"POST",
@@ -465,9 +533,7 @@
             $('#history').val('');
         });
 
-        $('#createNew').click(function(){
-            $('#add-modal').show();
-        });
+
 
         function getByCategoryAction(id)
         {
@@ -524,7 +590,7 @@
                         var Obj = respon.Obj;
                         if(respon.ID !="")
                         {
-                            $('#customer').val(Obj.id);
+                            $('#customer').append('<option value="' + Obj.id + '" selected="selected">' + Obj.name + '</option>');
                             $('#hp').val(Obj.hp);
                             $('#address').val(Obj.address);
                             $('#email').val(Obj.email);

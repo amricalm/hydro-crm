@@ -258,7 +258,7 @@ class CustomerController extends Controller
                 );
             }
 
-            $response= Adn::Response(true,"Sukses",$req->mode);
+            $response= Adn::Response(true,"Sukses",[$req->mode,$obj]);
         }
         catch(\PDOException $e)
         {

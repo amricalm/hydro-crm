@@ -53,8 +53,6 @@ class ActivityController extends Controller
 
     public function get(Request $req)
     {
-        // $data = Activity::where('id',$req->id)->get()->toArray();
-        // return response()->json($data);
         return $this->create($req->mode);
     }
 
@@ -84,7 +82,6 @@ class ActivityController extends Controller
                                     ->leftJoin('cr_response AS res','response_id','=','res.id')
                                     ->where('act.id', $req->id)
                                     ->get();
-            //-----------------------------------------------------------------------
             $qry    = DB::table('aa_customer AS cus')->select('cus.id','cus.name')
                     ->rightJoin('cr_sales_owner AS own','cus.id','=','own.cid')
                     ->where('periode',DB::raw((int)Carbon::now()->format('Ym')));
