@@ -48,6 +48,8 @@ class SaleingController extends Controller
 
         $tampilBarisTabel  = Adn::getSysVar('TampilBarisTabel');
         Session::put('TampilBarisTabel', $tampilBarisTabel);
+        $lastPeriode   = Adn::getSysVar('LastPeriode');
+        Session::put('LastPeriode', $lastPeriode);
         return view('pages.saleing.index', $app);
     }
 
@@ -204,33 +206,6 @@ class SaleingController extends Controller
                 return response()->json($response);
             }
 
-
-            // $cus = new Customer;
-            // if ($req->mode=='EDIT')
-            // {
-            //     $cus = Customer::find($obj->customer_id);
-            // }
-            // $cus->name=$req->customer;
-            // $cus->address=$req->address;
-            // $cus->hp=$req->hp;
-            // $cus->email=$req->email;
-            // $cus->facebook=$req->facebook;
-            // $cus->instagram=$req->instagram;
-            // $cus->cby=auth()->user()->id;
-            // $cus->uby=auth()->user()->id;
-            // $cus->save();
-            // $cusid = $cus->id;
-
-            // $sal = new SalesOwner;
-            // if ($req->mode=='EDIT')
-            // {
-            //     $sal = SalesOwner::firstOrNew(['cid'=>$cusid, 'periode'=>DB::raw((int)Carbon::now()->format('Ym'))]);
-            // }
-            // $sal->periode=Carbon::now()->format('Ym');
-            // $sal->cid=$cusid;
-            // $sal->eid=$req->sales;
-            // $sal->save();
-
             $obj->date=$req->date;
             $obj->customer_id=$req->customer_id;
             $obj->product_id=$req->product;
@@ -301,7 +276,7 @@ class SaleingController extends Controller
         $app['judul']       = "Penjualan";
             $qry    = DB::table('aa_customer AS cus')->select('cus.id','cus.name')
                     ->rightJoin('cr_sales_owner AS own','cus.id','=','own.cid')
-                    ->where('periode',DB::raw((int)Carbon::now()->format('Ym')));
+                    ->where('periode',DB::raw((int)session('LastPeriode')));
             if ($this->general->role_name() == 'SALES') {
                 $qry = $qry->where('eid',auth()->user()->id);
             }
@@ -323,7 +298,7 @@ class SaleingController extends Controller
         $search             = $request->search;
         $qry = DB::table('aa_customer AS cus')
             ->rightJoin('cr_sales_owner AS own','cus.id','=','own.cid')
-            ->where('periode',DB::raw((int)Carbon::now()->format('Ym')));
+            ->where('periode',DB::raw((int)session('LastPeriode')));
 
             if ($this->general->role_name() == 'SALES') {
                 $qry = $qry->where('eid',auth()->user()->id);

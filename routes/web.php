@@ -99,7 +99,6 @@ Route::post('/aksi/delete', [ActionController::class, 'delete'])->name('action.d
 Route::post('/aksi/isExist', [ActionController::class, 'isExist'])->name('action.isExist');
 //===================== ROUTE END AKSI ===========================//
 
-
 //============================= PRODUK ============================//
 Route::get('/target-aksi', [ActionTargetController::class, 'index']);
 Route::post('/target-aksi/getTabel', [ActionTargetController::class, 'getTabel'])->name('action-target.getTabel');
@@ -109,7 +108,6 @@ Route::post('/target-aksi', [ActionTargetController::class, 'save'])->name('acti
 Route::post('/target-aksi/delete', [ActionTargetController::class, 'delete'])->name('action-target.delete');
 Route::post('/target-aksi/isExist', [ActionTargetController::class, 'isExist'])->name('action-target.isExist');
 //===================== ROUTE END PRODUK ===========================//
-
 
 //============================= RESPON ============================//
 Route::get('/respon', [ResponseController::class, 'index']);

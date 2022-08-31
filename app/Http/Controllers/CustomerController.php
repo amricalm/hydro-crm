@@ -41,10 +41,13 @@ class CustomerController extends Controller
 
         $tampilBarisTabel  = Adn::getSysVar('TampilBarisTabel');
         Session::put('TampilBarisTabel', $tampilBarisTabel);
+        $lastPeriode  = Adn::getSysVar('LastPeriode');
+        Session::put('LastPeriode', $lastPeriode);
         return view('pages.customer.index', $app);
     }
 
-    public function getTabel(Request $req){
+    public function getTabel(Request $req)
+    {
         $output ='
         <table class="table table-bordered card-table table-vcenter text-wrap" width="100%">
         <thead>
@@ -62,17 +65,18 @@ class CustomerController extends Controller
 
         $status = (trim($req->status))!='1'?0:1;
         $employe = $req->employe;
+        $search  = $req->search;
         $page = (isset($req->page))?$req->page:1;
         $limit = session('TampilBarisTabel');
         $limit_start = ($page - 1) * $limit;
         $no = $limit_start + 1;
 
         $q = DB::table('aa_customer AS cus')
-            ->selectRaw('cus.id, cus.name, cus.hp, cus.address, cus.history, pr.name AS product_name, cus.status, emp.name as sales_name')
+            ->selectRaw('cus.id, cus.name, cus.hp, cus.address, cus.history, pr.name AS product_name, cus.status, emp.id AS sales_id, emp.name as sales_name')
             ->leftJoin('cr_sales_owner AS so', function($join)
                 {
                     $join->on('cus.id', '=', 'so.cid');
-                    $join->on('so.periode', '=', DB::raw((int)Carbon::now()->format('Ym')));
+                    $join->on('so.periode', '=', DB::raw((int)session('LastPeriode')));
                 })
             ->leftJoin('aa_employe AS emp','so.eid','=','emp.id')
             ->leftJoin('cr_saleing AS sl','cus.id','=','sl.customer_id')
@@ -84,17 +88,24 @@ class CustomerController extends Controller
                     DB::table('cr_sales_owner AS so')
                     ->select('cid')
                     ->leftJoin('aa_employe AS emp','so.eid','=','emp.id')
-                    ->where('periode',DB::raw((int)Carbon::now()->format('Ym')))
+                    ->where('periode',DB::raw((int)session('LastPeriode')))
                 );
             } elseif ($employe == 999) { //Jika sales dipilh semua
                 $q =  $q->whereIn('cid',
                     DB::table('cr_sales_owner AS so')
                     ->select('cid')
                     ->leftJoin('aa_employe AS emp','so.eid','=','emp.id')
-                    ->where('periode',DB::raw((int)Carbon::now()->format('Ym')))
+                    ->where('periode',DB::raw((int)session('LastPeriode')))
                 );
             } else {
                 $q = $q->where('emp.id',$employe); //Jika sales dipilih
+            }
+
+            if($search!='') { //Jika pencarian tidak kosong
+                $q = $q->where('cus.name', 'LIKE', '%'.$search.'%')
+                        ->orWhere('cus.hp', 'LIKE', '%'.$search.'%')
+                        ->orWhere('cus.address','LIKE', '%'.$search.'%')
+                        ->orWhere('cus.history','LIKE', '%'.$search.'%');
             }
 
             $total_records = $q->count();
@@ -112,7 +123,8 @@ class CustomerController extends Controller
             $product_name = ($row->product_name!='') ? $row->product_name : '';
             $tr .= '
             <tr ' . $kelas_baris_akhir .'>
-              <input type="hidden" value="'. $row->id .'">
+              <input type="hidden" id="customer_id" value="'. $row->id .'">
+              <input type="hidden" id="sales_id" value="'. $row->sales_id .'">
               <td class="py-1">'. $no .'</td>
               <td class="py-1">'. $row->name .'</td>
               <td class="py-1">'. $row->hp .'</td>
@@ -188,7 +200,7 @@ class CustomerController extends Controller
                 ->leftJoin('cr_sales_owner AS so', function($join)
                 {
                     $join->on('aa_customer.id', '=', 'so.cid');
-                    $join->on('so.periode', '=', DB::raw((int)Carbon::now()->format('Ym')));
+                    $join->on('so.periode', '=', DB::raw((int)session('LastPeriode')));
                 })
                 ->where('aa_customer.id',$req->id)
                 ->get()
@@ -253,7 +265,7 @@ class CustomerController extends Controller
                 //Simpan Sales Owner
                 $customer_id = $obj->id;
                 $salesOwner = SalesOwner::updateOrCreate(
-                    ['periode' => Carbon::now()->format('Ym'), 'cid' => $customer_id],
+                    ['periode' => session('LastPeriode'), 'cid' => $customer_id],
                     ['eid' => $req->sales, 'cby' => auth()->user()->id, 'uby' => auth()->user()->id]
                 );
             }
@@ -274,7 +286,21 @@ class CustomerController extends Controller
     public function delete(Request $req)
     {
         try {
-            Customer::where('id',$req->id)->delete();
+            $countCustomer = SalesOwner::selectRaw('COUNT(cus.id) AS count_customer_id')
+                            ->leftJoin('aa_customer AS cus','cr_sales_owner.cid','=','cus.id')
+                            ->where('periode', session('LastPeriode'))
+                            ->where('cr_sales_owner.cid', $req->customer_id)
+                            ->groupBy('cr_sales_owner.cid')
+                            ->count();
+            if($countCustomer<=1) {
+                Customer::where('id',$req->customer_id)->delete();
+                $getSalesOwner = SalesOwner::where('cid',$req->customer_id)->get();
+                if(isset($getSalesOwner)) {
+                    SalesOwner::where('cid',$req->customer_id)->delete();
+                }
+            } else {
+                SalesOwner::where('cid',$req->customer_id)->where('eid',$req->sales_id)->delete();
+            }
             $response= Adn::Response(true,"Sukses");
         }
         catch(\PDOException $e)

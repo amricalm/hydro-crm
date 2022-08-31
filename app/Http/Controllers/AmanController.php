@@ -104,6 +104,7 @@ class AmanController extends Controller
                 $sess['UserID'] = $user[0]->nm_login;
                 $sess['UserLogin'] = $user[0]->nm_login;
                 $sess['TampilBarisTabel'] = Adn::getSysVar('TampilBarisTabel');
+                $sess['LastPeriode'] = Adn::getSysVar('LastPeriode');
                 $sess['PeriodeMulai'] = Adn::getSysVar('periode_mulai');
                 $sess['ServerPosting'] = Adn::getSysVar('ServerPosting');
                 // $sess['UserMenu'] = $semuamenu;

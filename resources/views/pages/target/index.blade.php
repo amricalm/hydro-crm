@@ -30,11 +30,11 @@
                         <div class="card mb-4">
                             <div class="card-body py-4">
                                 <div class="form-group row row-sm mb-0">
-                                    <label class="col-md-2 form-label">Kategori Aksi</label>
+                                    <label class="col-md-2 form-label">Aksi</label>
                                     <div class="col-md-4">
                                         <select name="category" id="cb-category" class="form-select form-control form-control-sm mb-2" tabindex="10">
-                                            <option value="">-- Pilih Kategori Aksi --</option>
-                                            <option value="999">-- Pilih Semua Kategori Aksi --</option>
+                                            <option value="">-- Pilih Aksi --</option>
+                                            <option value="999">-- Pilih Semua Aksi --</option>
                                             @foreach($category as $item)
                                                 <option value="{{$item->id}}">{{$item->name}}</option>
                                             @endforeach
@@ -89,10 +89,10 @@
                                             <div class="card">
                                                 <div class="card-body">
                                                     <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-3 form-label">Kategori Aksi</label>
-                                                        <div class="col-md-9">
+                                                        <label class="col-md-3 form-label">Aksi</label>
+                                                        <div class="col-md-9" id="div-id">
                                                             <select name="category" id="cb-category" class="form-select form-control form-control-sm mb-2" tabindex="10">
-                                                                <option value="">-- Pilih Kategori Aksi --</option>
+                                                                <option value="">-- Pilih Aksi --</option>
                                                                 @foreach($category as $item)
                                                                 <option value="{{$item->id}}">{{$item->name}}</option>
                                                                 @endforeach
@@ -100,21 +100,21 @@
                                                         </div>
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-3 form-label">Kode Aksi</label>
+                                                        <label class="col-md-3 form-label">Dari Tanggal</label>
                                                         <div class="col-md-9">
-                                                            <input type="text" id="tx-code" name="code" autocomplete="off" class="form-control form-control-sm mb-2">
+                                                            <input type="date" name="tglDr" id="tx-tglDr" autocomplete="off" class="form-control  form-control-sm  mb-2" value="{{ $startDate }}">
                                                         </div>
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-3 form-label">Nama Aksi</label>
-                                                        <div class="col-md-9" id="div-id">
-                                                            <input type="text" id="tx-name" name="name" autocomplete="off" class="form-control form-control-sm mb-2">
+                                                        <label class="col-md-3 form-label">Sampai Tanggal</label>
+                                                        <div class="col-md-9">
+                                                            <input type="date" name="tglSd" id="tx-tglSd" autocomplete="off" class="form-control  form-control-sm  mb-2" value="{{ $endDate }}">
                                                         </div>
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-3 form-label">Bobot(%)</label>
+                                                        <label class="col-md-3 form-label">Target</label>
                                                         <div class="col-md-9">
-                                                            <input type="number" min="0" max="100" id="tx-weight" name="weight" autocomplete="off" class="form-control form-control-sm mb-2">
+                                                            <input type="number" id="tx-target" name="target" autocomplete="off" class="form-control form-control-sm mb-2">
                                                         </div>
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
@@ -163,15 +163,16 @@
         });
         loadData(1, $('#cb-category').val());
 
-        $('#tx-name').on('change', function(){
+        $('#tx-tglDr').on('change', function(){
+            var action_id = $('#cb-category').val();
             var el = $(this);
             $.ajax({
-                url:"{{ route('action.isExist') }}",
+                url:"{{ route('action-target.isExist') }}",
                 method:"POST",
-                data:{name:el.val()},
+                data:{action_id:action_id,tglDr:el.val()},
                 success:function(data){
                     if(data==='true'){
-                        alert('Nama Aksi telah ada.');
+                        alert('Target Aksi telah ada.');
                         el.val('');
                         el.focus();
                     }
@@ -199,20 +200,21 @@
             mode = 'EDIT';
             var id = $(this).closest('tr').find('input').val();
             $.ajax({
-                url:"{{ route('action.get') }}",
+                url:"{{ route('action-target.get') }}",
                 method:"POST",
                 data:{id:id.trim()},
                 success:function(data){
                     var obj = data[0];
+                    console.log(obj.id);
                     var input = document.createElement("input");
                     input.setAttribute("type", "hidden");
                     input.setAttribute("name", "id");
                     input.setAttribute("value", obj.id);
                     document.getElementById("div-id").appendChild(input);
-                    $('#cb-category option[value="'+obj.category_id+'"]').attr("selected", "selected");
-                    $('#tx-code').val(obj.code);
-                    $('#tx-name').val(obj.name);
-                    $('#tx-weight').val(obj.weight);
+                    $('#cb-category option[value="'+obj.action_id+'"]').attr("selected", "selected");
+                    $('#tx-tglDr').val(obj.start_date);
+                    $('#tx-tglSd').val(obj.end_date);
+                    $('#tx-target').val(obj.target);
                     $('#tx-desc').val(obj.desc);
                 }
             })
@@ -227,8 +229,7 @@
         });
 
         $('#add-modal').on('shown.bs.modal', function (e) {
-            //AktivasiTab();
-            $('#tx-name').focus();
+            $('#cb-category').focus();
         });
 
         $('#btn-close').click(function () {
@@ -255,20 +256,20 @@
             var kirim = true;
             const frm = new FormData(document.querySelector("#trn"));
             const obj = Object.fromEntries(frm.entries());
-            var name = $('#tx-name').val();
+            var tglDr = $('#tx-tglDr').val();
             obj.mode = mode;
 
             $.ajax({
                 headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                url: "{{ url('aksi/validation') }}",
+                url: "{{ url('target-aksi/validation') }}",
                 type: "POST",
-                data: {name:name},
+                data: {tglDr:tglDr},
                 dataType: "json",
                 success: function (respon) {
                     if($.isEmptyObject(respon.error)) {
                         $.ajax({
                             data: obj,
-                            url:  "{{ route('action.save') }}",
+                            url:  "{{ route('action-target.save') }}",
                             type: "POST",
                             success: function(msg) {
                                 if (msg.IsSuccess){
@@ -304,7 +305,7 @@
 
 function loadData(page,category){
     $.ajax({
-        url:"{{ route('action.getTabel') }}",
+        url:"{{ route('action-target.getTabel') }}",
         method:"POST",
         data:{page:page, category:category},
         success:function(data){
@@ -327,7 +328,7 @@ function checkdelete(id,el)
         }).then((result) => {
         if (result.value) {
             $.ajax({
-                url:"{{route('action.delete') }}",
+                url:"{{route('action-target.delete') }}",
                 method:"POST",
                 data:{id:id},
                 success:function(data){

@@ -26,6 +26,11 @@ class Adn{
         return $result;
     }
 
+    public static function SetdmY($aDate) {
+        $result = Date("d/m/Y",strtotime($aDate));
+        return $result;
+    }
+
     public static function setTglSd($aStrDate){
         $result =Date('Y-m-d', strtotime($aStrDate. ' + 1 days'));
         return $result;

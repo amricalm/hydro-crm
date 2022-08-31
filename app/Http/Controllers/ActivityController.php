@@ -48,6 +48,8 @@ class ActivityController extends Controller
 
         $tampilBarisTabel   = Adn::getSysVar('TampilBarisTabel');
         Session::put('TampilBarisTabel', $tampilBarisTabel);
+        $lastPeriode   = Adn::getSysVar('LastPeriode');
+        Session::put('LastPeriode', $lastPeriode);
         return view('pages.activity.sales', $app);
     }
 
@@ -68,7 +70,7 @@ class ActivityController extends Controller
         if(!isset($req->id)) { //add
             $qry    = DB::table('aa_customer AS cus')->select('cus.id','cus.name')
                     ->rightJoin('cr_sales_owner AS own','cus.id','=','own.cid')
-                    ->where('periode',DB::raw((int)Carbon::now()->format('Ym')));
+                    ->where('periode',DB::raw((int)session('LastPeriode')));
             if ($this->general->role_name() == 'SALES') {
                 $qry = $qry->where('eid',auth()->user()->id);
             }
@@ -84,7 +86,7 @@ class ActivityController extends Controller
                                     ->get();
             $qry    = DB::table('aa_customer AS cus')->select('cus.id','cus.name')
                     ->rightJoin('cr_sales_owner AS own','cus.id','=','own.cid')
-                    ->where('periode',DB::raw((int)Carbon::now()->format('Ym')));
+                    ->where('periode',DB::raw((int)session('LastPeriode')));
             if ($this->general->role_name() == 'SALES') {
                 $qry = $qry->where('eid',auth()->user()->id);
             }
@@ -274,7 +276,7 @@ class ActivityController extends Controller
         $search             = $request->search;
         $qry = DB::table('aa_customer AS cus')
             ->rightJoin('cr_sales_owner AS own','cus.id','=','own.cid')
-            ->where('periode',DB::raw((int)Carbon::now()->format('Ym')));
+            ->where('periode',DB::raw((int)session('LastPeriode')));
 
             if ($this->general->role_name() == 'SALES') {
                 $qry = $qry->where('eid',auth()->user()->id);
@@ -326,7 +328,7 @@ class ActivityController extends Controller
                     $eid = Employe::select('aa_employe.id')
                             ->leftJoin('cr_sales_owner','aa_employe.id','=','cr_sales_owner.eid')
                             ->rightJoin('aa_customer','cr_sales_owner.cid','=','aa_customer.id')
-                            ->where('periode',DB::raw((int)Carbon::now()->format('Ym')))
+                            ->where('periode',DB::raw((int)session('LastPeriode')))
                             ->where('aa_customer.id',$hdr->customer_id)
                             ->first();
                     $hdr->sales_id      = !empty($eid) ? $eid->id : auth()->user()->eid;

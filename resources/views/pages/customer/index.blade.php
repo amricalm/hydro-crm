@@ -54,6 +54,12 @@
                                         <button type="button" id="tampil" class="btn btn-sm btn-primary"><i class="fe fe-search"></i>Tampil</button>
                                     </div>
                                 </div>
+                                <div class="form-group row row-sm mb-0">
+                                    <label class="col-md-1 form-label">Cari</label>
+                                    <div class="col-md-7">
+                                        <input type="text" id="tx-search" name="search" autocomplete="off" class="form-control form-control-sm mb-2">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="card">
@@ -308,7 +314,7 @@
         $(document).ajaxStop(function() {
             $("#ajax-loading").hide();
         });
-        loadData(1,$('#pilih-status').val(), $('#cb-sales').val());
+        loadData(1,$('#pilih-status').val(), $('#cb-sales').val(), $('#tx-search').val());
 
         $('#tx-name').on('change', function(){
             var el = $(this);
@@ -330,13 +336,15 @@
            var page = $(this).attr("id");
            var status = $('#pilih-status').val();
            var employe = $('#cb-sales').val();
-           loadData(page,status,employe);
+           var search = $('#tx-search').val();
+           loadData(page,status,employe,search);
         });
 
         $('#tampil').click(function () {
            var status = $('#pilih-status').val();
            var employe = $('#cb-sales').val();
-           loadData(1,status,employe);
+           var search = $('#tx-search').val();
+           loadData(1,status,employe,search);
         });
 
         $('#createNew').click(function(){
@@ -379,8 +387,9 @@
         });
 
         $(document).on('click','.btn-delete',function(){
-            var id = $(this).closest('tr').find('input').val();
-            checkdelete(id.trim(),$(this));
+            var customer_id = $(this).closest('tr').find('#customer_id').val();
+            var sales_id = $(this).closest('tr').find('#sales_id').val();
+            checkdelete(customer_id.trim(),sales_id.trim(),$(this));
         });
 
         $('#add-modal').on('shown.bs.modal', function (e) {
@@ -395,14 +404,16 @@
             $('#cb-sales option').removeAttr("selected", "selected");
             var status = $('#pilih-status').val();
             var employe = $('#cb-sales').val();
-            loadData(1,status,employe);
+            var search = $('#tx-search').val();
+            loadData(1,status,employe,search);
         });
 
         $('#btn-close-import').click(function () {
             $('#modalImport').hide();
             var status = $('#pilih-status').val();
             var employe = $('#cb-sales').val();
-            loadData(1,status,employe);
+            var search = $('#tx-search').val();
+            loadData(1,status,employe,search);
         });
 
         $('#batal').click(function () {
@@ -500,18 +511,18 @@
     });
 
 
-function loadData(page,status,employe){
+function loadData(page,status,employe,search){
     $.ajax({
         url:"{{ route('pelanggan.getTabel') }}",
         method:"POST",
-        data:{page:page, status:status, employe:employe},
+        data:{page:page, status:status, employe:employe, search:search},
         success:function(data){
             $('#tbl').html(data);
         }
     })
 }
 
-function checkdelete(id,el)
+function checkdelete(customer_id,sales_id,el)
 {
     Swal.fire({
         title: 'Yakin?',
@@ -527,7 +538,7 @@ function checkdelete(id,el)
             $.ajax({
                 url:"{{route('customer.delete') }}",
                 method:"POST",
-                data:{id:id},
+                data:{customer_id:customer_id,sales_id:sales_id},
                 success:function(data){
                     if(data.Message=='Sukses')
                     {

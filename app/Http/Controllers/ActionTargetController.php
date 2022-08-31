@@ -6,14 +6,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
-use App\Models\CategoryAction;
+use App\Models\ActionTarget;
 use App\Models\Action;
 use App\SmartSystem\General;
 use Carbon\Carbon;
 use Validator;
 use App\Adn;
 
-class ActionController extends Controller
+class ActionTargetController extends Controller
 {
     public function __construct()
     {
@@ -26,12 +26,14 @@ class ActionController extends Controller
 
     public function index(Request $req)
     {
-        $app['judul']       = "Aksi";
-        $app['category']    = CategoryAction::all();
+        $app['judul']       = "Target Aksi";
+        $app['category']    = Action::all();
+        $app['startDate']   = (isset($_GET['tglDr'])&&$_GET['tglDr']!='') ? $_GET['tglDr'] : ((!isset($_GET['tglDr'])) ? Carbon::now()->format('Y-m-d') : '');
+        $app['endDate']     = (isset($_GET['tglSd'])&&$_GET['tglSd']!='') ? $_GET['tglSd'] : ((!isset($_GET['tglDr'])) ? Carbon::now()->format('Y-m-d') : '');
 
         $tampilBarisTabel  = Adn::getSysVar('TampilBarisTabel');
         Session::put('TampilBarisTabel', $tampilBarisTabel);
-        return view('pages.action.index', $app);
+        return view('pages.target.index', $app);
     }
 
     public function getTabel(Request $req){
@@ -40,10 +42,10 @@ class ActionController extends Controller
         <thead>
           <tr class="border-top">
             <th class="py-2" width="5%">#</th>
-            <th class="py-2">Kategori</th>
-            <th class="py-2">Kode</th>
+            <th class="py-2">Dari Tanggal</th>
+            <th class="py-2">Sampai Tanggal</th>
             <th class="py-2">Nama Aksi</th>
-            <th class="py-2">weight(%)</th>
+            <th class="py-2">Target</th>
             <th class="py-2">Keterangan</th>
         ';
         $output .='<th class="py-2" colspan="2" width="5%"></th>
@@ -57,11 +59,11 @@ class ActionController extends Controller
         $no = $limit_start + 1;
 
         $category = $req->category;
-        $q = DB::table('cr_action');
+        $q = DB::table('cr_action_target');
         if($category == '') { //Jika tidak dipilih
-            $q = $q->whereNull('category_id');
+            $q = $q->whereNull('action_id');
         } elseif ($category != '' && $category != 999) { //Jika dipilh
-            $q = $q->where('category_id',$category);
+            $q = $q->where('action_id',$category);
         }
 
         $total_records = $q->count();
@@ -72,16 +74,16 @@ class ActionController extends Controller
         $kelas_baris_akhir ='';
         $tr = '';
         foreach ($q as $row) {
-            $getCategory = (!empty($row->category_id)) ? CategoryAction::where('id', $row->category_id)->first() : '';
+            $getCategory = (!empty($row->action_id)) ? Action::select('name')->where('id', $row->action_id)->first() : '';
             $setNameType = !empty($getCategory) ? $getCategory->name : '';
             $tr .= '
             <tr ' . $kelas_baris_akhir .'>
               <input type="hidden" value="'. $row->id .'">
               <td class="py-1">'. $no .'</td>
+              <td class="py-1">'. Adn::SetdmY($row->start_date) .'</td>
+              <td class="py-1">'. Adn::SetdmY($row->end_date) .'</td>
               <td class="py-1">'. $setNameType .'</td>
-              <td class="py-1">'. $row->code .'</td>
-              <td class="py-1">'. $row->name .'</td>
-              <td class="py-1">'. $row->weight .'</td>
+              <td class="py-1">'. $row->target .'</td>
               <td class="py-1">'. $row->desc .'</td>
             ';
             $tr .= '<td class="py-1">
@@ -147,9 +149,9 @@ class ActionController extends Controller
 
     public function get(Request $req)
     {
-        $data = Action::selectRaw('cr_action.*, pt.name as category_name')
-                ->leftJoin('rf_category_action AS pt','pt.id', '=', 'cr_action.category_id')
-                ->where('cr_action.id',$req->id)
+        $data = ActionTarget::selectRaw('cr_action_target.*, pt.name as category_name')
+                ->leftJoin('cr_action AS pt','pt.id', '=', 'cr_action_target.action_id')
+                ->where('cr_action_target.id',$req->id)
                 ->get()->toArray();
         return response()->json($data);
     }
@@ -157,7 +159,7 @@ class ActionController extends Controller
     public static function validation(Request $req)
     {
         $validator = Validator::make($req->all(), [
-            'name' => 'required',
+            'tglDr' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -170,7 +172,8 @@ class ActionController extends Controller
     public function isExist(Request $req)
     {
         $result =false;
-        $q = Action::where('name','=',$req->name)->get();
+        $q = ActionTarget::whereBetween(DB::raw($req->tglDr), ['start_date', 'end_date'])
+            ->where('action_id',$req->action_id)->get();
         if($q->count()>0)
         {
             $result = true;
@@ -181,21 +184,20 @@ class ActionController extends Controller
     public function save(Request $req)
     {
         try {
-            //Simpan Aksi
-            $obj = new Action;
+            $obj = new ActionTarget;
             if ($req->mode=='EDIT')
             {
-                $obj = Action::find($req->id);
+                $obj = ActionTarget::find($req->id);
             }
             if($obj==null){
-                $response= Adn::Response(false,"Data Aksi Tidak Ditemukan.");
+                $response= Adn::Response(false,"Data Target Aksi Tidak Ditemukan.");
                 return response()->json($response);
             }
 
-            $obj->category_id=$req->category;
-            $obj->code=$req->code;
-            $obj->name=$req->name;
-            $obj->weight=$req->weight;
+            $obj->action_id=$req->category;
+            $obj->start_date=$req->tglDr;
+            $obj->end_date=$req->tglSd;
+            $obj->target=$req->target;
             $obj->desc=$req->desc;
             if ($req->mode=='EDIT') {
                 $obj->uby=auth()->user()->id;
@@ -220,7 +222,7 @@ class ActionController extends Controller
     public function delete(Request $req)
     {
         try {
-            Action::where('id',$req->id)->delete();
+            ActionTarget::where('id',$req->id)->delete();
             $response= Adn::Response(true,"Sukses");
         }
         catch(\PDOException $e)

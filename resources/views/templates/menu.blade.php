@@ -29,6 +29,7 @@
                 <li><a href="{{ url('produk') }}" class="slide-item">Produk</a></li>
                 <li><a href="{{ url('jenis-produk') }}" class="slide-item">Kategori Produk</a></li>
                 <li><a href="{{ url('aksi') }}" class="slide-item">Aksi</a></li>
+                <li><a href="{{ url('target-aksi') }}" class="slide-item">Target Aksi</a></li>
                 <li><a href="{{ url('respon') }}" class="slide-item">Respon</a></li>
             </ul>
         </li>
