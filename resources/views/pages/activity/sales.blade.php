@@ -19,7 +19,8 @@
                     </div>
                     <div class="page-rightheader">
                         <div class="btn-list">
-                            <a href="{{ route('activity.create') }}" id="createNew" class="btn btn-outline-primary" ><i class="fe fe-plus-square"></i>Tambah</a>
+                            <button class="btn btn-sm btn-success" id="btnExport"><i class="fa fa-file-excel-o"></i> Download</button>
+                            <a href="{{ route('activity.create') }}" id="createNew" class="btn btn-outline-primary" ><i class="fe fe-plus-square"></i> Tambah</a>
                         </div>
                     </div>
                 </div>
@@ -53,7 +54,7 @@
                                 @endif
                                 <div class="form-group row row-sm">
                                         <div class="col-md-8 text-right">
-                                        <button class="btn btn-sm btn-primary" id="tampil"><i class="fe fe-search"></i>Tampil</button>
+                                        <button class="btn btn-sm btn-primary" id="tampil"><i class="fe fe-search"></i> Tampil</button>
                                     </div>
                                 </div>
                             </div>
@@ -109,6 +110,10 @@
            var tglSd = $('#tglSd').val();
            var salesId = $('#salesId').val();
            loadData(1,tglDr,tglSd,salesId);
+        });
+
+        $('#btnExport').on('click',function(){
+            exportReportDtl($('#salesId').val(), $('#tglDr').val(), $('#tglSd').val());
         });
 
         $(document).on('click','.btn-edit',function(){
@@ -177,6 +182,14 @@ function checkdelete(id,el)
 
         }
     })
+}
+
+function exportReportDtl(salesId,startDate,endDate)
+{
+    var url = '{{ url('aktivitas/export-report-dtl') }}?tglDr='+startDate+'&tglSd='+endDate+'&salesId='+salesId;
+    $.get(url,function(data){
+        window.open(url, '_blank');
+    });
 }
 
 </script>

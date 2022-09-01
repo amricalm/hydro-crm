@@ -26,6 +26,16 @@ class AllExport implements FromView
                 return view('pages.customer.export_employe',$datas);
                 break;
 
+            case 'daily-report':
+                unset($datas['type']);
+                return view('pages.report.export_daily_report',$datas);
+                break;
+
+            case 'report-dtl':
+                unset($datas['type']);
+                return view('pages.report.export_report_dtl',$datas);
+                break;
+
             default:
                 break;
         }

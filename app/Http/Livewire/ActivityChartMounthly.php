@@ -16,10 +16,10 @@ class ActivityChartMounthly extends Component
             $data['data'][] = (int) $rows->sales_id;
         }
         $this->activity = json_encode($data);
+        // dd($this->activity);
     }
-
     public function render()
     {
-        return view('livewire.activity-chart-mounthly');
+        return view('livewire.activity-chart-mounthly')->extends('pages.dashboard')->section('body');
     }
 }

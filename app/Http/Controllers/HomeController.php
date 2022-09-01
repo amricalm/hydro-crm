@@ -26,7 +26,7 @@ class HomeController extends Controller
         $app['roleName']    = $this->general->role_name();
         $app['sales']       = DB::table('aa_employe')->get()->toArray();
         $app['startDate']   = (isset($_GET['tglDr'])&&$_GET['tglDr']!='') ? $_GET['tglDr'] : ((!isset($_GET['tglDr'])) ? Carbon::now()->format('Y-m-d') : '');
-        $app['endDate']     = (isset($_GET['tglSd'])&&$_GET['tglSd']!='') ? $_GET['tglSd'] : ((!isset($_GET['tglDr'])) ? Carbon::now()->format('Y-m-d') : '');
+        $app['endDate']     = (isset($_GET['tglSd'])&&$_GET['tglSd']!='') ? $_GET['tglSd'] : ((!isset($_GET['tglSd'])) ? Carbon::now()->format('Y-m-d') : '');
         $startDate          = $app['startDate'];
         $endDate            = $app['endDate'];
         $nowDate            = Carbon::now()->format('Y-m-d');
@@ -66,8 +66,8 @@ class HomeController extends Controller
                             ->select('a.id','a.name')
                             ->get();
         $timeRange = Activity::getTimeRange($app['salesId'], $startDate,$endDate);
-        $timeRangeMin = $timeRange->min>9 ? 9 : $timeRange->min;
-        $timeRangeMax = $timeRange->max<16 ? 16 : $timeRange->max;
+        $timeRangeMin = ($timeRange->min=='' || $timeRange->min>9) ? 9 : $timeRange->min;
+        $timeRangeMax = ($timeRange->max=='' || $timeRange->max<16) ? 16 : $timeRange->max;
         $app['timeRange'] = ['min'=>$timeRangeMin,'max'=>$timeRangeMax];
 
         $app['dailyReport'] = Activity::getDailyReport($app['salesId'], $startDate,$endDate);

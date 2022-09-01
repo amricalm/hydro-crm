@@ -24,33 +24,33 @@
                     <div class="row">
                         <div class="col-xl-12 col-lg-12 col-md-12">
                             <form>
-                            <div class="form-group row row-sm">
-                                <label class="col-md-2 form-label">Tanggal</label>
-                                <div class="col-md-3">
-                                    <input type="date" name="tglDr" id="tglDr" autocomplete="off" class="form-control  form-control-sm  mb-2" value="{{ $startDate }}">
-                                </div>
-                                <div class="col-md-3">
-                                    <input type="date" name="tglSd" id="tglSd" autocomplete="off" class="form-control  form-control-sm  mb-2" value="{{ $endDate }}">
-                                </div>
-                            </div>
-                            @if ($roleName == 'ADMIN')
-                                <div class="form-group row row-sm mb-0">
-                                    <label class="col-md-2 form-label">Sales</label>
-                                    <div class="col-md-6">
-                                        <select name="salesId" id="salesId" class="form-select form-control form-control-sm  mb-2" tabindex="10">
-                                            <option value="">-- Pilih Sales --</option>
-                                            @foreach($sales as $item)
-                                                <option value="{{$item->id}}" {{ $item->id == $salesId ? 'selected' : ''  }}>{{$item->name}}</option>
-                                            @endforeach
-                                        </select>
+                                <div class="form-group row row-sm">
+                                    <label class="col-md-2 form-label">Tanggal</label>
+                                    <div class="col-md-3">
+                                        <input type="date" name="tglDr" id="tglDr" autocomplete="off" class="form-control  form-control-sm  mb-2" value="{{ $startDate }}">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="date" name="tglSd" id="tglSd" autocomplete="off" class="form-control  form-control-sm  mb-2" value="{{ $endDate }}">
                                     </div>
                                 </div>
-                            @endif
-                            <div class="form-group row row-sm">
+                                @if ($roleName == 'ADMIN')
+                                    <div class="form-group row row-sm mb-0">
+                                        <label class="col-md-2 form-label">Sales</label>
+                                        <div class="col-md-6">
+                                            <select name="salesId" id="salesId" class="form-select form-control form-control-sm  mb-2" tabindex="10">
+                                                <option value="">-- Pilih Sales --</option>
+                                                @foreach($sales as $item)
+                                                    <option value="{{$item->id}}" {{ $item->id == $salesId ? 'selected' : ''  }}>{{$item->name}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                @endif
+                                <div class="form-group row row-sm">
                                     <div class="col-md-8 text-right">
-                                    <button class="btn btn-sm btn-primary"><i class="fe fe-search"></i>Tampil</button>
+                                        <button class="btn btn-sm btn-primary"><i class="fe fe-search"></i>Tampil</button>
+                                    </div>
                                 </div>
-                            </div>
                             </form>
                         </div>
                     </div>
@@ -77,7 +77,7 @@
                         <div class="col-md-12 col-lg-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h3 class="card-title">Key Performance Indicator ({{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }} s/d {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }})</h3>
+                                    <h3 class="card-title">TARGET AKTIVITAS ({{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }} s/d {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }})</h3>
                                 </div>
                                 <div class="card-body">
                                     <div class="form-group row">
@@ -115,7 +115,12 @@
                         <div class="col-xl-12 col-lg-12 col-md-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h3 class="card-title">Laporan Harian ({{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }} s/d {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }})</h3>
+                                    <h3 class="card-title">Laporan Aktivitas Harian ({{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }} s/d {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }})</h3>
+                                    @if ($salesId!='')
+                                        <div class="card-options">
+                                            <button class="btn btn-sm btn-success" onclick="exportDailyReport('{{ $salesId }}','{{ $startDate }}','{{ $endDate }}')"><i class="fa fa-file-excel-o"></i> Download</button>
+                                        </div>
+                                    @endif
                                 </div>
                                 <div class="card-body">
                                     <div class="table-responsive">
@@ -173,41 +178,96 @@
 @endsection
 @section('footer')
 <script>
-    var act = <?php json_encode($actionDaily) ?>;
-    const ctx = document.getElementById('myChart').getContext('2d');
-    const myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-            datasets: [{
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
+    function exportDailyReport(salesId,startDate,endDate)
+    {
+
+        var url = '{{ url('home/export-daily-report') }}?tglDr='+startDate+'&tglSd='+endDate+'&salesId='+salesId;
+        $.get(url,function(data){
+            window.open(url, '_blank');
+        });
+    }
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
+    $(document).ready(function () {
+        // $('#tampil').click(function () {
+        //     var url = '{{ url('aktivitas') }}';
+        //     $.get(url,function(){
+        //         window.open(url);
+        //     });
+        //    var tglDr = $('#tglDr').val();
+        //    var tglSd = $('#tglSd').val();
+        //    var salesId = $('#salesId').val();
+        //    loadData(1,tglDr,tglSd,salesId);
+        // });
+
+
+
+        // $.ajax({
+        //     headers: {_token:'{{ csrf_token() }}'},
+        //     url: "{{ url('activity-chart-mounthly') }}",
+        //     type: "POST",
+        //     dataType: "json",
+        //     success: function (data) {
+        //         getActivityChartMounthly(data);
+        //     },
+        //     error: function() {
+        //         console.log("error");
+        //     }
+        // });
+    });
+
+    function loadData(page,tglDr,tglSd,salesId){
+        $.ajax({
+            url:"{{ url('aktivitas/getTabel') }}",
+            method:"POST",
+            data:{page:page, tglDr:tglDr, tglSd:tglSd, salesId:salesId},
+            success:function(data){
+                $('#tbl').html(data);
+            }
+        })
+    }
+
+    function getActivityChartMounthly(data)
+    {
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                datasets: [{
+                    label: '# of Votes',
+                    data: [12, 19, 3, 5, 2, 3],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
 </script>
 @endsection

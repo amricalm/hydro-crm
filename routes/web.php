@@ -17,6 +17,9 @@ use App\Http\Controllers\ResponseController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\SaleingController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\ExportController;
+use App\Http\Livewire\ActivityChartMounthly;
+use App\Http\Controllers\DailyReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,6 +47,8 @@ Route::post('aman/validasi', [AmanController::class, 'validasi']);
 
 //===================== ROUTE DASHBOARD ===========================//
 Route::get('/home', [HomeController::class, 'index'])->name('home');
+Route::get('home/export-daily-report',[ExportController::class, 'dailyReport']);
+// Route::post('activity-chart-mounthly', ActivityChartMounthly::class);
 //===================== ROUTE END DASHBOARD ===========================//
 
 //============================= KARYAWAN ============================//
@@ -119,7 +124,6 @@ Route::post('/respon/delete', [ResponseController::class, 'delete'])->name('resp
 Route::post('/respon/isExist', [ResponseController::class, 'isExist'])->name('response.isExist');
 //===================== ROUTE END RESPON ===========================//
 
-
 //============================= PELANGGAN ============================//
 Route::get('/aktivitas', [ActivityController::class, 'index']);
 Route::post('/aktivitas/getTabel', [ActivityController::class, 'getTabel'])->name('activity.getTabel');
@@ -132,6 +136,7 @@ Route::post('/aktivitas/create', [ActivityController::class, 'create']);
 Route::post('/aktivitas/search', [ActivityController::class, 'search']);
 Route::post('/aktivitas/validation', [ActivityController::class, 'validation']);
 Route::post('/aktivitas/save', [ActivityController::class, 'save']);
+Route::get('/aktivitas/export-report-dtl',[ExportController::class, 'reportDtl']);
 //===================== ROUTE END PELANGGAN ===========================//
 
 //============================= PENJUALAN ============================//

@@ -1,3 +1,7 @@
 <div>
-    <canvas id="myChart" width="400" height="400"></canvas>
+    <canvas id="myChart"></canvas>
+    <script>
+        var chartData = JSON.parse('<?php echo $activity ?>');
+        console.log(chartData);
+    </script>
 </div>
