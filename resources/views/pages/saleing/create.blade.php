@@ -105,7 +105,7 @@
                                             <tr>
                                                 <th style="width:24%;">Produk</th>
                                                 <th style="width:20%;">Teknisi</th>
-                                                <th style="width:20%;">Sales</th>
+                                                <th style="width:20%;">CRO</th>
                                                 <th style="width:20%;">Keterangan</th>
                                                 <th style="width:12%;">Harga</th>
                                                 <th colspan="2" style="width:4%;"></th>
@@ -131,7 +131,7 @@
                                                 </td>
                                                 <td class="text-right">
                                                     <select name="sales" id="sales" class="form-select form-control form-control-sm mb-2 cbo-sales" tabindex="10">
-                                                        <option value="">--- Pilih Sales ---</option>
+                                                        <option value="">--- Pilih CRO ---</option>
                                                         @foreach($sales as $item)
                                                             <option value="{{$item->name}}">{{$item->name}}</option>
                                                         @endforeach

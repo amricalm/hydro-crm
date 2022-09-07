@@ -7,7 +7,7 @@
             <th>Hp</th>
             <th>Aksi</th>
             <th>Respon</th>
-            <th>Sales</th>
+            <th>CRO</th>
         </tr>
     </thead>
         <tbody>

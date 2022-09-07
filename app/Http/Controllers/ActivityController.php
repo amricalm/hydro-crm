@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\Activity;
 use App\Models\ActivityDtl;
-use App\Models\Address;
 use App\SmartSystem\General;
 use Carbon\Carbon;
 use App\Adn;
@@ -39,10 +38,16 @@ class ActivityController extends Controller
         $app['sales']       = DB::table('aa_employe')->get()->toArray();
         $app['startDate']   = (isset($_GET['tglDr'])&&$_GET['tglDr']!='') ? $_GET['tglDr'] : ((!isset($_GET['tglDr'])) ? Carbon::now()->format('Y-m-d') : '');
         $app['endDate']     = (isset($_GET['tglSd'])&&$_GET['tglSd']!='') ? $_GET['tglSd'] : ((!isset($_GET['tglDr'])) ? Carbon::now()->format('Y-m-d') : '');
+        $app['actionId']    = (isset($_GET['actionId'])&&$_GET['actionId']!='') ? $_GET['actionId'] : '';
+        $hour               = (isset($_GET['time'])&&$_GET['time']!='') ? $_GET['time'] : '';
+        $app['time']        = $hour!='' ? (sprintf("%02d", $hour).':00') : '';
+        // dd($hour,$app['time']);
         $app['roleName']    = $this->general->role_name();
         if ($app['roleName'] == 'ADMIN') {
+            $app['sales']   = DB::table('aa_employe')->get()->toArray();
             $app['salesId'] = (isset($_GET['salesId'])&&$_GET['salesId']!='') ? $_GET['salesId'] : '';
         } else {
+            $app['sales']   = DB::table('aa_employe')->where('id', auth()->user()->eid)->get()->toArray();
             $app['salesId'] = auth()->user()->eid;
         }
 
@@ -72,9 +77,9 @@ class ActivityController extends Controller
                     ->rightJoin('cr_sales_owner AS own','cus.id','=','own.cid')
                     ->where('periode',DB::raw((int)session('LastPeriode')));
             if ($this->general->role_name() == 'SALES') {
-                $qry = $qry->where('eid',auth()->user()->id);
+                $qry = $qry->where('eid',auth()->user()->eid);
             }
-            $qry    = $qry->orderBy('cus.id','DESC')->get()->toArray();
+            $qry    = $qry->orderBy('cus.name','ASC')->get()->toArray();
 
         } else { //edit
             $app['activity']    = Activity::where('id',$req->id)->first();
@@ -88,9 +93,9 @@ class ActivityController extends Controller
                     ->rightJoin('cr_sales_owner AS own','cus.id','=','own.cid')
                     ->where('periode',DB::raw((int)session('LastPeriode')));
             if ($this->general->role_name() == 'SALES') {
-                $qry = $qry->where('eid',auth()->user()->id);
+                $qry = $qry->where('eid',auth()->user()->eid);
             }
-            $qry    = $qry->orderBy('cus.id','DESC')->get()->toArray();
+            $qry    = $qry->orderBy('cus.name','ASC')->get()->toArray();
 
             if($req->ajax()) {
                 return response()->json(["IsSuccess"=>true,"Obj"=>$app]);
@@ -183,17 +188,19 @@ class ActivityController extends Controller
         }
         $dateFr  = $req->tglDr;
         $dateTo  = $req->tglSd;
+        $actionId= $req->actionId;
+        $time    = $req->time;
         $page = (isset($req->page))?$req->page:1;
         $limit = session('TampilBarisTabel');
         $limit_start = ($page - 1) * $limit;
         $no = $limit_start + 1;
 
-        $q = Activity::getActivity($dateFr,$dateTo,$salesId,'');
+        $q = Activity::getActivity($dateFr,$dateTo,$salesId,'',$actionId,$time);
 
         $q = $q->offset($limit_start)
             ->limit($limit)->get();
 
-        $activityList = Activity::getActivity($dateFr,$dateTo,$salesId,'');
+        $activityList = Activity::getActivity($dateFr,$dateTo,$salesId,'',$actionId,$time);
 
         $total_records =$activityList->count();
 
@@ -279,10 +286,10 @@ class ActivityController extends Controller
             ->where('periode',DB::raw((int)session('LastPeriode')));
 
             if ($this->general->role_name() == 'SALES') {
-                $qry = $qry->where('eid',auth()->user()->id);
+                $qry = $qry->where('eid',auth()->user()->eid);
             }
 
-            $qry = $qry->where('name', 'LIKE', '%'.$search.'%')
+            $qry = $qry->where('name', 'LIKE', "%".$search."%")
             ->orWhere('hp', 'LIKE', '%'.$search.'%')
             ->orWhere('address','LIKE', '%'.$search.'%')
             ->orWhere('email','LIKE', '%'.$search.'%')
@@ -290,6 +297,7 @@ class ActivityController extends Controller
             ->orWhere('instagram','LIKE', '%'.$search.'%')
             ->select('cus.id','cus.name')
             ->get();
+
         $array = array('resultSearch'=>$qry);
         echo (count($qry)>0) ? json_encode($array) : '' ;
     }

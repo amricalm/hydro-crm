@@ -102,17 +102,19 @@ class CustomerController extends Controller
             }
 
             if($search!='') { //Jika pencarian tidak kosong
-                $q = $q->where('cus.name', 'LIKE', '%'.$search.'%')
-                        ->orWhere('cus.hp', 'LIKE', '%'.$search.'%')
-                        ->orWhere('cus.address','LIKE', '%'.$search.'%')
-                        ->orWhere('cus.history','LIKE', '%'.$search.'%');
+                $q = $q->where(function($cus) use ($search) {
+                            $cus->where('cus.name', 'LIKE', '%'.$search.'%')
+                            ->orWhere('cus.hp', 'LIKE', '%'.$search.'%')
+                            ->orWhere('cus.address','LIKE', '%'.$search.'%')
+                            ->orWhere('cus.history','LIKE', '%'.$search.'%');
+                        });
             }
 
             $total_records = $q->count();
 
             $q = $q->offset($limit_start)
                     ->limit($limit)
-                    ->orderBy('cus.id','DESC')
+                    ->orderBy('cus.name','ASC')
                     ->get();
 
         $kelas_baris_akhir ='';

@@ -230,11 +230,11 @@
                                                         </div>
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-3 form-label">Sales Owner</label>
+                                                        <label class="col-md-3 form-label">CRO Owner</label>
                                                         <div class="col-md-9">
                                                             <select name="sales" id="cb-sales" class="form-select form-control form-control-sm mb-2" tabindex="10">
                                                                 @if($roleName == 'ADMIN')
-                                                                <option value="">-- Pilih Sales --</option>
+                                                                <option value="">-- Pilih CRO --</option>
                                                                 @endif
                                                                 @foreach($karyawan as $item)
                                                                 <option value="{{$item->id}}">{{$item->name}}</option>

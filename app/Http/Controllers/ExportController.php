@@ -54,6 +54,8 @@ class ExportController extends Controller
         $app['roleName']    = $this->general->role_name();
         $startDate   = (isset($req->tglDr)&&$req->tglDr!='') ? $req->tglDr : ((!isset($req->tglDr)) ? Carbon::now()->format('Y-m-d') : '');
         $endDate     = (isset($req->tglSd)&&$req->tglSd!='') ? $req->tglSd : ((!isset($req->tglSd)) ? Carbon::now()->format('Y-m-d') : '');
+        $actionId    = $req->actionId;
+        $time        = $req->time;
         if ($app['roleName'] == 'ADMIN') {
             $app['salesId']    = (isset($req->salesId)&&$req->salesId!='') ? $req->salesId : '';
         } elseif ($app['roleName'] == 'SALES') {
@@ -63,7 +65,7 @@ class ExportController extends Controller
         $seles          = isset($getSales) ? $getSales->name : '';
 
 
-        $q = Activity::getActivity($startDate,$endDate,$app['salesId'],'')->get();
+        $q = Activity::getActivity($startDate,$endDate,$app['salesId'],'',$actionId,$time)->get();
 
         $array += array('allData'=>$q);
         return Excel::download(new AllExport($array),'Laporan-Aktivitas-Detail_'.$seles.'_'.$startDate.'_'.$endDate.'.xlsx');

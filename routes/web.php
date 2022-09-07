@@ -124,7 +124,7 @@ Route::post('/respon/delete', [ResponseController::class, 'delete'])->name('resp
 Route::post('/respon/isExist', [ResponseController::class, 'isExist'])->name('response.isExist');
 //===================== ROUTE END RESPON ===========================//
 
-//============================= PELANGGAN ============================//
+//============================= AKTIVITAS SALES ============================//
 Route::get('/aktivitas', [ActivityController::class, 'index']);
 Route::post('/aktivitas/getTabel', [ActivityController::class, 'getTabel'])->name('activity.getTabel');
 Route::post('/aktivitas/getByCategoryAction', [ActivityController::class, 'getByCategoryAction']);
@@ -137,7 +137,7 @@ Route::post('/aktivitas/search', [ActivityController::class, 'search']);
 Route::post('/aktivitas/validation', [ActivityController::class, 'validation']);
 Route::post('/aktivitas/save', [ActivityController::class, 'save']);
 Route::get('/aktivitas/export-report-dtl',[ExportController::class, 'reportDtl']);
-//===================== ROUTE END PELANGGAN ===========================//
+//===================== ROUTE END AKTIVITAS SALES ===========================//
 
 //============================= PENJUALAN ============================//
 Route::get('/penjualan', [SaleingController::class, 'index']);

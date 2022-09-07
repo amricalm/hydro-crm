@@ -24,7 +24,6 @@ class HomeController extends Controller
     {
         $app['judul']       = 'Dashboard';
         $app['roleName']    = $this->general->role_name();
-        $app['sales']       = DB::table('aa_employe')->get()->toArray();
         $app['startDate']   = (isset($_GET['tglDr'])&&$_GET['tglDr']!='') ? $_GET['tglDr'] : ((!isset($_GET['tglDr'])) ? Carbon::now()->format('Y-m-d') : '');
         $app['endDate']     = (isset($_GET['tglSd'])&&$_GET['tglSd']!='') ? $_GET['tglSd'] : ((!isset($_GET['tglSd'])) ? Carbon::now()->format('Y-m-d') : '');
         $startDate          = $app['startDate'];
@@ -32,9 +31,11 @@ class HomeController extends Controller
         $nowDate            = Carbon::now()->format('Y-m-d');
 
         if ($app['roleName'] == 'ADMIN') {
+            $app['sales']       = DB::table('aa_employe')->get()->toArray();
             $app['salesId']    = (isset($_GET['salesId'])&&$_GET['salesId']!='') ? $_GET['salesId'] : '';
         } elseif ($app['roleName'] == 'SALES') {
             $app['salesId']    = auth()->user()->eid;
+            $app['sales']       = DB::table('aa_employe')->where('id',auth()->user()->eid)->get()->toArray();
         }
         //KPI
         $app['actionKpi'] = Action::select('cr_action.id', 'cr_action.name', 'tar.target', DB::raw('COUNT(vit.sales_id) AS result'))
@@ -58,7 +59,7 @@ class HomeController extends Controller
                             ->where('cr_action.category_id', $this->general->category_action_id('KPI'))
                             ->groupBy('cr_action.id')
                             ->get();
-                            // dd($app['actionKpi']);
+
         //Laporan Harian
         $app['actionDaily'] = DB::table('cr_action AS a')
                             ->leftJoin('rf_category_action as ca','category_id','=','ca.id')

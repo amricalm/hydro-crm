@@ -38,10 +38,9 @@ class Activity extends Model
         return $q;
     }
 
-    public static function getActivity($dateFr='',$dateTo='',$salesId='',$id='')
+    public static function getActivity($dateFr='',$dateTo='',$salesId='',$id='',$actionId='',$time='')
     {
         $qrySales       = Employe::selectRaw('aa_employe.id, aa_employe.name')->leftJoin('cr_activity','aa_employe.id','=','cr_activity.sales_id')->groupBy('aa_employe.id');
-
         $q = DB::table('cr_activity_dtl AS dtl')
             ->selectRaw('act.id, act.date, cus.name AS name, cus.hp AS hp, GROUP_CONCAT(acn.name) AS action, GROUP_CONCAT(res.name) AS response, sls.name AS sales')
             ->leftJoin('cr_activity AS act','dtl.activity_id','=','act.id')
@@ -57,6 +56,14 @@ class Activity extends Model
             }
             if($dateFr!='' && $dateTo!='') {
                 $q->whereBetween(DB::raw('DATE(act.date)'), [(string)$dateFr, (string)$dateTo]);
+            }
+            if($actionId!='') {
+                $q->where('acn.id',$actionId);
+            }
+            if($time!='') {
+                $timeFr = $time.':00';
+                $timeTo = substr($time,0,2).':59:00';
+                $q->whereBetween(DB::raw('TIME(act.date)'), [(string)$timeFr, (string)$timeTo]);
             }
 
         $q = $q->groupBy('cus.name','act.id','act.date','cus.hp');

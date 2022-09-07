@@ -39,11 +39,11 @@
                                     </div>
                                 </div>
                                 <div class="form-group row row-sm mb-0">
-                                    <label class="col-md-1 form-label">Sales</label>
+                                    <label class="col-md-1 form-label">CRO</label>
                                     <div class="col-md-6">
                                         <select name="sales" id="cb-sales" class="form-select form-control form-control-sm mb-2">
                                             @if($roleName == 'ADMIN')
-                                            <option value="">-- Pilih Sales --</option>
+                                            <option value="">-- Pilih CRO --</option>
                                             @endif
                                             @foreach($karyawan as $item)
                                                 <option value="{{$item->id}}">{{$item->name}}</option>
@@ -110,7 +110,7 @@
                                                             <input type="text" id="tx-customer" name="customer" autocomplete="off" class="form-control form-control-sm mb-2">
                                                             {{-- <select name="customer" id="cb-customer" class="form-select form-control form-control-sm mb-2"> --}}
                                                                 {{-- @if($roleName == 'ADMIN') --}}
-                                                                {{-- <option value="">-- Pilih Sales --</option> --}}
+                                                                {{-- <option value="">-- Pilih CRO --</option> --}}
                                                                 {{-- @endif --}}
                                                                 {{-- @foreach($customer as $item) --}}
                                                                 {{-- <option value="{{$item->id}}">{{$item->name}}</option> --}}
@@ -153,7 +153,7 @@
                                                         <div class="col-md-9">
                                                             <select name="product" id="cb-product" class="form-select form-control form-control-sm mb-2">
                                                                 @if($roleName == 'ADMIN')
-                                                                <option value="">-- Pilih Sales --</option>
+                                                                <option value="">-- Pilih CRO --</option>
                                                                 @endif
                                                                 @foreach($product as $item)
                                                                 <option value="{{$item->id}}">{{$item->name}}</option>
@@ -175,11 +175,11 @@
                                                         </div>
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-3 form-label">Sales</label>
+                                                        <label class="col-md-3 form-label">CRO</label>
                                                         <div class="col-md-9">
                                                             <select name="sales" id="cbe-sales" class="form-select form-control form-control-sm mb-2">
                                                                 @if($roleName == 'ADMIN')
-                                                                <option value="">-- Pilih Sales --</option>
+                                                                <option value="">-- Pilih CRO --</option>
                                                                 @endif
                                                                 @foreach($karyawan as $item)
                                                                 <option value="{{$item->id}}">{{$item->name}}</option>

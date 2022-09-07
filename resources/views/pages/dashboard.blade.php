@@ -1,6 +1,7 @@
 @extends('templates.index')
 @include('templates.komponen.chart')
 @include('templates.komponen.livewire')
+@include('templates.komponen.tooltip')
 @section('body')
 <!-- Page -->
 <div class="page">
@@ -33,19 +34,19 @@
                                         <input type="date" name="tglSd" id="tglSd" autocomplete="off" class="form-control  form-control-sm  mb-2" value="{{ $endDate }}">
                                     </div>
                                 </div>
-                                @if ($roleName == 'ADMIN')
                                     <div class="form-group row row-sm mb-0">
-                                        <label class="col-md-2 form-label">Sales</label>
+                                        <label class="col-md-2 form-label">CRO</label>
                                         <div class="col-md-6">
                                             <select name="salesId" id="salesId" class="form-select form-control form-control-sm  mb-2" tabindex="10">
-                                                <option value="">-- Pilih Sales --</option>
+                                                @if ($roleName == 'ADMIN')
+                                                <option value="">-- Pilih CRO --</option>
+                                                @endif
                                                 @foreach($sales as $item)
                                                     <option value="{{$item->id}}" {{ $item->id == $salesId ? 'selected' : ''  }}>{{$item->name}}</option>
                                                 @endforeach
                                             </select>
                                         </div>
                                     </div>
-                                @endif
                                 <div class="form-group row row-sm">
                                     <div class="col-md-8 text-right">
                                         <button class="btn btn-sm btn-primary"><i class="fe fe-search"></i>Tampil</button>
@@ -60,7 +61,7 @@
                         <div class="col-md-12 col-lg-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h3 class="card-title">Aktivitas Sales Per Bulan</h3>
+                                    <h3 class="card-title">Aktivitas CRO Per Bulan</h3>
                                 </div>
                                 <div class="card-body">
                                     <div class="form-group row">
@@ -158,7 +159,10 @@
                                                                     @endforeach
                                                                 @php $total+= $tampil; @endphp
                                                             @endif
-                                                            <td class="text-center">{{ $tampil ?? '-' }}</td>
+                                                            <td id="acthour" class="text-center" data-bs-placement="right" data-bs-toggle="tooltip" data-bs-original-title="{{ $v->name }}">
+                                                                    {{ $tampil ?? '-' }}
+                                                                <p hidden>{{ $v->id }},{{ $hour }}</p>
+                                                            </td>
                                                         @endforeach
                                                         <td class="text-center fw-bold">{{ $total ?? '-' }}</td>
                                                     </tr>
@@ -178,33 +182,22 @@
 @endsection
 @section('footer')
 <script>
-    function exportDailyReport(salesId,startDate,endDate)
-    {
-
-        var url = '{{ url('home/export-daily-report') }}?tglDr='+startDate+'&tglSd='+endDate+'&salesId='+salesId;
-        $.get(url,function(data){
-            window.open(url, '_blank');
-        });
-    }
-
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
     $(document).ready(function () {
-        // $('#tampil').click(function () {
-        //     var url = '{{ url('aktivitas') }}';
-        //     $.get(url,function(){
-        //         window.open(url);
-        //     });
-        //    var tglDr = $('#tglDr').val();
-        //    var tglSd = $('#tglSd').val();
-        //    var salesId = $('#salesId').val();
-        //    loadData(1,tglDr,tglSd,salesId);
-        // });
-
-
+        $(document).on('click','#acthour',function(){
+            var tglDr = $('#tglDr').val();
+            var tglSd = $('#tglSd').val();
+            var salesId = $('#salesId').val();
+            var act = $(this).closest('td').find('p').text();
+            const acthour = act.split(",");
+            var actId = acthour[0];
+            var time  = acthour[1];
+            reportDtl(salesId,tglDr,tglSd,actId,time);
+        });
 
         // $.ajax({
         //     headers: {_token:'{{ csrf_token() }}'},
@@ -220,6 +213,23 @@
         // });
     });
 
+    function exportDailyReport(salesId,startDate,endDate)
+    {
+        var url = '{{ url('home/export-daily-report') }}?tglDr='+startDate+'&tglSd='+endDate+'&salesId='+salesId;
+        $.get(url,function(data){
+            window.open(url, '_blank');
+        });
+    }
+
+    //---------------------------------------------------
+    function reportDtl(salesId,startDate,endDate,actId,time)
+    {
+        var url = '{{ url('aktivitas') }}?tglDr='+startDate+'&tglSd='+endDate+'&salesId='+salesId+'&actionId='+actId+'&time='+time;
+        $.get(url,function(){
+            window.open(url, '_blank');
+        });
+    }
+
     function loadData(page,tglDr,tglSd,salesId){
         $.ajax({
             url:"{{ url('aktivitas/getTabel') }}",
@@ -230,6 +240,8 @@
             }
         })
     }
+    //---------------------------------------------------
+
 
     function getActivityChartMounthly(data)
     {

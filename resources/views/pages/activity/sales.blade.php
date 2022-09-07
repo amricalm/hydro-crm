@@ -32,26 +32,37 @@
                             <div class="card-body py-4">
                                 <div class="form-group row row-sm">
                                     <label class="col-md-2 form-label">Tanggal</label>
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         <input type="date" name="tglDr" id="tglDr" autocomplete="off" class="form-control  form-control-sm  mb-2" value="{{ $startDate }}">
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         <input type="date" name="tglSd" id="tglSd" autocomplete="off" class="form-control  form-control-sm  mb-2" value="{{ $endDate }}">
                                     </div>
+                                    <div class="col-md-2">
+                                        <input type="time" name="time" id="time" autocomplete="off" class="form-control  form-control-sm  mb-2" value="{{ $time ?? '' }}">
+                                    </div>
                                 </div>
-                                @if ($roleName == 'ADMIN')
                                     <div class="form-group row row-sm mb-0">
-                                        <label class="col-md-2 form-label">Sales</label>
-                                        <div class="col-md-6">
+                                        <label class="col-md-2 form-label">CRO</label>
+                                        <div class="col-md-2">
                                             <select name="salesId" id="salesId" class="form-select form-control form-control-sm  mb-2" tabindex="10">
-                                                <option value="">-- Pilih Sales --</option>
+                                                @if ($roleName == 'ADMIN')
+                                                <option value="">-- Pilih CRO --</option>
+                                                @endif
                                                 @foreach($sales as $item)
                                                     <option value="{{$item->id}}" {{ $item->id == $salesId ? 'selected' : ''  }}>{{$item->name}}</option>
                                                 @endforeach
                                             </select>
                                         </div>
+                                        <div class="col-md-4">
+                                            <select name="actionId" id="actionId" class="form-select form-control form-control-sm  mb-2" tabindex="10">
+                                                <option value="">-- Pilih Aksi --</option>
+                                                @foreach($action as $item)
+                                                    <option value="{{$item->id}}" {{ $item->id == $actionId ? 'selected' : ''  }}>{{$item->name}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                     </div>
-                                @endif
                                 <div class="form-group row row-sm">
                                         <div class="col-md-8 text-right">
                                         <button class="btn btn-sm btn-primary" id="tampil"><i class="fe fe-search"></i> Tampil</button>
@@ -94,26 +105,32 @@
         $(document).ajaxStop(function() {
             $("#ajax-loading").hide();
         });
+        console.log($('#salesId').val());
+        console.log($('#actionId').val());
 
-        loadData(1,$('#tglDr').val(), $('#tglSd').val(), $('#salesId').val());
+        loadData(1,$('#tglDr').val(), $('#tglSd').val(), $('#salesId').val(), $('#actionId').val(), $('#time').val());
 
         $(document).on('click', '.halaman', function(){
            var page = $(this).attr("id");
            var tglDr = $('#tglDr').val();
            var tglSd = $('#tglSd').val();
            var salesId = $('#salesId').val();
-           loadData(page,tglDr,tglSd,salesId);
+           var actionId = $('#actionId').val();
+           var time = $('#time').val();
+           loadData(page,tglDr,tglSd,salesId,actionId,time);
         });
 
         $('#tampil').click(function () {
            var tglDr = $('#tglDr').val();
            var tglSd = $('#tglSd').val();
            var salesId = $('#salesId').val();
-           loadData(1,tglDr,tglSd,salesId);
+           var actionId = $('#actionId').val();
+           var time = $('#time').val();
+           loadData(1,tglDr,tglSd,salesId,actionId,time);
         });
 
         $('#btnExport').on('click',function(){
-            exportReportDtl($('#salesId').val(), $('#tglDr').val(), $('#tglSd').val());
+            exportReportDtl($('#salesId').val(), $('#tglDr').val(), $('#tglSd').val(), $('#actionId').val(), $('#time').val());
         });
 
         $(document).on('click','.btn-edit',function(){
@@ -139,11 +156,14 @@
     });
 
 
-function loadData(page,tglDr,tglSd,salesId){
+function loadData(page,tglDr,tglSd,salesId,actionId,time){
+    console.log(salesId);
+    console.log(actionId);
+    console.log(time);
     $.ajax({
         url:"{{ url('aktivitas/getTabel') }}",
         method:"POST",
-        data:{page:page, tglDr:tglDr, tglSd:tglSd, salesId:salesId},
+        data:{page:page, tglDr:tglDr, tglSd:tglSd, salesId:salesId, actionId:actionId, time:time},
         success:function(data){
             $('#tbl').html(data);
         }
@@ -184,9 +204,9 @@ function checkdelete(id,el)
     })
 }
 
-function exportReportDtl(salesId,startDate,endDate)
+function exportReportDtl(salesId,startDate,endDate,actionId,time)
 {
-    var url = '{{ url('aktivitas/export-report-dtl') }}?tglDr='+startDate+'&tglSd='+endDate+'&salesId='+salesId;
+    var url = '{{ url('aktivitas/export-report-dtl') }}?tglDr='+startDate+'&tglSd='+endDate+'&salesId='+salesId+'&actionId='+actionId+'&time='+time;
     $.get(url,function(data){
         window.open(url, '_blank');
     });
