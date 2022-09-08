@@ -57,7 +57,7 @@ class CustomerController extends Controller
             <th class="py-2" width="15%">Hp</th>
             <th class="py-2">Alamat</th>
             <th class="py-2">Jenis/Tipe Produk</th>
-            <th class="py-2">Sales</th>
+            <th class="py-2">CRO</th>
             <th class="py-2" colspan="2" width="5%"></th>
           </tr>
         </thead>

@@ -63,7 +63,7 @@ class SaleingController extends Controller
             <th class="py-2">Nama Pelanggan</th>
             <th class="py-2">Produk</th>
             <th class="py-2">Teknisi</th>
-            <th class="py-2">Sales</th>
+            <th class="py-2">CRO</th>
             <th class="py-2">Harga</th>
             <th class="py-2" colspan="2" width="5%"></th>
           </tr>

@@ -175,7 +175,7 @@ class ActivityController extends Controller
             <th class="py-2">Hp</th>
             <th class="py-2">Aksi</th>
             <th class="py-2">Respon</th>
-            <th class="py-2">Sales</th>
+            <th class="py-2">CRO</th>
             <th class="py-2" colspan="2" width="5%"></th>
           </tr>
         </thead>
