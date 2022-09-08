@@ -20,6 +20,7 @@
                     <div class="page-rightheader">
                         <div class="btn-list">
                             {{-- <a href="javascript:void(0)" id="import" class="btn btn-sm btn-secondary"><i class="fe fe-download"></i> Impor dari Excel</a> --}}
+                            <button class="btn btn-sm btn-success" id="btnExport"><i class="fa fa-file-excel-o"></i> Download</button>
                             <a href="javascript:void(0)" id="createNew" class="btn btn-outline-primary" ><i class="fe fe-plus-square"></i> Tambah</a>
                         </div>
                     </div>
@@ -347,6 +348,10 @@
            loadData(1,status,employe,search);
         });
 
+        $('#btnExport').on('click',function(){
+            exportListCustomer($('#pilih-status').val(), $('#cb-sales').val(), $('#tx-search').val());
+        });
+
         $('#createNew').click(function(){
             mode = 'TAMBAH';
             $('#add-modal').show();
@@ -554,6 +559,14 @@ function checkdelete(customer_id,sales_id,el)
 
         }
     })
+}
+
+function exportListCustomer(status,salesId,search)
+{
+    var url = '{{ url('pelanggan/export-list-customer') }}?salesId='+salesId+'&status='+status+'&search='+search;
+    $.get(url,function(data){
+        window.open(url, '_blank');
+    });
 }
 
 </script>

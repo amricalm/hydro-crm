@@ -71,51 +71,15 @@ class CustomerController extends Controller
         $limit_start = ($page - 1) * $limit;
         $no = $limit_start + 1;
 
-        $q = DB::table('aa_customer AS cus')
-            ->selectRaw('cus.id, cus.name, cus.hp, cus.address, cus.history, pr.name AS product_name, cus.status, emp.id AS sales_id, emp.name as sales_name')
-            ->leftJoin('cr_sales_owner AS so', function($join)
-                {
-                    $join->on('cus.id', '=', 'so.cid');
-                    $join->on('so.periode', '=', DB::raw((int)session('LastPeriode')));
-                })
-            ->leftJoin('aa_employe AS emp','so.eid','=','emp.id')
-            ->leftJoin('cr_saleing AS sl','cus.id','=','sl.customer_id')
-            ->leftJoin('cr_product AS pr','sl.product_id','=','pr.id')
-            ->where('cus.status', $status);
+        $q = Customer::getCustomer($employe,$status,$search);
 
-            if($employe == '') { //Jika sales tidak dipilih
-                $q =  $q->whereNotIn('cus.id',
-                    DB::table('cr_sales_owner AS so')
-                    ->select('cid')
-                    ->leftJoin('aa_employe AS emp','so.eid','=','emp.id')
-                    ->where('periode',DB::raw((int)session('LastPeriode')))
-                );
-            } elseif ($employe == 999) { //Jika sales dipilh semua
-                $q =  $q->whereIn('cid',
-                    DB::table('cr_sales_owner AS so')
-                    ->select('cid')
-                    ->leftJoin('aa_employe AS emp','so.eid','=','emp.id')
-                    ->where('periode',DB::raw((int)session('LastPeriode')))
-                );
-            } else {
-                $q = $q->where('emp.id',$employe); //Jika sales dipilih
-            }
+        $q = $q->offset($limit_start)
+                ->limit($limit)
+                ->orderBy('cus.name','ASC')
+                ->get();
 
-            if($search!='') { //Jika pencarian tidak kosong
-                $q = $q->where(function($cus) use ($search) {
-                            $cus->where('cus.name', 'LIKE', '%'.$search.'%')
-                            ->orWhere('cus.hp', 'LIKE', '%'.$search.'%')
-                            ->orWhere('cus.address','LIKE', '%'.$search.'%')
-                            ->orWhere('cus.history','LIKE', '%'.$search.'%');
-                        });
-            }
-
-            $total_records = $q->count();
-
-            $q = $q->offset($limit_start)
-                    ->limit($limit)
-                    ->orderBy('cus.name','ASC')
-                    ->get();
+        $list = Customer::getCustomer($employe,$status,$search);
+        $total_records = $list->count();
 
         $kelas_baris_akhir ='';
         $tr = '';

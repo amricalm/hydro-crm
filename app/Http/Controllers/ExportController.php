@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Exports\AllExport;
 use App\Models\Activity;
+use App\Models\Customer;
 use App\Models\Employe;
 use App\SmartSystem\General;
 use Maatwebsite\Excel\Facades\Excel;
@@ -69,5 +70,33 @@ class ExportController extends Controller
 
         $array += array('allData'=>$q);
         return Excel::download(new AllExport($array),'Laporan-Aktivitas-Detail_'.$seles.'_'.$startDate.'_'.$endDate.'.xlsx');
+    }
+
+    public function listCustomer(Request $req)
+    {
+        $array = array('type'=>'list-customer');
+        $app['roleName']    = $this->general->role_name();
+        if ($app['roleName'] == 'ADMIN') {
+            $app['salesId']    = (isset($req->salesId)&&$req->salesId!='') ? $req->salesId : '';
+        } elseif ($app['roleName'] == 'SALES') {
+            $app['salesId']    = auth()->user()->eid;
+        }
+        $getSales       = Employe::select('name')->where('id', $app['salesId'])->first();
+        $seles          = isset($getSales) ? $getSales->name : '';
+
+        $q = Customer::getCustomer($req->salesId,$req->status,$req->search)->get();
+
+        $array += array('allData'=>$q);
+        return Excel::download(new AllExport($array),'Daftar-Pelanggan_'.$seles.'.xlsx');
+    }
+
+    public function listEmploye(Request $req)
+    {
+        $array = array('type'=>'list-employe');
+        $status = $req->status==1 ? 'AKTIF' : 'TIDAK AKTIF';
+        $q = Employe::where('status',$req->status)->get();
+
+        $array += array('allData'=>$q, 'status'=>$status);
+        return Excel::download(new AllExport($array),'Daftar-Karyawan_'.$status.'.xlsx');
     }
 }

@@ -59,6 +59,7 @@ Route::post('/karyawan/validation', [EmployeController::class, 'validation']);
 Route::post('/karyawan', [EmployeController::class, 'save'])->name('employe.save');
 Route::post('/karyawan/delete', [EmployeController::class, 'delete'])->name('employe.delete');
 Route::post('/karyawan/isExist', [EmployeController::class, 'isExist'])->name('employe.isExist');
+Route::get('/karyawan/export-list-employe',[ExportController::class, 'listEmploye']);
 //===================== ROUTE END KARYAWAN ===========================//
 
 //============================= PELANGGAN ============================//
@@ -72,6 +73,7 @@ Route::post('/pelanggan/delete', [CustomerController::class, 'delete'])->name('c
 Route::get('/pelanggan/export',[CustomerController::class, 'template']);
 Route::post('/pelanggan/export',[CustomerController::class, 'upload'])->name('customer.upload');
 Route::get('/karyawan/export',[CustomerController::class, 'employeList']);
+Route::get('/pelanggan/export-list-customer',[ExportController::class, 'listCustomer']);
 //===================== ROUTE END PELANGGAN ===========================//
 
 //============================= PRODUK ============================//

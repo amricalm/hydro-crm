@@ -19,6 +19,7 @@
                     </div>
                     <div class="page-rightheader">
                         <div class="btn-list">
+                            <button class="btn btn-sm btn-success" id="btnExport"><i class="fa fa-file-excel-o"></i> Download</button>
                             <a href="javascript:void(0)" id="createNew" class="btn btn-outline-primary" ><i class="fe fe-plus-square"></i>Tambah</a>
                         </div>
                     </div>
@@ -225,6 +226,10 @@
            loadData(1,status);
         });
 
+        $('#btnExport').on('click',function(){
+            exportListEmploye($('#pilih-status').val());
+        });
+
         $('#createNew').click(function(){
             mode = 'TAMBAH';
             $('#add-modal').show();
@@ -380,6 +385,14 @@ function checkdelete(id,el)
 
         }
     })
+}
+
+function exportListEmploye(status)
+{
+    var url = '{{ url('karyawan/export-list-employe') }}?status='+status;
+    $.get(url,function(data){
+        window.open(url, '_blank');
+    });
 }
 
 </script>
