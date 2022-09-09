@@ -58,6 +58,9 @@ class CustomerController extends Controller
             <th class="py-2">Alamat</th>
             <th class="py-2">Jenis/Tipe Produk</th>
             <th class="py-2">CRO</th>
+            <th class="py-2">Teknisi</th>
+            <th class="py-2">Kunjungan1</th>
+            <th class="py-2">Kunjungan2</th>
             <th class="py-2" colspan="2" width="5%"></th>
           </tr>
         </thead>
@@ -97,6 +100,9 @@ class CustomerController extends Controller
               <td class="py-1">'. $row->address .'</td>
               <td class="py-1">'. $row->history .''. $product_name .'</td>
               <td class="py-1">'. $row->sales_name .'</td>
+              <td class="py-1">'. $row->technician .'</td>
+              <td class="py-1">'. $row->maintenance1 .'</td>
+              <td class="py-1">'. $row->maintenance2 .'</td>
 
               <td class="py-1">
                     <button type="button" class="btn bg-info-transparent py-0 px-2 btn-edit"><i class="fe fe-edit"></i></button>
@@ -219,6 +225,9 @@ class CustomerController extends Controller
             $obj->facebook=$req->facebook;
             $obj->instagram=$req->instagram;
             $obj->history=$req->history;
+            $obj->technician=$req->technician;
+            $obj->maintenance1=$req->maintenance1;
+            $obj->maintenance2=$req->maintenance2;
             $obj->status=!($req->aktif);
             if ($req->mode=='EDIT') {
                 $obj->uby=auth()->user()->id;

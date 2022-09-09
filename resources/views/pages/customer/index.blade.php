@@ -161,6 +161,24 @@
                                                         </div>
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
+                                                        <label class="col-md-3 form-label">Teknisi</label>
+                                                        <div class="col-md-9">
+                                                            <textarea id="tx-technician" rows="4" name="technician" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row row-sm mb-0">
+                                                        <label class="col-md-3 form-label">Kunjungan 1</label>
+                                                        <div class="col-md-9">
+                                                            <textarea id="tx-maintenance1" rows="4" name="maintenance1" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row row-sm mb-0">
+                                                        <label class="col-md-3 form-label">Kunjungan 2</label>
+                                                        <div class="col-md-9">
+                                                            <textarea id="tx-maintenance2" rows="4" name="maintenance2" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row row-sm mb-0">
                                                         <label class="col-md-3 form-label">
                                                         </label>
                                                         <div class="col-md-9 col-auto">
@@ -383,6 +401,9 @@
                     $('#tx-instagram').val(obj.instagram);
                     $('#tx-history').val(obj.history);
                     $('#cb-sales option[value="'+obj.eid+'"]').attr("selected", "selected");
+                    $('#tx-technician').val(obj.technician);
+                    $('#tx-maintenance1').val(obj.maintenance1);
+                    $('#tx-maintenance2').val(obj.maintenance2);
                     $('#chk-aktif').prop('checked', !(Boolean(obj.status)));
                 }
             })

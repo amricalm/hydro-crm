@@ -117,6 +117,30 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group row row-sm mb-0">
+                                                <label class="col-md-3 form-label">Teknisi</label>
+                                                <div class="col-md-9">
+                                                    <textarea type="text" name="technician" id="technician" rows="2" autocomplete="off" class="form-control  form-control-sm  mb-2"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group row row-sm mb-0">
+                                                <label class="col-md-3 form-label">Kunjungan 1</label>
+                                                <div class="col-md-9">
+                                                    <textarea type="text" name="maintenance1" id="maintenance1" rows="2" autocomplete="off" class="form-control  form-control-sm  mb-2"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row row-sm mb-0">
+                                                <label class="col-md-3 form-label">Kunjungan 2</label>
+                                                <div class="col-md-9">
+                                                    <textarea type="text" name="maintenance2" id="maintenance2" rows="2" autocomplete="off" class="form-control  form-control-sm  mb-2"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <hr class="border-info mt-4 mb-4">
                                     <table class="table-sm table-condensed table-bordered small fw-bold" id="tbl-transaksi">
                                         <thead>
@@ -240,6 +264,24 @@
                                                                 <option value="{{$item->id}}">{{$item->name}}</option>
                                                                 @endforeach
                                                             </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row row-sm mb-0">
+                                                        <label class="col-md-3 form-label">Teknisi</label>
+                                                        <div class="col-md-9">
+                                                            <textarea id="tx-technician" rows="4" name="technician" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row row-sm mb-0">
+                                                        <label class="col-md-3 form-label">Kunjungan 1</label>
+                                                        <div class="col-md-9">
+                                                            <textarea id="tx-maintenance1" rows="4" name="maintenance1" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row row-sm mb-0">
+                                                        <label class="col-md-3 form-label">Kunjungan 2</label>
+                                                        <div class="col-md-9">
+                                                            <textarea id="tx-maintenance2" rows="4" name="maintenance2" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
                                                         </div>
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
@@ -531,6 +573,9 @@
             $('#facebook').val('');
             $('#instagram').val('');
             $('#history').val('');
+            $('#technician').val('');
+            $('#maintenance1').val('');
+            $('#maintenance2').val('');
         });
 
 
@@ -577,6 +622,9 @@
                 $('#facebook').val('');
                 $('#instagram').val('');
                 $('#history').val('');
+                $('#technician').val('');
+                $('#maintenance1').val('');
+                $('#maintenance2').val('');
                 return false;
             }
 
@@ -597,6 +645,9 @@
                             $('#facebook').val(Obj.facebook);
                             $('#instagram').val(Obj.instagram);
                             $('#history').val(Obj.history);
+                            $('#technician').val(Obj.technician);
+                            $('#maintenance1').val(Obj.maintenance1);
+                            $('#maintenance2').val(Obj.maintenance2);
                             $('#customer').focus();
                         }
                     }
@@ -888,7 +939,10 @@
                 email = $('#email').val(),
                 facebook = $('#facebook').val(),
                 instagram = $('#instagram').val(),
-                history = $('#history').val();
+                history = $('#history').val(),
+                technician = $('#technician').val(),
+                maintenance1 = $('#maintenance1').val(),
+                maintenance2 = $('#maintenance2').val();
 
             //--------- Validasi ---------------------------------------------//
             const frm = new FormData(document.querySelector("#trn"));
@@ -903,7 +957,7 @@
                 dataType: "json",
                 success: function (respon) {
                     if($.isEmptyObject(respon.error)) {
-                        const o = [{modeEdit:modeEdit, activityId:activityId, date:date, time:time, customer:customer, hp:hp, address:address, email:email, facebook:facebook, instagram:instagram, history:history}];
+                        const o = [{modeEdit:modeEdit, activityId:activityId, date:date, time:time, customer:customer, hp:hp, address:address, email:email, facebook:facebook, instagram:instagram, history:history, technician:technician, maintenance1:maintenance1, maintenance2:maintenance2}];
 
                         baris = tbl.tBodies[0].getElementsByTagName('tr');
                         rowCount = 0;

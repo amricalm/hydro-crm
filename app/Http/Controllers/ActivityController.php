@@ -350,7 +350,7 @@ class ActivityController extends Controller
 
                 // Update Pelanggan
                 $customer = Customer::find($hdr->customer_id);
-                $customer->update(['address' => $v["address"], 'hp' => $v["hp"], 'email' => $v["email"], 'facebook' => $v["facebook"], 'instagram' => $v["instagram"], 'history' => $v["history"]]);
+                $customer->update(['address' => $v["address"], 'hp' => $v["hp"], 'email' => $v["email"], 'facebook' => $v["facebook"], 'instagram' => $v["instagram"], 'history' => $v["history"], 'technician' => $v["technician"], 'maintenance1' => $v["maintenance1"], 'maintenance2' => $v["maintenance2"]]);
 
                 if($modeEdit=="EDIT") {
                     $dtl = ActivityDtl::where('activity_id',$activityId)->delete();
