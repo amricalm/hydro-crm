@@ -43,7 +43,6 @@ class ActionController extends Controller
             <th class="py-2">Kategori</th>
             <th class="py-2">Kode</th>
             <th class="py-2">Nama Aksi</th>
-            <th class="py-2">weight(%)</th>
             <th class="py-2">Keterangan</th>
         ';
         $output .='<th class="py-2" colspan="2" width="5%"></th>
@@ -81,7 +80,6 @@ class ActionController extends Controller
               <td class="py-1">'. $setNameType .'</td>
               <td class="py-1">'. $row->code .'</td>
               <td class="py-1">'. $row->name .'</td>
-              <td class="py-1">'. $row->weight .'</td>
               <td class="py-1">'. $row->desc .'</td>
             ';
             $tr .= '<td class="py-1">
@@ -195,7 +193,6 @@ class ActionController extends Controller
             $obj->category_id=$req->category;
             $obj->code=$req->code;
             $obj->name=$req->name;
-            $obj->weight=$req->weight;
             $obj->desc=$req->desc;
             if ($req->mode=='EDIT') {
                 $obj->uby=auth()->user()->id;

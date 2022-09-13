@@ -71,7 +71,7 @@
     <div class="modal-dialog modal-fullscreen bwa-modal-fullscreen">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="page-title text-primary">Edit {{ $judul }}</h4>
+          <h4 class="page-title text-primary">{{ $judul }}</h4>
             <div class="float-right">
                 <button type="button" class="btn btn-outline-primary position-relative" id="save" tabindex="-1"><i class="fe fe-save"></i>
                     Simpan</button>

@@ -112,12 +112,6 @@
                                                         </div>
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-3 form-label">Bobot(%)</label>
-                                                        <div class="col-md-9">
-                                                            <input type="number" min="0" max="100" id="tx-weight" name="weight" autocomplete="off" class="form-control form-control-sm mb-2">
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group row row-sm mb-0">
                                                         <label class="col-md-3 form-label">Keterangan</label>
                                                         <div class="col-md-9">
                                                             <textarea type="text" id="tx-desc" name="desc" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
@@ -212,7 +206,6 @@
                     $('#cb-category option[value="'+obj.category_id+'"]').attr("selected", "selected");
                     $('#tx-code').val(obj.code);
                     $('#tx-name').val(obj.name);
-                    $('#tx-weight').val(obj.weight);
                     $('#tx-desc').val(obj.desc);
                 }
             })

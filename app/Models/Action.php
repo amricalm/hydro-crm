@@ -13,5 +13,5 @@ class Action extends Model
     const UPDATED_AT = 'uon';
 
     protected $table = "cr_action";
-    protected $fillable = ['id','code','name','category_id','weight','desc','cby','uby'];
+    protected $fillable = ['id','code','name','category_id','desc','cby','uby'];
 }
