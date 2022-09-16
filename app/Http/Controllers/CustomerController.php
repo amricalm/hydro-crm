@@ -58,9 +58,10 @@ class CustomerController extends Controller
             <th class="py-2">Alamat</th>
             <th class="py-2">Jenis/Tipe Produk</th>
             <th class="py-2">CRO</th>
-            <th class="py-2">Teknisi</th>
-            <th class="py-2">Kunjungan1</th>
-            <th class="py-2">Kunjungan2</th>
+            <th class="py-2">Tanggal</th>
+            <th class="py-2">Teknisi/Sales</th>
+            <th class="py-2">Kunjungan/Penjualan</th>
+            <th class="py-2">Rp</th>
             <th class="py-2" colspan="2" width="5%"></th>
           </tr>
         </thead>
@@ -90,6 +91,22 @@ class CustomerController extends Controller
         foreach ($q as $row) {
             $status = ($row->status==1)?'AKTIF':'TIDAK AKTIF';
             $product_name = ($row->product_name!='') ? $row->product_name : '';
+            $date1 = isset($row->date1) ? Carbon::parse($row->date1)->format('d/m/y') : '';
+            $date2 = isset($row->date2) ? Carbon::parse($row->date2)->format('d/m/y') : '';
+            $date3 = isset($row->date3) ? Carbon::parse($row->date3)->format('d/m/y') : '';
+            $tech1 = str_replace(array("\n", "\r\n"),', ',trim($row->technician1));
+            $tech2 = str_replace(array("\n", "\r\n"),', ',trim($row->technician2));
+            $tech3 = str_replace(array("\n", "\r\n"),', ',trim($row->technician3));
+            $main1 = str_replace(array("\n", "\r\n"),', ',trim($row->maintenance1));
+            $main2 = str_replace(array("\n", "\r\n"),', ',trim($row->maintenance2));
+            $main3 = str_replace(array("\n", "\r\n"),', ',trim($row->maintenance3));
+            $price1 = isset($row->price1) ? $row->price1 : 0;
+            $price2 = isset($row->price2) ? $row->price2 : 0;
+            $price3 = isset($row->price3) ? $row->price3 : 0;
+            $date       = array($date1, $date2, $date3);
+            $technician = array($tech1,$tech2,$tech3);
+            $maintenance= array($main1,$main2,$main3);
+            $sumPrice   = $price1 + $price2 + $price3;
             $tr .= '
             <tr ' . $kelas_baris_akhir .'>
               <input type="hidden" id="customer_id" value="'. $row->id .'">
@@ -100,9 +117,10 @@ class CustomerController extends Controller
               <td class="py-1">'. $row->address .'</td>
               <td class="py-1">'. $row->history .''. $product_name .'</td>
               <td class="py-1">'. $row->sales_name .'</td>
-              <td class="py-1">'. $row->technician .'</td>
-              <td class="py-1">'. $row->maintenance1 .'</td>
-              <td class="py-1">'. $row->maintenance2 .'</td>
+              <td class="py-1">'. implode(', ', array_filter($date)) .'</td>
+              <td class="py-1">'. implode(', ', array_filter($technician)) .'</td>
+              <td class="py-1">'. implode(', ', array_filter($maintenance)) .'</td>
+              <td class="py-1 text-right">'. number_format($sumPrice,0,",",".") .'</td>
 
               <td class="py-1">
                     <button type="button" class="btn bg-info-transparent py-0 px-2 btn-edit"><i class="fe fe-edit"></i></button>
@@ -225,9 +243,18 @@ class CustomerController extends Controller
             $obj->facebook=$req->facebook;
             $obj->instagram=$req->instagram;
             $obj->history=$req->history;
-            $obj->technician=$req->technician;
+            $obj->date1=$req->date1;
+            $obj->date2=$req->date2;
+            $obj->date3=$req->date3;
+            $obj->technician1=$req->technician1;
+            $obj->technician2=$req->technician2;
+            $obj->technician3=$req->technician3;
             $obj->maintenance1=$req->maintenance1;
             $obj->maintenance2=$req->maintenance2;
+            $obj->maintenance3=$req->maintenance3;
+            $obj->price1=$req->price1;
+            $obj->price2=$req->price2;
+            $obj->price3=$req->price3;
             $obj->status=!($req->aktif);
             if ($req->mode=='EDIT') {
                 $obj->uby=auth()->user()->id;

@@ -100,101 +100,173 @@
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-body">
-                                <div class="row row-sm">
-                                    <div class="col-lg-6 col-md-12">
-                                        <form class="" id='trn'>
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-3 form-label">Nama Lengkap</label>
-                                                        <div class="col-md-9" id="div-id">
-                                                            <input type="text" id="tx-name" name="name" autocomplete="off" class="form-control form-control-sm mb-2">
-                                                        </div>
+                                <form class="" id='trn'>
+                                <div class="row">
+                                    <div class="col-xl-6 col-lg-12 col-md-12 col-sm-12">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h3 class="card-title">Data Pelanggan</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="form-group row row-sm mb-0">
+                                                    <label class="col-md-3 form-label">Nama Lengkap</label>
+                                                    <div class="col-md-9" id="div-id">
+                                                        <input type="text" id="tx-name" name="name" autocomplete="off" class="form-control form-control-sm mb-2">
                                                     </div>
-                                                    <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-3 form-label">Alamat</label>
-                                                        <div class="col-md-9">
-                                                            <textarea type="text" id="tx-address" name="address" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
-                                                        </div>
+                                                </div>
+                                                <div class="form-group row row-sm mb-0">
+                                                    <label class="col-md-3 form-label">Alamat</label>
+                                                    <div class="col-md-9">
+                                                        <textarea type="text" id="tx-address" name="address" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
                                                     </div>
-                                                    <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-3 form-label">HP</label>
-                                                        <div class="col-md-9">
-                                                            <input type="text" id="tx-hp" name="hp" autocomplete="off" class="form-control form-control-sm mb-2">
-                                                        </div>
+                                                </div>
+                                                <div class="form-group row row-sm mb-0">
+                                                    <label class="col-md-3 form-label">HP</label>
+                                                    <div class="col-md-9">
+                                                        <input type="text" id="tx-hp" name="hp" autocomplete="off" class="form-control form-control-sm mb-2">
                                                     </div>
-                                                    <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-3 form-label">Email</label>
-                                                        <div class="col-md-9">
-                                                            <input type="text" id="tx-email" name="email" autocomplete="off" class="form-control form-control-sm mb-2">
-                                                        </div>
+                                                </div>
+                                                <div class="form-group row row-sm mb-0">
+                                                    <label class="col-md-3 form-label">Email</label>
+                                                    <div class="col-md-9">
+                                                        <input type="text" id="tx-email" name="email" autocomplete="off" class="form-control form-control-sm mb-2">
                                                     </div>
-                                                    <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-3 form-label">Facebook</label>
-                                                        <div class="col-md-9">
-                                                            <input type="text" id="tx-facebook" name="facebook" autocomplete="off" class="form-control form-control-sm mb-2">
-                                                        </div>
+                                                </div>
+                                                <div class="form-group row row-sm mb-0">
+                                                    <label class="col-md-3 form-label">Facebook</label>
+                                                    <div class="col-md-9">
+                                                        <input type="text" id="tx-facebook" name="facebook" autocomplete="off" class="form-control form-control-sm mb-2">
                                                     </div>
-                                                    <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-3 form-label">Instagram</label>
-                                                        <div class="col-md-9">
-                                                            <input type="text" id="tx-instagram" name="instagram" autocomplete="off" class="form-control form-control-sm mb-2">
-                                                        </div>
+                                                </div>
+                                                <div class="form-group row row-sm mb-0">
+                                                    <label class="col-md-3 form-label">Instagram</label>
+                                                    <div class="col-md-9">
+                                                        <input type="text" id="tx-instagram" name="instagram" autocomplete="off" class="form-control form-control-sm mb-2">
                                                     </div>
-                                                    <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-3 form-label">Jenis/Tipe Produk</label>
-                                                        <div class="col-md-9">
-                                                            <textarea id="tx-history" rows="4" name="history" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
-                                                        </div>
+                                                </div>
+                                                <div class="form-group row row-sm mb-0">
+                                                    <label class="col-md-3 form-label">Jenis/Tipe Produk</label>
+                                                    <div class="col-md-9">
+                                                        <textarea id="tx-history" rows="4" name="history" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
                                                     </div>
-                                                    <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-3 form-label">CRO Owner</label>
-                                                        <div class="col-md-9">
-                                                            <select name="sales" id="cb-sales" class="form-select form-control form-control-sm mb-2" tabindex="10">
-                                                                @if($roleName == 'ADMIN')
-                                                                <option value="">-- Pilih CRO --</option>
-                                                                @endif
-                                                                @foreach($karyawan as $item)
-                                                                <option value="{{$item->id}}">{{$item->name}}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
+                                                </div>
+                                                <div class="form-group row row-sm mb-0">
+                                                    <label class="col-md-3 form-label">CRO Owner</label>
+                                                    <div class="col-md-9">
+                                                        <select name="sales" id="cb-sales" class="form-select form-control form-control-sm mb-2" tabindex="10">
+                                                            @if($roleName == 'ADMIN')
+                                                            <option value="">-- Pilih CRO --</option>
+                                                            @endif
+                                                            @foreach($karyawan as $item)
+                                                            <option value="{{$item->id}}">{{$item->name}}</option>
+                                                            @endforeach
+                                                        </select>
                                                     </div>
-                                                    <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-3 form-label">Teknisi</label>
-                                                        <div class="col-md-9">
-                                                            <textarea id="tx-technician" rows="4" name="technician" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-3 form-label">Kunjungan 1</label>
-                                                        <div class="col-md-9">
-                                                            <textarea id="tx-maintenance1" rows="4" name="maintenance1" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-3 form-label">Kunjungan 2</label>
-                                                        <div class="col-md-9">
-                                                            <textarea id="tx-maintenance2" rows="4" name="maintenance2" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-3 form-label">
+                                                </div>
+                                                <div class="form-group row row-sm mb-0">
+                                                    <label class="col-md-8 form-label">
+                                                    </label>
+                                                    <div class="col-md-9 col-auto">
+                                                        <label class="custom-control custom-checkbox">
+                                                            <input type="checkbox" class="custom-control-input" id="chk-aktif" name="aktif" tabindex="19">
+                                                            <span class="custom-control-label">Tidak Aktif</span>
                                                         </label>
-                                                        <div class="col-md-9 col-auto">
-                                                            <label class="custom-control custom-checkbox">
-                                                                <input type="checkbox" class="custom-control-input" id="chk-aktif" name="aktif" tabindex="19">
-                                                                <span class="custom-control-label">Tidak Aktif</span>
-                                                            </label>
-                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </form><!-- END Form -->
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-12 col-md-12 col-sm-12">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h3 class="card-title">History Pelanggan</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="form-group row row-sm mb-0">
+                                                    <label class="col-md-4 form-label">Tanggal</label>
+                                                    <div class="col-md-8">
+                                                        <input type="date" name="date1" id="tx-date1" autocomplete="off" class="form-control  form-control-sm  mb-2">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row row-sm mb-0">
+                                                    <label class="col-md-4 form-label">Nama Teknisi/Sales</label>
+                                                    <div class="col-md-8">
+                                                        <textarea id="tx-technician1" rows="4" name="technician1" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row row-sm mb-0">
+                                                    <label class="col-md-4 form-label">Kunjungan/Penjualan</label>
+                                                    <div class="col-md-8">
+                                                        <textarea id="tx-maintenance1" rows="4" name="maintenance1" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row row-sm mb-0">
+                                                    <label class="col-md-4 form-label">Closing (Rp)</label>
+                                                    <div class="col-md-8">
+                                                        <input type="number" name="price1" id="tx-price1" autocomplete="off" class="form-control form-control-sm mb-2">
+                                                    </div>
+                                                </div>
+                                                <hr class="border-info mt-4 mb-4">
+                                                <div class="form-group row row-sm mb-0">
+                                                    <label class="col-md-4 form-label">Tanggal</label>
+                                                    <div class="col-md-8">
+                                                        <input type="date" name="date2" id="tx-date2" autocomplete="off" class="form-control  form-control-sm  mb-2">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row row-sm mb-0">
+                                                    <label class="col-md-4 form-label">Nama Teknisi/Sales</label>
+                                                    <div class="col-md-8">
+                                                        <textarea id="tx-technician2" rows="4" name="technician2" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row row-sm mb-0">
+                                                    <label class="col-md-4 form-label">Kunjungan/Penjualan</label>
+                                                    <div class="col-md-8">
+                                                        <textarea id="tx-maintenance2" rows="4" name="maintenance2" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row row-sm mb-0">
+                                                    <label class="col-md-4 form-label">Closing (Rp)</label>
+                                                    <div class="col-md-8">
+                                                        <input type="number" name="price2" id="tx-price2" autocomplete="off" class="form-control form-control-sm mb-2">
+                                                    </div>
+                                                </div>
+                                                <hr class="border-info mt-4 mb-4">
+                                                <div class="form-group row row-sm mb-0">
+                                                    <label class="col-md-4 form-label">Tanggal</label>
+                                                    <div class="col-md-8">
+                                                        <input type="date" name="date3" id="tx-date3" autocomplete="off" class="form-control  form-control-sm  mb-2">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row row-sm mb-0">
+                                                    <label class="col-md-4 form-label">Nama Teknisi/Sales</label>
+                                                    <div class="col-md-8">
+                                                        <textarea id="tx-technician3" rows="4" name="technician3" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row row-sm mb-0">
+                                                    <label class="col-md-4 form-label">Kunjungan/Penjualan</label>
+                                                    <div class="col-md-8">
+                                                        <textarea id="tx-maintenance3" rows="4" name="maintenance3" autocomplete="off" class="form-control form-control-sm mb-2"></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row row-sm mb-0">
+                                                    <label class="col-md-4 form-label">Closing (Rp)</label>
+                                                    <div class="col-md-8">
+                                                        <input type="number" name="price3" id="tx-price3" autocomplete="off" class="form-control form-control-sm mb-2">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card-footer">
+                                                <div class="row">
+                                                    <div class="col-md-4"><h3 class="card-title">Total Closing</h3></div>
+                                                    <div class="col-md-8" id="total-price"></div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-
-                            </div>
+                                </form><!-- END Form -->
                             </div>
                         </div>
                     </div>
@@ -202,6 +274,7 @@
                 <!-- End Row -->
             </div>
         </div>
+      </div>
     </div>
 </div>
 <!--#endregion === Modal=== -->
@@ -389,6 +462,7 @@
                 success:function(data){
                     var obj = data[0];
                     var input = document.createElement("input");
+                    var total = Number(obj.price1) + Number(obj.price2) + Number(obj.price3);
                     input.setAttribute("type", "hidden");
                     input.setAttribute("name", "id");
                     input.setAttribute("value", obj.id);
@@ -401,9 +475,20 @@
                     $('#tx-instagram').val(obj.instagram);
                     $('#tx-history').val(obj.history);
                     $('#cb-sales option[value="'+obj.eid+'"]').attr("selected", "selected");
-                    $('#tx-technician').val(obj.technician);
+                    $('#tx-date1').val(obj.date1);
+                    $('#tx-date2').val(obj.date2);
+                    $('#tx-date3').val(obj.date3);
+                    $('#tx-technician1').val(obj.technician1);
+                    $('#tx-technician2').val(obj.technician2);
+                    $('#tx-technician3').val(obj.technician3);
                     $('#tx-maintenance1').val(obj.maintenance1);
                     $('#tx-maintenance2').val(obj.maintenance2);
+                    $('#tx-maintenance3').val(obj.maintenance3);
+                    $('#tx-price1').val(obj.price1);
+                    $('#tx-price2').val(obj.price2);
+                    $('#tx-price3').val(obj.price3);
+                    var tot = new Intl.NumberFormat("id-ID", {style: "currency",currency: "IDR"}).format(total);
+                    $("#total-price").append("<h3 class='card-title'>"+tot+"</h3>");
                     $('#chk-aktif').prop('checked', !(Boolean(obj.status)));
                 }
             })
@@ -428,6 +513,7 @@
             var frm = document.querySelector("#trn");
             frm.reset();
             $('#cb-sales option').removeAttr("selected", "selected");
+            $('#total-price').empty();
             var status = $('#pilih-status').val();
             var employe = $('#cb-sales').val();
             var search = $('#tx-search').val();
@@ -447,6 +533,7 @@
             var frm = document.querySelector("#trn");
             frm.reset();
             $('#cb-sales option').removeAttr("selected", "selected");
+            $('#total-price').empty();
         });
 
         $('#batalImport').click(function () {
@@ -484,6 +571,7 @@
                                     alert('Sukses.');
                                     $('#trn').trigger("reset");
                                     $('#cb-sales option').removeAttr("selected", "selected");
+                                    $('#total-price').empty();
                                     if(obj[0] == 'EDIT') {
                                         $('#add-modal').hide();
                                         window.location.reload();

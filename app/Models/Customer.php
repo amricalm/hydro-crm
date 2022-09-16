@@ -15,7 +15,7 @@ class Customer extends Model
     const UPDATED_AT = 'uon';
 
     protected $table = "aa_customer";
-    protected $fillable = ['name','address','province','city','zip_code','hp','email','facebook','instagram','sales_owner','status','history','technician','maintenance1','maintenance2','cby','uby'];
+    protected $fillable = ['name','address','province','city','zip_code','hp','email','facebook','instagram','sales_owner','status','history','date1','date2','date3','technician1','technician2','technician3','maintenance1','maintenance2','maintenance3','price1','price2','price3','cby','uby'];
 
     public static function getCustomerName($id='')
     {
@@ -32,7 +32,7 @@ class Customer extends Model
     public static function getCustomer($employe='',$status='',$search='')
     {
         $q = DB::table('aa_customer AS cus')
-            ->selectRaw('cus.id, cus.name, cus.hp, cus.address, cus.email, cus.facebook, cus.instagram, cus.history, pr.name AS product_name, cus.status, emp.id AS sales_id, emp.name as sales_name, cus.technician, cus.maintenance1, cus.maintenance2')
+            ->selectRaw('cus.id, cus.name, cus.hp, cus.address, cus.email, cus.facebook, cus.instagram, cus.history, pr.name AS product_name, cus.status, emp.id AS sales_id, emp.name as sales_name, cus.date1, cus.date2, cus.date3, cus.technician1, cus.technician2, cus.technician3, cus.maintenance1, cus.maintenance2, cus.maintenance3, cus.price1, cus.price2, cus.price3')
             ->leftJoin('cr_sales_owner AS so', function($join)
                 {
                     $join->on('cus.id', '=', 'so.cid');
