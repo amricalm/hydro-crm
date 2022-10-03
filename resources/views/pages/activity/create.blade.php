@@ -127,7 +127,7 @@
                                             <div class="row">
                                                 <div class="col-md-4">
                                                     <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-4 form-label">Tanggal</label>
+                                                        <label class="col-md-4 form-label">Tanggal Transaksi</label>
                                                         <div class="col-md-8">
                                                             <input type="date" name="date1" id="date1" autocomplete="off" class="form-control  form-control-sm  mb-2">
                                                         </div>
@@ -145,7 +145,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-4 form-label">Closing (Rp)</label>
+                                                        <label class="col-md-4 form-label">Nominal Closing (Rp)</label>
                                                         <div class="col-md-8">
                                                             <input type="number" name="price1" id="price1" autocomplete="off" class="form-control form-control-sm mb-2">
                                                         </div>
@@ -153,7 +153,7 @@
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-4 form-label">Tanggal</label>
+                                                        <label class="col-md-4 form-label">Tanggal Transaksi</label>
                                                         <div class="col-md-8">
                                                             <input type="date" name="date2" id="date2" autocomplete="off" class="form-control  form-control-sm  mb-2">
                                                         </div>
@@ -171,7 +171,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-4 form-label">Closing (Rp)</label>
+                                                        <label class="col-md-4 form-label">Nominal Closing (Rp)</label>
                                                         <div class="col-md-8">
                                                             <input type="number" name="price2" id="price2" autocomplete="off" class="form-control form-control-sm mb-2">
                                                         </div>
@@ -179,7 +179,7 @@
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-4 form-label">Tanggal</label>
+                                                        <label class="col-md-4 form-label">Tanggal Transaksi</label>
                                                         <div class="col-md-8">
                                                             <input type="date" name="date3" id="date3" autocomplete="off" class="form-control  form-control-sm  mb-2">
                                                         </div>
@@ -197,7 +197,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="form-group row row-sm mb-0">
-                                                        <label class="col-md-4 form-label">Closing (Rp)</label>
+                                                        <label class="col-md-4 form-label">Nominal Closing (Rp)</label>
                                                         <div class="col-md-8">
                                                             <input type="number" name="price3" id="price3" autocomplete="off" class="form-control form-control-sm mb-2">
                                                         </div>

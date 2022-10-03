@@ -58,10 +58,10 @@ class CustomerController extends Controller
             <th class="py-2">Alamat</th>
             <th class="py-2">Jenis/Tipe Produk</th>
             <th class="py-2">CRO</th>
-            <th class="py-2">Tanggal</th>
-            <th class="py-2">Teknisi/Sales</th>
-            <th class="py-2">Kunjungan/Penjualan</th>
-            <th class="py-2">Rp</th>
+            <th class="py-2">Tanggal Transaksi</th>
+            <th class="py-2">Teknisi/ Sales</th>
+            <th class="py-2">Kunjungan/ Penjualan</th>
+            <th class="py-2">Nominal Closing (Rp)</th>
             <th class="py-2" colspan="2" width="5%"></th>
           </tr>
         </thead>
