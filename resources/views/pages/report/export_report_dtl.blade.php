@@ -13,6 +13,7 @@
             <th>Instagram</th>
             <th>Jenis/Tipe Produk</th>
             <th>CRO</th>
+            <th>Total Closing</th>
             <th>Tanggal Transaksi 1</th>
             <th>Teknisi/Sales 1</th>
             <th>Kunjungan/Penjualan 1</th>
@@ -43,6 +44,7 @@
                 <td>{{ $row->instagram }}</td>
                 <td>{{ $row->history }}</td>
                 <td>{{ $row->sales }}</td>
+                <td>{{ $row->total!=0 ? $row->total : '' }}</td>
                 <td>{{ $row->date1!='' ? Date("d/m/Y",strtotime(str_replace('-"', '/', $row->date1))) : '' }}</td>
                 <td>{{ $row->technician1 }}</td>
                 <td>{{ $row->maintenance1 }}</td>

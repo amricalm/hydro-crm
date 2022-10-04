@@ -32,7 +32,7 @@ class Customer extends Model
     public static function getCustomer($employe='',$status='',$search='')
     {
         $q = DB::table('aa_customer AS cus')
-            ->selectRaw('cus.id, cus.name, cus.hp, cus.address, cus.email, cus.facebook, cus.instagram, cus.history, pr.name AS product_name, cus.status, emp.id AS sales_id, emp.name as sales_name, cus.date1, cus.date2, cus.date3, cus.technician1, cus.technician2, cus.technician3, cus.maintenance1, cus.maintenance2, cus.maintenance3, cus.price1, cus.price2, cus.price3')
+            ->selectRaw('cus.id, cus.name, cus.hp, cus.address, cus.email, cus.facebook, cus.instagram, cus.history, pr.name AS product_name, cus.status, emp.id AS sales_id, emp.name as sales_name, cus.date1, cus.date2, cus.date3, cus.technician1, cus.technician2, cus.technician3, cus.maintenance1, cus.maintenance2, cus.maintenance3, cus.price1, cus.price2, cus.price3, IFNULL(price1, 0) + IFNULL(price2, 0) + IFNULL(price3, 0) AS total')
             ->leftJoin('cr_sales_owner AS so', function($join)
                 {
                     $join->on('cus.id', '=', 'so.cid');
@@ -41,7 +41,8 @@ class Customer extends Model
             ->leftJoin('aa_employe AS emp','so.eid','=','emp.id')
             ->leftJoin('cr_saleing AS sl','cus.id','=','sl.customer_id')
             ->leftJoin('cr_product AS pr','sl.product_id','=','pr.id')
-            ->where('cus.status', $status);
+            ->where('cus.status', $status)
+            ->orderBy('cus.name','ASC');
 
             if($employe == '') { //Jika sales tidak dipilih
                 $q =  $q->whereNotIn('cus.id',
