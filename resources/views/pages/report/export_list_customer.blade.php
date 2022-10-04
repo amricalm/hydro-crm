@@ -25,7 +25,9 @@
         </tr>
     </thead>
         <tbody>
-        @php $no = 1; @endphp
+        @php
+            $no = 1;
+        @endphp
         @foreach ($allData as $row)
             <tr>
                 <td>{{ $no }}</td>
@@ -37,18 +39,18 @@
                 <td>{{ $row->instagram }}</td>
                 <td>{{ $row->history }}</td>
                 <td>{{ $row->sales_name }}</td>
-                <td>{{ $row->date1 }}</td>
+                <td>{{ $row->date1!='' ? Date("d/m/Y",strtotime(str_replace('-"', '/', $row->date1))) : '' }}</td>
                 <td>{{ $row->technician1 }}</td>
                 <td>{{ $row->maintenance1 }}</td>
-                <td>{{ $row->price1 }}</td>
-                <td>{{ $row->date2 }}</td>
+                <td>{{ $row->price1!='' ? $row->price1 : '' }}</td>
+                <td>{{ $row->date2!='' ? Date("d/m/Y",strtotime(str_replace('-"', '/', $row->date2))) : '' }}</td>
                 <td>{{ $row->technician2 }}</td>
                 <td>{{ $row->maintenance2 }}</td>
-                <td>{{ $row->price2 }}</td>
-                <td>{{ $row->date3 }}</td>
+                <td>{{ $row->price2!='' ? $row->price2 : '' }}</td>
+                <td>{{ $row->date3!='' ? Date("d/m/Y",strtotime(str_replace('-"', '/', $row->date3))) : '' }}</td>
                 <td>{{ $row->technician3 }}</td>
                 <td>{{ $row->maintenance3 }}</td>
-                <td>{{ $row->price3 }}</td>
+                <td>{{ $row->price3!='' ? $row->price3 : '' }}</td>
             </tr>
             @php $no++; @endphp
         @endforeach

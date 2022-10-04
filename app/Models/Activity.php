@@ -42,7 +42,7 @@ class Activity extends Model
     {
         $qrySales       = Employe::selectRaw('aa_employe.id, aa_employe.name')->leftJoin('cr_activity','aa_employe.id','=','cr_activity.sales_id')->groupBy('aa_employe.id');
         $q = DB::table('cr_activity_dtl AS dtl')
-            ->selectRaw('act.id, act.date, cus.name AS name, cus.hp AS hp, GROUP_CONCAT(acn.name) AS action, GROUP_CONCAT(res.name) AS response, sls.name AS sales')
+            ->selectRaw('act.id, act.date, cus.name AS name, cus.hp AS hp, cus.address, cus.email, cus.facebook, cus.instagram, cus.history, GROUP_CONCAT(acn.name) AS action, GROUP_CONCAT(res.name) AS response, sls.name AS sales, cus.date1, cus.date2, cus.date3, cus.technician1, cus.technician2, cus.technician3, cus.maintenance1, cus.maintenance2, cus.maintenance3, cus.price1, cus.price2, cus.price3')
             ->leftJoin('cr_activity AS act','dtl.activity_id','=','act.id')
             ->leftJoin('aa_customer AS cus','act.customer_id','=','cus.id')
             ->leftJoin(DB::raw('('.$qrySales->toSql().') as sls'),'act.sales_id','=','sls.id')

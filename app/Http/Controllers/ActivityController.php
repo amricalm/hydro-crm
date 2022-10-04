@@ -41,7 +41,7 @@ class ActivityController extends Controller
         $app['actionId']    = (isset($_GET['actionId'])&&$_GET['actionId']!='') ? $_GET['actionId'] : '';
         $hour               = (isset($_GET['time'])&&$_GET['time']!='') ? $_GET['time'] : '';
         $app['time']        = $hour!='' ? (sprintf("%02d", $hour).':00') : '';
-        // dd($hour,$app['time']);
+        
         $app['roleName']    = $this->general->role_name();
         if ($app['roleName'] == 'ADMIN') {
             $app['sales']   = DB::table('aa_employe')->get()->toArray();
