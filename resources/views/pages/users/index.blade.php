@@ -218,7 +218,7 @@
                     input.setAttribute("value", obj.id);
                     document.getElementById("div-id").appendChild(input);
 
-                    $('#cb-name option[value="'+obj.name+'"]').attr("selected", "selected");
+                    $('#cb-name option[value="'+obj.id+'"]').attr("selected", "selected");
                     $('#tx-email').val(obj.email);
                     // $('#tx-password').val(obj.password);
                     $('#tx-password').remove();
